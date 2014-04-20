@@ -35,7 +35,7 @@
 
     // ∑ - sum over data from ... to ... of func
     function summation(data, func) {
-        return f.reduce(data, f.compose(exports.addition, func || f.returnValue, f.returnValue), 0);
+        return f.reduce(data, f.compose(addition, func || f.returnValue, f.returnValue), 0);
     };
 
     var exports = {};
