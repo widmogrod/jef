@@ -5,7 +5,8 @@
   "main": "functional.js",
   "dependencies": {},
   "devDependencies": {
-    "mocha": "~1.18.2"
+    "mocha": "~1.18.2",
+    "should": "^3.3.1"
   },
   "scripts": {
     "test": "mocha"
