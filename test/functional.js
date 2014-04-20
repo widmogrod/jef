@@ -160,22 +160,22 @@ describe('Functional', function(){
     describe('#curry()', function(){
         it('should return function when function with zero argument is passed', function(){
             var result = f.curry(function(){});
-            result.should.be.a('function');
+            result.should.be.type('function');
         })
         it('should return function when function with one argument is passed', function(){
             var result = f.curry(function(a){ return a + 1 });
-            result.should.be.a('function');
+            result.should.be.type('function');
             result(1).should.be.eql(2);
         })
         it('should return function when function with two arguments is passed', function(){
             var result = f.curry(function(a, b){ return a + b });
-            result.should.be.a('function');
+            result.should.be.type('function');
             result(1,2).should.be.eql(3);
             result(1)(2).should.be.eql(3);
         })
         it('should return function when function with tree arguments is passed', function(){
             var result = f.curry(function(a, b, c){ return a + b + c });
-            result.should.be.a('function');
+            result.should.be.type('function');
             result(1, 2, 3).should.be.eql(6);
             result(1, 2)(3).should.be.eql(6);
             result(1)(2, 3).should.be.eql(6);
@@ -183,7 +183,7 @@ describe('Functional', function(){
         })
         it('should hold context of previous arguments', function(){
             var result = f.curry(function(a, b, c){ return a + b + c });
-            result.should.be.a('function');
+            result.should.be.type('function');
 
             var addOne = result(1);
             var addTwo = addOne(2);
@@ -193,7 +193,7 @@ describe('Functional', function(){
         })
         it('should return array when function with one argument is passed', function(){
             var result = f.curry(function(a){ return a });
-            result.should.be.a('function');
+            result.should.be.type('function');
             result([1]).should.be.eql([1]);
             result([1,2]).should.be.eql([1,2]);
         })
@@ -206,7 +206,7 @@ describe('Functional', function(){
                 return +a + 1;
             });
 
-            result.should.be.a('function');
+            result.should.be.type('function');
             result(2).should.be.eql(3);
         })
     })
@@ -237,7 +237,7 @@ describe('Functional', function(){
     describe('#get()', function(){
         it('should return function when arguments is passed', function(){
             var func = f.get('name');
-            func.should.be.a('function');
+            func.should.be.type('function');
         })
         it('should return value when arguments is passed and function is invoked on object', function(){
             var obj = {name: 'test'};
@@ -318,7 +318,7 @@ describe('Functional', function(){
                 test += 1;
                 return test;
             });
-            func.should.be.a('function');
+            func.should.be.type('function');
             func().should.be.eql(1);
             func().should.be.eql(1);
         })
@@ -328,7 +328,7 @@ describe('Functional', function(){
                 test += 1;
                 return test;
             });
-            func.should.be.a('function');
+            func.should.be.type('function');
             func(null, [1,2,[3]], {test: function(){}}).should.be.eql(1);
             func(null, [1,2,[3]], {test: function(){}}).should.be.eql(1);
         })
