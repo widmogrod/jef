@@ -9,6 +9,9 @@
 })(this, function() {
     'use strict';
 
+    /**
+     * Base function for storing, retrieving variables
+     */
     function value(v) {
         return function(set) {
             if (arguments.length) {
