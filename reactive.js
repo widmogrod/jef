@@ -4,7 +4,8 @@
     } else if (typeof define === 'function' && define.amd) { // Require.JS
         define(factory);
     } else { // Browser globals
-        factory();
+        root.jef = root.jef || {};
+        root.jef.reactive = factory();
     }
 })(this, function() {
     'use strict';
