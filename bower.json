@@ -1,0 +1,22 @@
+{
+  "name": "jef",
+  "version": "0.1.0",
+  "homepage": "https://github.com/widmogrod/jef",
+  "authors": [
+    "widmogrod <widmogrod@gmail.com>"
+  ],
+  "description": "JavaScript experimental functions",
+  "keywords": [
+    "functional",
+    "reactive",
+    "experiments"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
