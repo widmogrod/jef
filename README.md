@@ -1,4 +1,4 @@
-jef ![Build Status](https://travis-ci.org/widmogrod/jef.svg?branch=master)](https://travis-ci.org/widmogrod/jef)
+jef [![Build Status](https://travis-ci.org/widmogrod/jef.svg?branch=master)](https://travis-ci.org/widmogrod/jef)
 ---
 
 Description
