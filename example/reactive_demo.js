@@ -7,8 +7,8 @@
     } else if (typeof define === 'function' && define.amd) { // Require.JS
         define(['jef/functional', 'jef/reactive'], factory);
     } else {  // Browser globals
-        root.jef = root.jef || {};
-        root.jef.mathematical = factory(
+        root.jefdemo = root.jefdemo || {};
+        root.jefdemo.reactive_demo = factory(
             root.jef.functional,
             root.jef.reactive
         );
