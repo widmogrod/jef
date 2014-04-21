@@ -28,7 +28,7 @@
     return {
         main: function(element, document) {
 
-            var value, key, vars = root;
+            var value, key, vars = root, funcs = {};
             var names = '#ABCDEFGHIJ';
             var tr, td, label, result, input;
             var cols = 5;
@@ -71,19 +71,24 @@
                         return function() {
                             if (this.value > 0) {
                                 vars[key](this.value);
+                            } else if(!this.value) {
+                                vars[key](null);
                             } else {
                                 // extract variables that must be observed
                                 var funcName = this.value.replace('=','');
-                                var v = funcName.match(/\w\d/g);
-                                var b = 'with(vars) { value(' + funcName + ') }';
-                                var fn = new Function('vars', 'value', b);
-                                fn = fn.bind(fn, vars, vars[key]);
+                                var args = funcName.match(/\w\d/g);
+                                var body = 'with(vars) { value(' + funcName + ') }';
+                                var func = new Function('vars', 'value', body);
+                                // func = func.bind(func, vars, vars[key]);
+                                funcs[key] = func;
 
-                                f.each(v, function(name) {
-                                    vars[name] = r.observable(vars[name], fn);
+                                f.each(args, function(name) {
+                                    vars[name] = r.observable(vars[name], function() {
+                                        if (key in funcs) funcs[key](vars, vars[key]);
+                                    });
                                 });
 
-                                fn();
+                                func(vars, vars[key]);
                             }
                         }
                     })(value, result, key);
