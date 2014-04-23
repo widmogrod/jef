@@ -30,7 +30,7 @@
             'functions',
             'variables',
             'value',
-            'console.log(arguments); value(functions["' + name + '"](variables["'+ args.join('"], variables["') +'"]))'
+            'value(functions["' + name + '"](variables["'+ args.join('"], variables["') +'"]))'
         );
     }
 
