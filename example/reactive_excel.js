@@ -10,40 +10,64 @@
         root.jefdemo = root.jefdemo || {};
         root.jefdemo.reactive_excel = factory(
             root.jef.functional,
-            root.jef.reactive,
-            root
+            root.jef.reactive
         );
     }
-})(this, function(f, r, root){
+})(this, function(f, r){
     'use strict';
 
-    root.node_set_text = function(node, value) {
+    function node_set_text(node, value) {
         node.innerText = value();
     }
-
-    root.ADD = function (a, b) {
-       return parseInt(a()) + parseInt(b());
+    function extract_function_name(value) {
+        return value.match(/[a-z]+/i)[0].toUpperCase();
+    }
+    function extract_function_arguments(value) {
+        return value.match(/[a-z]{1,2}[0-9]{1,2}/ig) || [];
+    }
+    function build_excel_function(name, args) {
+        return new Function(
+            'functions',
+            'variables',
+            'value',
+            'console.log(arguments); value(functions["' + name + '"](variables["'+ args.join('"], variables["') +'"]))'
+        );
     }
 
+    function merge(a, b) {
+        var r = {};
+        f.each(a, function(value, key) {
+            r[key] = (key in b) ? b[key] : value
+        });
+        return r;
+    }
+
+    var baseOptions = {
+        functions: {},
+        columns: '#ABCDEFGHIJ',
+        rows: 5
+    };
+
     return {
-        main: function(element, document) {
+        main: function(element, document, options) {
+            options = merge(baseOptions, options);
 
-            var value, key, vars = root, funcs = {};
-            var names = '#ABCDEFGHIJ';
-            var tr, td, label, result, input;
-            var cols = 5;
-            var rows = 5;
+            var tr, td, label, result, input, cellName,
+                sharedVariables = {},
+                sharedFunctions = {},
+                cols = options.columns.length,
+                rows = options.rows;
 
-            // columns
+            // Build columns
             tr = document.createElement('tr');
             for (var j = 0; j < cols; j++) {
                 td = document.createElement('td');
-                td.innerText = names.charAt(j);
+                td.innerText = options.columns.charAt(j);
                 tr.appendChild(td);
             }
             element.appendChild(tr);
 
-            // rows
+            // Build rows
             for (var i = 1; i < rows; i++) {
                 tr = document.createElement('tr');
 
@@ -51,7 +75,7 @@
                 td.innerText = i;
                 tr.appendChild(td);
 
-
+                // Build cells
                 for (var j = 1; j < cols; j++) {
                     td = document.createElement('td');
                     input = document.createElement('input');
@@ -61,37 +85,34 @@
                     td.appendChild(result);
                     tr.appendChild(td);
 
-                    value = r.value(i.j)
-                    value = r.observable(value, node_set_text.bind(null, result, value));
+                    cellName = options.columns.charAt(j) + i;
+                    sharedVariables[cellName] = r.value(cellName)
+                    sharedVariables[cellName] = r.observable(sharedVariables[cellName], node_set_text.bind(null, result, sharedVariables[cellName]));
 
-                    key = names.charAt(j) + i;
-                    vars[key] = value;
-
-                    input.onchange = (function(value, result, key) {
+                    input.onchange = (function(cellName) {
                         return function() {
                             if (this.value > 0) {
-                                vars[key](this.value);
+                                sharedVariables[cellName](this.value);
                             } else if(!this.value) {
-                                vars[key](null);
+                                sharedVariables[cellName](null);
                             } else {
-                                // extract variables that must be observed
-                                var funcName = this.value.replace('=','');
-                                var args = funcName.match(/\w\d/g);
-                                var body = 'with(vars) { value(' + funcName + ') }';
-                                var func = new Function('vars', 'value', body);
-                                // func = func.bind(func, vars, vars[key]);
-                                funcs[key] = func;
+                                sharedFunctions[cellName] = build_excel_function(
+                                    extract_function_name(this.value),
+                                    extract_function_arguments(this.value)
+                                );
 
-                                f.each(args, function(name) {
-                                    vars[name] = r.observable(vars[name], function() {
-                                        if (key in funcs) funcs[key](vars, vars[key]);
+                                f.each(extract_function_arguments(this.value), function(variableName) {
+                                    sharedVariables[variableName] = r.observable(sharedVariables[variableName], function() {
+                                        if (cellName in sharedFunctions) {
+                                            sharedFunctions[cellName](options.functions, sharedVariables, sharedVariables[cellName]);
+                                        }
                                     });
                                 });
 
-                                func(vars, vars[key]);
+                                sharedFunctions[cellName](options.functions, sharedVariables, sharedVariables[cellName]);
                             }
                         }
-                    })(value, result, key);
+                    })(cellName);
                 }
                 element.appendChild(tr);
             }

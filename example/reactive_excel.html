@@ -57,10 +57,20 @@
     <p>INFO: Right now only one demonstrating function is implemented - ADD. Write in cell i.e. <b>ADD(A1, B1)</b></p>
     <table id="excel"></table>
     <script>
+
+        var options = {
+            functions: {
+                ADD: function (a, b) {
+                    return parseInt(a()) + parseInt(b());
+                }
+            }
+        };
+
         jefdemo.reactive_excel.main(
             document.getElementById('excel'),
-            document
+            document,
+            options
         );
     </script>
-</body>
-</html>
+    </body>
+    </html>
