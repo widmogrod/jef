@@ -11,7 +11,7 @@
             root.jef.events
         );
     }
-})(this, function(events, f) {
+})(this, function(events) {
     'use strict';
 
     function stream(options) {
