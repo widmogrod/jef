@@ -199,7 +199,7 @@
 
     /**
      * Apply on list of arguments function but
-     * arguments passed to function are each element from
+     * arguments passed to function are taken by index
      *
      * Example:
      * applyc(multiply, [2,3], [4,5]) -> [8, 15]
@@ -218,11 +218,10 @@
     }
 
     /**
-     * Apply arguments to function
+     * For each element form invoke method with arguments
      *
      * Examples:
-     * invoke(addition, [1,2]) -> 3
-     * invoke(addition, [1,2], [2,3]) -> [3, 5]
+     * invoke([{add: add1}, {add:add2}], add, [1]) -> [1, 2]
      */
     function invoke(list, method, args) {
         list = first(slice(arguments, 0, 1));
