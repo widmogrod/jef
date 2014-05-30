@@ -1,6 +1,6 @@
 (function(root, factory) {
     if (typeof exports === 'object') { // Node.js
-        module.exports.events = factory();
+        module.exports = factory();
     } else if (typeof define === 'function' && define.amd) { // Require.JS
         define(factory);
     } else { // Browser globals
@@ -28,12 +28,16 @@
 
         return this;
     };
-    events.prototype.off = function() {
+    events.prototype.off = function(name, func) {
         var idx;
         this.eachEvent(name, function(name) {
-            idx = this.events[name].indexOf(func);
-            if (-1 !== idx) {
-                this.events[name].splice(idx, 1);
+            if (typeof func === 'function') {
+                idx = this.events[name].indexOf(func);
+                if (-1 !== idx) {
+                    this.events[name].splice(idx, 1);
+                }
+            } else {
+                this.events[name] = [];
             }
         }.bind(this));
 
