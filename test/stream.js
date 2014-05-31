@@ -109,4 +109,36 @@ describe('Stream', function() {
             called.should.be.false;
         });
     });
+    describe('pipe', function() {
+        beforeEach(function() {
+            object.value(1);
+            object.value(2);
+            object.value('test');
+            called = 0;
+        });
+        it('should pipe all values in stream to given function', function() {
+            object.pipe(function(v) {
+                called++;
+                args.push(v);
+            });
+            called.should.be.eql(3);
+            args.should.be.eql(params);
+        });
+        it('should pipe last value to given function', function() {
+            object.pipe(function(v) {
+                called++;
+                args.push(v);
+            }, -1);
+            called.should.be.eql(1);
+            args.should.be.eql(['test']);
+        });
+        it('should pipe first value to given function', function() {
+            object.pipe(function(v) {
+                called++;
+                args.push(v);
+            }, 0, 1);
+            called.should.be.eql(1);
+            args.should.be.eql([1]);
+        });
+    });
 });
