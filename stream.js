@@ -69,7 +69,7 @@
     }
 
     stream.when = function() {
-        var data = [].prototype.slice.call(arguments);
+        var data = Array.prototype.slice.call(arguments);
         var refs = [];
         var buffer = new Array(data.length);
         var result = new stream({
@@ -79,8 +79,8 @@
             },
             destroy: function() {
                 data.forEach(function(item, index) {
-                    item.off(refs[index][0]);
-                    item.off(refs[index][1]);
+                    item.off('out', refs[index][0]);
+                    item.off('value', refs[index][1]);
                 });
             }
         });

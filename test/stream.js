@@ -1,6 +1,6 @@
 var stream = require('../stream.js');
 var events = require('../events.js');
-var object, context, args, next;
+var object, context, args, next, called;
 var callback = function() {};
 var params = [1, 2, 'test'];
 var greaterThan3 = function(v) { return v > 3; }
@@ -11,6 +11,7 @@ describe('Stream', function() {
         object = new stream();
         args = [];
         context = null;
+        called = false;
     });
 
     describe('#construction', function(){
@@ -74,6 +75,38 @@ describe('Stream', function() {
             })
             object.value(2);
             args.should.be.eql(4);
+        });
+    });
+    describe('#when', function() {
+        var streamA, streamB;
+        beforeEach(function() {
+            streamA = new stream();
+            streamB = new stream();
+            object = stream.when(streamA, streamB);
+        });
+
+        it('should join streams to on joined stream', function() {
+            object.should.be.an.instanceOf(stream);
+        });
+        it('should trigger "out" event when not all stream have value', function() {
+           object.on('out', function() { called = true; });
+           streamA.value(1);
+           called.should.be.true;
+        });
+        it('should trigger "value" event when all stream have value', function() {
+           object.on('value', function(a, b) { called = true; args = [a, b]});
+           streamA.value(1);
+           streamB.value(2);
+           called.should.be.true;
+           args.should.be.eql([1, 2]);
+        });
+        it('should remove references when destroyed', function() {
+            object.on('value', function() {
+                called = true;
+            });
+            object.destroy();
+            object.value(2);
+            called.should.be.false;
         });
     });
 });
