@@ -16,9 +16,6 @@
 })(this, function(f, stream){
     'use strict';
 
-    function node_set_text(node, value) {
-        node.innerText = value();
-    }
     function extract_function_name(value) {
         return value.match(/[a-z]+/i)[0].toUpperCase();
     }
@@ -29,20 +26,18 @@
         return new Function(
             'functions',
             'streams',
-            'value',
             'cellName',
-            'console.log("executed: ", cellName);'
-            + 'return jef.stream.when(streams["'+ args.join('"], streams["') +'"])'
+            // Merge steams into one stream
+            'return jef.stream.when(streams["'+ args.join('"], streams["') +'"])'
+                   // for last merged values in stream (if any)
                 + '.last(function() {'
-                    + 'console.log("on value: " + cellName);'
-                    + 'value.value('
+                    // apply function and set this value for given cellName
+                    + 'streams[cellName].value('
                         + 'functions["' + name + '"].apply(null, arguments)'
                     + ');'
                 +'});'
         );
     }
-
-    stream.when()
 
     var baseOptions = {
         functions: {},
@@ -101,19 +96,20 @@
                             }
 
                             if (this.value > 0) {
-                                console.log('a: integer')
                                 streams[cellName].value(this.value);
                             } else if(!this.value) {
-                                console.log('b: null')
                                 streams[cellName].value(null);
                             } else {
-                                console.log('c: function');
                                 sharedFunctions[cellName] = build_excel_function(
                                     extract_function_name(this.value),
                                     extract_function_arguments(this.value)
                                 );
 
-                                sharedResults[cellName] = sharedFunctions[cellName](options.functions, streams, streams[cellName], cellName);
+                                sharedResults[cellName] = sharedFunctions[cellName](
+                                    options.functions,
+                                    streams,
+                                    cellName
+                                );
                             }
                         }
                     })(cellName);
