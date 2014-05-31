@@ -58,7 +58,13 @@
         return this;
     }
     stream.prototype.destroy = function() {
+        // Custom destroy function
         this.options.destroy && this.options.destroy();
+        // Destroy childs
+        this.chain.forEach(function(stream) {
+            stream.destroy();
+        });
+        // Invoking constructor clean properties
         stream.call(this);
     }
 
