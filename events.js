@@ -18,34 +18,34 @@
     events.prototype.eachEvent = function(name, func) {
         name.split(/\s+/).forEach(function(name) {
             this.events[name] = name in this.events ? this.events[name] : [];
-            func(name);
+            func(name, this.events[name]);
         }.bind(this));
     };
     events.prototype.on = function(name, func) {
-        this.eachEvent(name, function(name) {
-            this.events[name].push(func);
+        this.eachEvent(name, function(name, events) {
+            events.push(func);
         }.bind(this));
 
         return this;
     };
     events.prototype.off = function(name, func) {
         var idx;
-        this.eachEvent(name, function(name) {
+        this.eachEvent(name, function(name, events) {
             if (typeof func === 'function') {
-                idx = this.events[name].indexOf(func);
+                idx = events.indexOf(func);
                 if (-1 !== idx) {
-                    this.events[name].splice(idx, 1);
+                    events.splice(idx, 1);
                 }
             } else {
-                this.events[name] = [];
+                events.length = 0;
             }
         }.bind(this));
 
         return this;
     };
     events.prototype.trigger = function(name, args, context) {
-        this.eachEvent(name, function(name) {
-            this.events[name].forEach(function(func) {
+        this.eachEvent(name, function(name, events) {
+            events.forEach(function(func) {
                 func.apply(context || func, args);
             });
         }.bind(this));

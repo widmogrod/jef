@@ -1,5 +1,5 @@
 var events = require('../events.js');
-var object, context, args;
+var object, context, args, called;
 var callback = function() {};
 var params = [1, 2, 'test'];
 
@@ -8,6 +8,7 @@ describe('Events', function() {
         object = new events();
         args = [];
         context = null;
+        called = 0;
     });
 
     describe('#construction', function(){
@@ -60,6 +61,16 @@ describe('Events', function() {
              });
              object.trigger('a', params, object);
              context.should.be.exactly(object);
+        });
+        it('should trigger all callbacks', function() {
+             object.on('a', function() {
+                 called++;
+             });
+             object.on('a', function() {
+                 called++;
+             });
+             object.trigger('a');
+             called.should.be.eql(2);
         });
     })
 });
