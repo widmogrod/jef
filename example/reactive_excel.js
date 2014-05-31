@@ -34,14 +34,6 @@
         );
     }
 
-    function merge(a, b) {
-        var r = {};
-        f.each(a, function(value, key) {
-            r[key] = (key in b) ? b[key] : value
-        });
-        return r;
-    }
-
     var baseOptions = {
         functions: {},
         columns: '#ABCDEFGHIJ',
@@ -50,7 +42,7 @@
 
     return {
         main: function(element, document, options) {
-            options = merge(baseOptions, options);
+            options = f.merge(baseOptions, options);
 
             var tr, td, label, result, input, cellName,
                 sharedVariables = {},

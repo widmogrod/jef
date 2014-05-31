@@ -1,0 +1,43 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+td {
+    border: 1px solid rgba(0,0,0,.3);
+    position: relative;
+}
+td:first-of-type {width: 20px}
+td, input, pre {
+    line-height: 1em;
+    font-family: Monospace;
+    font-size: 1em;
+    font-weight: normal;
+    padding: 5px;
+}
+input, pre {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    border: 0;
+}
+pre {
+    z-index: 1;
+}
+input {
+    width: 100%;
+    color: rgba(0,0,0,0);
+    background-color: transparent;
+    z-index: 2;
+}
+input:focus {
+    color: rgba(0,0,0,1);
+    background-color: white;
+}
