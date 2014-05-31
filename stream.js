@@ -20,7 +20,7 @@
         this.chain = [];
     }
     stream.constructor = stream;
-    stream.prototype = Object.create(events);
+    stream.prototype = new events();
 
     stream.prototype.map = function(func) {
         // Create new stream
