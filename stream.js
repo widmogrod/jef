@@ -26,12 +26,12 @@
         // Create new stream
         this.chain.push(new stream({map: func}));
         return this.chain[this.chain.length - 1];
-    }
+    };
     stream.prototype.filter = function(func) {
         // Create new stream
         this.chain.push(new stream({filter: func}));
         return this.chain[this.chain.length - 1];
-    }
+    };
     stream.prototype.value = function(value) {
         // Test value if this part of the stream would like to accept it
         if (this.options.filter && !this.options.filter(value)) {
@@ -56,7 +56,7 @@
         });
 
         return this;
-    }
+    };
     stream.prototype.destroy = function() {
         // Custom destroy function
         this.options.destroy && this.options.destroy();
@@ -66,7 +66,7 @@
         });
         // Invoking constructor clean properties
         stream.call(this);
-    }
+    };
 
     stream.when = function() {
         var data = Array.prototype.slice.call(arguments);
