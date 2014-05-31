@@ -424,6 +424,17 @@
         }
     }
 
+    /**
+     * Merge two object into one
+     */
+    function merge(a, b) {
+        var result = {};
+        each(a, function(value, key) {
+            result[key] = (key in b) ? b[key] : value
+        });
+        return result;
+    }
+
     var exports = {};
 
     exports.apply         = apply;
@@ -446,6 +457,7 @@
     exports.map           = map;
     exports.maybe         = maybe;
     exports.memoize       = memoize;
+    exports.merge         = merge;
     exports.mValue        = mValue;
     exports.reduce        = reduce;
     exports.transpose     = transpose;
