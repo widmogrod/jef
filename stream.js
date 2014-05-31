@@ -39,7 +39,13 @@
         }
 
         // Lets map our result
-        this.options.map && (value = this.options.map(value));
+        if (this.options.map) {
+            if (typeof this.options.map === 'function')  {
+                value = this.options.map(value);
+            } else {
+                value = this.options.map;
+            }
+        }
 
         // Notify that value was set
         this.trigger('value', this.options.apply ? value : [value]);

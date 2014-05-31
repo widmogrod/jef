@@ -44,4 +44,20 @@ describe('Stream', function() {
                 .should.not.be.arguments;
         })
     })
+    describe('#map', function() {
+        beforeEach(function() {
+            next = object.map(666);
+        });
+        it('should create new stream that accepts specific values', function() {
+            next.should.be.an.instanceOf(stream)
+                .should.not.be.exactly(object);
+        });
+        it('should receive maped value', function() {
+            next.on('value', function(value) {
+                args = value;
+            })
+            object.value(5);
+            args.should.be.eql(666);
+        })
+    });
 });
