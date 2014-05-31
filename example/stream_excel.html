@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reactive excel</title>
+    <meta charset="utf-8" />
+    <script src="../functional.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../events.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../stream.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./stream_excel.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="./excel.css" type="text/css" media="all" />
+</head>
+<body>
+    <p>INFO: Right now only one demonstrating function is implemented - ADD. Write in cell i.e. <b>ADD(A1, B1)</b></p>
+    <table id="excel"></table>
+    <script>
+    var options = {
+        functions: {
+            ADD: function (a, b) {
+                return parseInt(a) + parseInt(b);
+            }
+        }
+    };
+
+    jefdemo.stream_excel.main(
+        document.getElementById('excel'),
+        document,
+        options
+    );
+    </script>
+</body>
+</html>
