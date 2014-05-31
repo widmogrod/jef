@@ -44,6 +44,13 @@ describe('Stream', function() {
             args.should.be.empty
                 .should.not.be.arguments;
         })
+        it('should receive invalid values on out event', function() {
+            next.on('out', function(value) {
+                args = value
+            })
+            object.value(1);
+            args.should.be.eql(1);
+        })
     })
     describe('#map', function() {
         beforeEach(function() {
