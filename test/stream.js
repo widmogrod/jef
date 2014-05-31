@@ -4,6 +4,7 @@ var object, context, args, next;
 var callback = function() {};
 var params = [1, 2, 'test'];
 var greaterThan3 = function(v) { return v > 3; }
+var addTwo = function(v) { return v + 2; }
 
 describe('Stream', function() {
     beforeEach(function() {
@@ -59,5 +60,13 @@ describe('Stream', function() {
             object.value(5);
             args.should.be.eql(666);
         })
+        it('should map function', function() {
+            next = object.map(addTwo);
+            next.on('value', function(value) {
+                args = value;
+            })
+            object.value(2);
+            args.should.be.eql(4);
+        });
     });
 });
