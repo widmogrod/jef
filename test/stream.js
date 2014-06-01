@@ -22,9 +22,9 @@ describe('Stream', function() {
             object.should.be.an.instanceOf(events);
         })
     })
-    describe('#filter', function() {
+    describe('#accept', function() {
         beforeEach(function() {
-            next = object.filter(greaterThan3);
+            next = object.accept(greaterThan3);
         });
         it('should create new stream that accepts specific values', function() {
             next.should.be.an.instanceOf(stream)
@@ -51,6 +51,37 @@ describe('Stream', function() {
             })
             object.push(1);
             args.should.be.eql(1);
+        })
+    })
+    describe('#reject', function() {
+        beforeEach(function() {
+            next = object.reject(greaterThan3);
+        });
+        it('should create new stream that accepts specific values', function() {
+            next.should.be.an.instanceOf(stream)
+                .should.not.be.exactly(object);
+        });
+        it('should receive valid values', function() {
+            next.on('data', function(value) {
+                args = value;
+            })
+            object.push(2);
+            args.should.be.eql(2);
+        })
+        it('should not receive invalid values', function() {
+            next.on('data', function() {
+                args = arguments
+            })
+            object.push(5);
+            args.should.be.empty
+                .should.not.be.arguments;
+        })
+        it('should receive invalid values on out event', function() {
+            next.on('out', function(value) {
+                args = value
+            })
+            object.push(5);
+            args.should.be.eql(5);
         })
     })
     describe('#map', function() {

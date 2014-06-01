@@ -48,21 +48,38 @@
         return this.pipe(func, 0, 1);
     };
     stream.prototype.map = function(func) {
-        // Create new stream
-        this.chain.push(new stream({map: func}));
+        // Create new stream with that maps values to new form
+        this.chain.push(new stream({
+            apply: this.options.apply,
+            map: func
+        }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.filter = function(func) {
-        // Create new stream
-        this.chain.push(new stream({filter: func}));
+    stream.prototype.accept = function(func) {
+        // Create new stream that will accept values that pass filter test
+        this.chain.push(new stream({
+            apply: this.options.apply,
+            filter: function() {
+                return !func.apply(func, arguments);
+            }
+        }));
         return this.chain[this.chain.length - 1];
     };
+    stream.prototype.reject = function(func) {
+        // Create new stream that will reject values that don't filter test
+        this.chain.push(new stream({
+            apply: this.options.apply,
+            filter: func
+        }));
+        return this.chain[this.chain.length - 1];
+    };
+
     stream.prototype.push = function(data) {
         // On new data mark stream as not filtered
         this.filtered = false;
 
         // Test data if this part of the stream would like to accept it
-        if (this.options.filter && !this.options.filter(data)) {
+        if (this.options.filter && this.options.filter(data)) {
             this.filtered = true;
             return this.trigger('out', this.options.apply ? data : [data], this);
         }
@@ -111,7 +128,7 @@
         var result = new stream({
             apply: true,
             filter: function(data) {
-                return -1 === data.called.indexOf(false);
+                return -1 !== data.called.indexOf(false);
             },
             map: function(data) {
                 return data.arguments;
