@@ -31,17 +31,17 @@ describe('Stream', function() {
                 .should.not.be.exactly(object);
         });
         it('should receive valid values', function() {
-            next.on('value', function(value) {
+            next.on('data', function(value) {
                 args = value;
             })
-            object.value(5);
+            object.push(5);
             args.should.be.eql(5);
         })
         it('should not receive invalid values', function() {
-            next.on('value', function() {
+            next.on('data', function() {
                 args = arguments
             })
-            object.value(1);
+            object.push(1);
             args.should.be.empty
                 .should.not.be.arguments;
         })
@@ -49,7 +49,7 @@ describe('Stream', function() {
             next.on('out', function(value) {
                 args = value
             })
-            object.value(1);
+            object.push(1);
             args.should.be.eql(1);
         })
     })
@@ -61,20 +61,52 @@ describe('Stream', function() {
             next.should.be.an.instanceOf(stream)
                 .should.not.be.exactly(object);
         });
-        it('should receive maped value', function() {
-            next.on('value', function(value) {
+        it('should receive maped data', function() {
+            next.on('data', function(value) {
                 args = value;
             })
-            object.value(5);
+            object.push(5);
             args.should.be.eql(666);
         })
         it('should map function', function() {
             next = object.map(addTwo);
-            next.on('value', function(value) {
+            next.on('data', function(value) {
                 args = value;
             })
-            object.value(2);
+            object.push(2);
             args.should.be.eql(4);
+        });
+    });
+    describe('#merge', function() {
+        var streamA, streamB;
+        beforeEach(function() {
+            streamA = new stream();
+            streamB = new stream();
+            object = streamA.merge(streamB)
+        });
+
+        it('should merge streams', function() {
+            object.should.be.an.instanceOf(stream);
+        });
+        it('should trigger "out" event when not all stream have data', function() {
+           object.on('out', function() { called = true; });
+           streamA.push(1);
+           called.should.be.true;
+        });
+        it('should trigger "data" event when all stream have data', function() {
+           object.on('data', function(a, b) { called = true; args = [a, b]});
+           streamA.push(1);
+           streamB.push(2);
+           called.should.be.true;
+           args.should.be.eql([1, 2]);
+        });
+        it('should remove references when destroyed', function() {
+            object.on('data', function() {
+                called = true;
+            });
+            object.destroy();
+            object.push(2);
+            called.should.be.false;
         });
     });
     describe('#when', function() {
@@ -88,32 +120,32 @@ describe('Stream', function() {
         it('should join streams to on joined stream', function() {
             object.should.be.an.instanceOf(stream);
         });
-        it('should trigger "out" event when not all stream have value', function() {
+        it('should trigger "out" event when not all stream have data', function() {
            object.on('out', function() { called = true; });
-           streamA.value(1);
+           streamA.push(1);
            called.should.be.true;
         });
-        it('should trigger "value" event when all stream have value', function() {
-           object.on('value', function(a, b) { called = true; args = [a, b]});
-           streamA.value(1);
-           streamB.value(2);
+        it('should trigger "data" event when all stream have data', function() {
+           object.on('data', function(a, b) { called = true; args = [a, b]});
+           streamA.push(1);
+           streamB.push(2);
            called.should.be.true;
            args.should.be.eql([1, 2]);
         });
         it('should remove references when destroyed', function() {
-            object.on('value', function() {
+            object.on('data', function() {
                 called = true;
             });
             object.destroy();
-            object.value(2);
+            object.push(2);
             called.should.be.false;
         });
     });
     describe('pipe', function() {
         beforeEach(function() {
-            object.value(1);
-            object.value(2);
-            object.value('test');
+            object.push(1);
+            object.push(2);
+            object.push('test');
             called = 0;
         });
         it('should pipe all values in stream to given function', function() {

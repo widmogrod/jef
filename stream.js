@@ -18,7 +18,7 @@
         events.call(this);
         this.options = options || {};
         this.chain = [];
-        this.values = [];
+        this.buffer = [];
         this.filtered = false;
     }
     stream.constructor = stream;
@@ -26,9 +26,9 @@
 
     stream.prototype.pipe = function(func, from, limit) {
         if (from < 0) {
-            from += this.values.length;
+            from += this.buffer.length;
         }
-        this.values.forEach(function(value, index) {
+        this.buffer.forEach(function(value, index) {
             if (undefined !== from && from > index) {
                 return;
             }
@@ -39,7 +39,7 @@
             func.apply(func, this.options.apply ? value : [value]);
         }.bind(this));
 
-        return this.on('value', func);
+        return this.on('data', func);
     };
     stream.prototype.last = function(func) {
         return this.pipe(func, -1, 1);
@@ -57,37 +57,40 @@
         this.chain.push(new stream({filter: func}));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.value = function(value) {
-        // On new value mark stream as not filtered
+    stream.prototype.push = function(data) {
+        // On new data mark stream as not filtered
         this.filtered = false;
 
-        // Test value if this part of the stream would like to accept it
-        if (this.options.filter && !this.options.filter(value)) {
+        // Test data if this part of the stream would like to accept it
+        if (this.options.filter && !this.options.filter(data)) {
             this.filtered = true;
-            return this.trigger('out', this.options.apply ? value : [value], this);
+            return this.trigger('out', this.options.apply ? data : [data], this);
         }
 
         // Lets map our result
         if (this.options.map) {
             if (typeof this.options.map === 'function')  {
-                value = this.options.map(value);
+                data = this.options.map(data);
             } else {
-                value = this.options.map;
+                data = this.options.map;
             }
         }
 
-        // Collect streamed value
-        this.values.push(value);
+        // Collect streamed data
+        this.buffer.push(data);
 
-        // Notify that value was set
-        this.trigger('value', this.options.apply ? value : [value], this);
+        // Notify that data was set
+        this.trigger('data', this.options.apply ? data : [data], this);
 
         // Notify children nodes
         this.chain.forEach(function(stream) {
-            stream.value(value);
+            stream.push(data);
         });
 
         return this;
+    };
+    stream.prototype.merge = function(next) {
+        return stream.when(this, next);
     };
     stream.prototype.destroy = function() {
         // Custom destroy function
@@ -107,16 +110,16 @@
         var called = new Array(data.length);
         var result = new stream({
             apply: true,
-            filter: function(value) {
-                return -1 === value.called.indexOf(false);
+            filter: function(data) {
+                return -1 === data.called.indexOf(false);
             },
-            map: function(value) {
-                return value.arguments;
+            map: function(data) {
+                return data.arguments;
             },
             destroy: function() {
                 data.forEach(function(item, index) {
                     item.off('out', refs[index]);
-                    item.off('value', refs[index]);
+                    item.off('data', refs[index]);
                 });
             }
         });
@@ -126,7 +129,7 @@
             refs[index] = function(value) {
                 called[index] = !this.filtered;
                 buffer[index] = value;
-                result.value({arguments: buffer, called: called });
+                result.push({arguments: buffer, called: called });
             }
             item.on('out', refs[index]);
             item.last(refs[index]);
