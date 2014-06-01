@@ -21,7 +21,7 @@ npm test
 Other
 -----
 
-Deploy to GitHub Pages:
+Deploy to GitHub Pages
 ```
 npm run deplo
 ```
