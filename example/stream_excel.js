@@ -32,7 +32,7 @@
                    // for last merged values in stream (if any)
                 + '.last(function() {'
                     // apply function and set this value for given cellName
-                    + 'streams[cellName].value('
+                    + 'streams[cellName].push('
                         + 'functions["' + name + '"].apply(null, arguments)'
                     + ');'
                 +'});'
@@ -85,7 +85,7 @@
 
                     cellName = options.columns.charAt(j) + i;
                     streams[cellName] = new stream();
-                    streams[cellName].on('value', function(value) {
+                    streams[cellName].on('data', function(value) {
                          this.innerText = value;
                     }.bind(result));
 
@@ -96,9 +96,9 @@
                             }
 
                             if (this.value > 0) {
-                                streams[cellName].value(this.value);
+                                streams[cellName].push(this.value);
                             } else if(!this.value) {
-                                streams[cellName].value(null);
+                                streams[cellName].push(null);
                             } else {
                                 sharedFunctions[cellName] = build_excel_function(
                                     extract_function_name(this.value),
