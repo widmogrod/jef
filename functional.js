@@ -71,6 +71,7 @@
 
     /**
      * Check if object has its own property
+     *
      * @param  {[type]}  key
      * @return {Boolean}
      */
@@ -82,6 +83,7 @@
 
     /**
      * Set param in object property
+     *
      * @param  {[type]}  key
      * @return {Boolean}
      */
@@ -91,6 +93,17 @@
                 obj[key] = value;
             };
         }
+    }
+
+    /**
+     * Check if value is in array
+     *
+     * @param {Array} array
+     * @param {[type]} value
+     * @return {Integer}
+     */
+    function isIn(array, value) {
+        return array.indexOf(value);
     }
 
     /**
@@ -449,6 +462,7 @@
     exports.has           = has;
     exports.invoke        = invoke;
     exports.is            = is;
+    exports.isIn          = isIn;
     exports.isArray       = isArray;
     exports.isFunction    = isFunction;
     exports.isObject      = isObject;
