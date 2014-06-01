@@ -16,3 +16,12 @@ This library is using mocha as a test framework.
 npm install
 npm test
 ```
+
+
+Other
+-----
+
+Deploy to GitHub Pages:
+```
+npm run deplo
+```
