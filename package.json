@@ -9,7 +9,8 @@
     "should": "^3.3.1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "deploy": "git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master"
   },
   "repository": {
     "type": "git",
