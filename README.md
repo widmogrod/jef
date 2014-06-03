@@ -1,14 +1,11 @@
-jef [![Build Status](https://travis-ci.org/widmogrod/jef.svg?branch=master)](https://travis-ci.org/widmogrod/jef)
----
+# jef [![Build Status](https://travis-ci.org/widmogrod/jef.svg?branch=master)](https://travis-ci.org/widmogrod/jef)
 
-Description
------------
+## Description
 
 J.E.F is collection of JavaScript experimental functions, written to lern and test `functional` & `reactive` programming.
 
 
-Testing
--------
+## Testing
 
 This library is using mocha as a test framework.
 
@@ -18,19 +15,15 @@ npm test
 ```
 
 
-Other
------
+## Other
 
 Deploy to GitHub Pages
 ```
 npm run deploy
 ```
 
-Components
-----------
-
-Stream
-======
+## Components
+### Stream
 
 Given I have three streams A, B and C which stream value over time:
 ```
@@ -46,7 +39,8 @@ stream.flat(A,B,C)  -b1--b2a1------a2b3c1------------a3--------
 ```
 
 When I pass given stream to `stream.when` then new stream will be created,
-and will stream collected values from given stream but only when given streams emit at least one value.
+and will stream merged streamed data from given streams, but only when all streams emit at least one value.
 ```
 stream.when(A,B,C)  --------------[a2,b3,c1]--------[a3,b3,c1]-
 ```
+
