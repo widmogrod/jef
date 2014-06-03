@@ -14,6 +14,8 @@
 })(this, function(events, undefined) {
     'use strict';
 
+    var slice =  Function.prototype.call.bind(Array.prototype.slice);
+
     function stream(options) {
         events.call(this);
         this.options = options || {};
@@ -36,7 +38,8 @@
                 return;
             }
 
-            func.apply(func, this.options.apply ? value : [value]);
+            func.apply(func, value);
+            // func.apply(func, this.options.apply ? value : [value]);
         }.bind(this));
 
         return this.on('data', func);
@@ -47,6 +50,18 @@
     stream.prototype.first = function(func) {
         return this.pipe(func, 0, 1);
     };
+    stream.prototype.take = function (limit, skip, allowEmpty) {
+        // Create new stream that will reject values that don't filter test
+        this.chain.push(new stream({
+            // apply: true,
+            take: {
+                limit: limit,
+                skip: skip || 0,
+                allowEmpty: !! allowEmpty
+            }
+        }));
+        return this.chain[this.chain.length - 1];
+    }
     stream.prototype.map = function(func) {
         // Create new stream with that maps values to new form
         this.chain.push(new stream({
@@ -75,33 +90,57 @@
     };
 
     stream.prototype.push = function(data) {
+        // Arguments to array
+        data = slice(arguments);
+
         // On new data mark stream as not filtered
         this.filtered = false;
 
         // Test data if this part of the stream would like to accept it
-        if (this.options.filter && this.options.filter(data)) {
+        if (this.options.filter && this.options.filter.apply(this.options.filter, data)) {
             this.filtered = true;
-            return this.trigger('out', this.options.apply ? data : [data], this);
+            return this.trigger('out', data, this);
+            // return this.trigger('out', this.options.apply ? data : [data], this);
         }
 
         // Lets map our result
         if (this.options.map) {
             if (typeof this.options.map === 'function')  {
-                data = this.options.map(data);
+                data = this.options.map.apply(this, data);
             } else {
                 data = this.options.map;
             }
+            data = Array.isArray(data) ? data : [data];
         }
 
         // Collect streamed data
         this.buffer.push(data);
 
+        if (this.options.take) {
+            var length = this.buffer.length;
+            var end = length - this.options.take.skip;
+            var start = end - this.options.take.limit;
+
+            start = start < 0 ? 0 : start;
+
+            // console.log('take', start, end, this.options.take);
+            data = this.buffer.slice(start, end);
+
+            // Will take only when will have given limit in buffer
+            if (!this.options.allowEmpty
+                && data.length !== this.options.take.limit
+            ) {
+                return this;
+            }
+        }
+
         // Notify that data was set
-        this.trigger('data', this.options.apply ? data : [data], this);
+        this.trigger('data', data, this);
+        // this.trigger('data', this.options.apply ? data : [data], this);
 
         // Notify children nodes
         this.chain.forEach(function(stream) {
-            stream.push(data);
+            stream.push.apply(stream, data);
         });
 
         return this;
@@ -120,28 +159,39 @@
         stream.call(this);
     };
 
+    stream.flat = function () {
+        var streams = slice(arguments);
+        var flatten = new stream();
+        streams.forEach(function (stream) {
+            stream.on('data', function () {
+                flatten.push.apply(flatten, arguments)
+            });
+        });
+
+        return flatten;
+    }
     stream.when = function() {
-        var data = Array.prototype.slice.call(arguments);
+        var streams = slice(arguments);
         var refs = [];
-        var buffer = new Array(data.length);
-        var called = new Array(data.length);
+        var buffer = new Array(streams.length);
+        var called = new Array(streams.length);
         var result = new stream({
-            apply: true,
-            filter: function(data) {
-                return -1 !== data.called.indexOf(false);
+            // apply: true,
+            filter: function(streams) {
+                return -1 !== streams.called.indexOf(false);
             },
-            map: function(data) {
-                return data.arguments;
+            map: function(streams) {
+                return streams.arguments;
             },
             destroy: function() {
-                data.forEach(function(item, index) {
+                streams.forEach(function(item, index) {
                     item.off('out', refs[index]);
                     item.off('data', refs[index]);
                 });
             }
         });
 
-        data.forEach(function(item, index) {
+        streams.forEach(function(item, index) {
             called[index] = false;
             refs[index] = function(value) {
                 called[index] = !this.filtered;

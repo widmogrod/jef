@@ -28,7 +28,7 @@ describe('Stream', function() {
         });
         it('should create new stream that accepts specific values', function() {
             next.should.be.an.instanceOf(stream)
-                .should.not.be.exactly(object);
+            .should.not.be.exactly(object);
         });
         it('should receive valid values', function() {
             next.on('data', function(value) {
@@ -43,7 +43,7 @@ describe('Stream', function() {
             })
             object.push(1);
             args.should.be.empty
-                .should.not.be.arguments;
+            .should.not.be.arguments;
         })
         it('should receive invalid values on out event', function() {
             next.on('out', function(value) {
@@ -59,7 +59,7 @@ describe('Stream', function() {
         });
         it('should create new stream that accepts specific values', function() {
             next.should.be.an.instanceOf(stream)
-                .should.not.be.exactly(object);
+            .should.not.be.exactly(object);
         });
         it('should receive valid values', function() {
             next.on('data', function(value) {
@@ -74,7 +74,7 @@ describe('Stream', function() {
             })
             object.push(5);
             args.should.be.empty
-                .should.not.be.arguments;
+            .should.not.be.arguments;
         })
         it('should receive invalid values on out event', function() {
             next.on('out', function(value) {
@@ -90,7 +90,7 @@ describe('Stream', function() {
         });
         it('should create new stream that accepts specific values', function() {
             next.should.be.an.instanceOf(stream)
-                .should.not.be.exactly(object);
+            .should.not.be.exactly(object);
         });
         it('should receive maped data', function() {
             next.on('data', function(value) {
@@ -120,16 +120,16 @@ describe('Stream', function() {
             object.should.be.an.instanceOf(stream);
         });
         it('should trigger "out" event when not all stream have data', function() {
-           object.on('out', function() { called = true; });
-           streamA.push(1);
-           called.should.be.true;
+            object.on('out', function() { called = true; });
+            streamA.push(1);
+            called.should.be.true;
         });
         it('should trigger "data" event when all stream have data', function() {
-           object.on('data', function(a, b) { called = true; args = [a, b]});
-           streamA.push(1);
-           streamB.push(2);
-           called.should.be.true;
-           args.should.be.eql([1, 2]);
+            object.on('data', function(a, b) { called = true; args = [a, b]});
+            streamA.push(1);
+            streamB.push(2);
+            called.should.be.true;
+            args.should.be.eql([1, 2]);
         });
         it('should remove references when destroyed', function() {
             object.on('data', function() {
@@ -152,16 +152,16 @@ describe('Stream', function() {
             object.should.be.an.instanceOf(stream);
         });
         it('should trigger "out" event when not all stream have data', function() {
-           object.on('out', function() { called = true; });
-           streamA.push(1);
-           called.should.be.true;
+            object.on('out', function() { called = true; });
+            streamA.push(1);
+            called.should.be.true;
         });
         it('should trigger "data" event when all stream have data', function() {
-           object.on('data', function(a, b) { called = true; args = [a, b]});
-           streamA.push(1);
-           streamB.push(2);
-           called.should.be.true;
-           args.should.be.eql([1, 2]);
+            object.on('data', function(a, b) { called = true; args = [a, b]});
+            streamA.push(1);
+            streamB.push(2);
+            called.should.be.true;
+            args.should.be.eql([1, 2]);
         });
         it('should remove references when destroyed', function() {
             object.on('data', function() {
@@ -202,6 +202,59 @@ describe('Stream', function() {
             }, 0, 1);
             called.should.be.eql(1);
             args.should.be.eql([1]);
+        });
+    });
+    describe('take', function() {
+        beforeEach(function() {
+            next = object.take(2);
+            called = 0;
+        });
+        it('should create stream', function() {
+            next.should.be.an.instanceOf(stream)
+            .should.not.be.exactly(object);
+        });
+        it('schould not take anythign when is not enought data in stream', function() {
+            next.on('data', function() {called++});
+            next.push(1);
+            called.should.be.eql(0)
+        });
+        it('should take two last item from stream', function() {
+            next.on('data', function(a, b) {called++, args = [a, b]});
+            object.push(1);
+            object.push(2);
+            called.should.be.eql(1)
+            args.should.be.eql([[1],[2]]);
+        });
+        it('should take two last item from stream and have more than two items in stream', function() {
+            next.on('data', function(a, b) {called++, args = [a, b]});
+            object.push(1);
+            object.push(2);
+            object.push(3);
+            called.should.be.eql(2)
+            args.should.be.eql([[2],[3]]);
+        });
+    });
+    describe('flat', function() {
+        beforeEach(function() {
+            streamA = new stream();
+            streamB = new stream();
+            object = stream.flat(streamA, streamB);
+            called = 0;
+        });
+        it('should create stream', function() {
+            object.should.be.an.instanceOf(stream)
+        });
+        it('should stream values from flatten streams', function() {
+            object.on('data', function(value) {
+                called++;
+                args = [value];
+            })
+            streamA.push(1);
+            called.should.be.eql(1);
+            args.should.be.eql([1]);
+            streamB.push(2);
+            called.should.be.eql(2);
+            args.should.be.eql([2]);
         });
     });
 });
