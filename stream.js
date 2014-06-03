@@ -161,9 +161,16 @@
 
     stream.flat = function () {
         var streams = slice(arguments);
-        var flatten = new stream();
-        streams.forEach(function (stream) {
-            stream.on('data', function () {
+        var refs = [];
+        var flatten = new stream({
+            destroy: function() {
+                streams.forEach(function(item, index) {
+                    item.off('data', refs[index]);
+                });
+            }
+        });
+        streams.forEach(function (stream, index) {
+            stream.on('data', refs[index] = function () {
                 flatten.push.apply(flatten, arguments)
             });
         });

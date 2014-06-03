@@ -256,5 +256,11 @@ describe('Stream', function() {
             called.should.be.eql(2);
             args.should.be.eql([2]);
         });
+        it('should remove references on destroy', function() {
+            object.on('data', function(value) {called++;})
+            object.destroy();
+            streamA.push(1);
+            called.should.be.eql(0);
+        });
     });
 });
