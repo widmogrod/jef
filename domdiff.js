@@ -114,7 +114,7 @@
                         nodeNamespace(i-1, namespace),
                         'bElement'
                     ));
-                } while(++diff < 0);
+                } while(++delta < 0);
             }
         }
         // no relation, use b remove a
