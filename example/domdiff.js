@@ -14,25 +14,30 @@
 })(this, function(jQuery){
     'use strict';
 
-    var dataA = {
-        rows:[
-            {name: "Adam", 'class': 'red'}
-        ]
-    };
-    var dataB = {
-        rows:[
-            {name: "Adam", 'class': 'blue'},
-            {name: "Barbara", 'class': 'blue'},
-            {name: "John", 'class': 'blue'}
-        ]
+    var ENTER = 13;
+    var data = {
+        name: 'guest',
+        rows:[]
     };
 
     return {
         main: function(element, document, template) {
-            $(element).diffhtml(template(dataA));
-            $('#js-render').on('click', function() {
-                $(element).diffhtml(template(dataB));
+            var $el = $(element);
+
+            $el.diffhtml(template(data), {debug: true});
+            $el.on('keyup', function(e) {
+                var $el = $(e.target);
+                if (e.keyCode === ENTER) {
+                    data.rows.push({
+                        comment: $el.val()
+                    })
+                    $el.val(null);
+                    $el.trigger('render');
+                }
             });
+            $el.on('render', function() {
+                $el.diffhtml(template(data), {debug: true});
+            })
         }
     };
 });

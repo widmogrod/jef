@@ -38,7 +38,7 @@ describe('DomDiff', function() {
         it('should return string', function(){
             domdiff.diff(refA, refB).should.be.eql(
                 'aElement.children[0].appendChild(bElement.children[0].children[1]);\n' +
-                'aElement.children[0].appendChild(bElement.children[0].children[1])'
+                'aElement.children[0].appendChild(bElement.children[0].children[1]);'
             );
         })
     })
@@ -109,6 +109,12 @@ describe('DomDiff', function() {
                 result = domdiff.nodeRetrievePath(elementOne) ;
                 result.should.be.eql(
                     'document.children[0].children[1].children[0]'
+                );
+            });
+            it('should retrieve element path to specific element', function() {
+                result = domdiff.nodeRetrievePath(elementOne, 'element', document.children[0]) ;
+                result.should.be.eql(
+                    'element.children[1].children[0]'
                 );
             });
             it('should retrieve element memory path', function() {

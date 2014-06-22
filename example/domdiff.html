@@ -10,25 +10,32 @@
     <script src="./domdiff.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-    <script type="text/template" id="list">
+    <script type="text/template" id="comments">
+    <% if(_.size(rows)) { %>
     <ul>
         <% _.each(rows, function(row) { %>
-        <li><%= row.name %></li>
+        <li>
+            <b><%= name %></b>
+            <span><%= row.comment %></span>
+            <% if (_.random(1)) { %>
+            <p>another node</p>
+            <% } %>
+        </li>
         <% }); %>
     </ul>
-    <% if(_.size(rows) > 2) { %>
-    <p>We have more than 2 rows <b><%= _.size(rows) %></b></p>
+    <% } else { %>
+    <p>Please write a comment</p>
     <%}%>
+    <textarea placeholder="Write a comment"></textarea>
     </script>
 
     <div id="domdiff"></div>
-    <button id="js-render" type="submit">Render</button>
 
     <script>
     jefdemo.domdiff.main(
         document.getElementById('domdiff'),
         document,
-        _.template(document.getElementById('list').innerHTML)
+        _.template(document.getElementById('comments').innerHTML)
     );
     </script>
 </body>

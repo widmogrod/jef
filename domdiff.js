@@ -10,14 +10,15 @@
 })(this, function() {
     'use strict';
 
-    /*
-       Node.removeChild
-       Node.replaceChild
-       Node.insertBefore
-       Node.hasChildNodes
-       Node.appendChild
-       */
-
+    function isNode(node) {
+        // var type = Object.prototype.toString.call(node);
+        // return type.match(/HTML\w*Element/i);
+        return node
+            && node.children
+            && node.replaceChild
+            && node.appendChild
+            && node.removeChild
+    }
     function nodeSame(a, b) {
         return a.nodeName === b.nodeName;
     }
@@ -28,15 +29,17 @@
     function nodeExactly(a, b) {
         return a.textContent === b.textContent && nodeSame(a, b);
     }
-
-    function nodeAction(action, nodePath, namespace) {
-        return namespace + '.'+ action +'(' + nodePath + ')';
+    function nodeAction(namespace, action, nodePath) {
+        return namespace + '.'+ action +'(' + nodePath + ');';
     }
-    function nodeRemove(nodePath, namespace, context) {
-        return nodeAction('removeChild', nodePath, namespace);
+    function nodeRemove(nodePath, namespace) {
+        return nodeAction(namespace, 'removeChild', nodePath);
     }
-    function nodeAppend(nodePath, namespace, context) {
-        return nodeAction('appendChild', nodePath, namespace);
+    function nodeReplace(newPath, oldPath, namespace) {
+        return namespace + '.replaceChild('+ newPath +', '+ oldPath +');';
+    }
+    function nodeAppend(nodePath, namespace) {
+        return nodeAction(namespace, 'appendChild', nodePath);
     }
 
     function nodeLength(node) {
@@ -58,30 +61,40 @@
         result = namespace + '.' + result;
         return result;
     }
+    function nodePreviousNamespace(namespace) {
+       return namespace.replace(/(\.[^\.]+)/, '');
+    }
 
-    function nodeRetrievePath(node, context) {
+    function nodeRetrievePath(node, contextName, to) {
         var index, parent, child = node, result = '';
 
-        // Use custome context or document
-        context = context ? context : 'document';
+        // Use custom contextName or document
+        contextName = contextName ? contextName : 'document';
 
         // Unit parent element exists, then build node path
-        while ((parent = child.parentNode) && parent) {
+        while ((parent = child.parentNode) && parent && (!to || to !== child )) {
             index = nodePosition(child);
             result = '.children['+ index +']' + result
+            // result = '.children['+ index +'/*'+ child.nodeName +'*/]' + result
             child = parent;
         }
 
-        return context + result;
+        return contextName + result;
     }
 
     /**
      * @param {Node} a
      * @param {Node} b
      * @param {String} [namespace]
+     * @param {Node} [rootA]
+     * @param {Node} [rootB]
      */
-    function diff(a, b, namespace) {
+    function diff(a, b, namespace, rootA, rootB) {
         var i, length, delta, nodeA, nodeB, inner, path, result = [];
+
+        // Remember root element
+        rootA = rootA || a;
+        rootB = rootB || b;
 
         if (!namespace) {
             // Extract namespace from the 'a' node
@@ -93,19 +106,35 @@
             length = nodeLength(a);
             delta = length - nodeLength(b);
 
+            if (delta > 0) {
+                // 'b' has leser length so we need to reduce
+                // 'a' loop length to 'b' length; if we haven't do this
+                // then we would have null elements in nodeB var
+                length -= delta;
+            }
+
             for (i = 0; i < length; i++) {
                 nodeA = nodeRetrieve(a, i);
                 nodeB = nodeRetrieve(b, i);
 
-                inner = diff(nodeA, nodeB, nodeNamespace(i, namespace))
+                inner = diff(nodeA, nodeB, nodeNamespace(i, namespace), rootA, rootB);
                 inner && result.push(inner);
             }
 
-            if (delta < 0) {
+            if (delta > 0) {
+                // remove unused elements form 'a' node
+                path = nodeRetrievePath(nodeRetrieve(a, i), 'aElement', rootA);
+                do {
+                    result.push(nodeRemove(
+                        path,
+                        namespace
+                    ));
+                } while(--delta > 0);
+            } else if (delta < 0) {
                 // the 'a' node have less children than the 'b' node
                 // then since we compare all common 'a' and 'b' nodes
                 // then we need add remaining 'b' nodes
-                path = nodeRetrievePath(nodeRetrieve(b, i), 'bElement')
+                path = nodeRetrievePath(nodeRetrieve(b, i), 'bElement', rootB);
                 do {
                     result.push(nodeAppend(
                         path,
@@ -115,23 +144,30 @@
             }
         }
         // no relation, use b remove a
-        else if (!nodeExactly(a, b)){
-            result.push(nodeRemove(nodeRetrievePath(a, 'aElement'), namespace));
-            result.push(nodeAppend(nodeRetrievePath(b, 'bElement'), namespace));
+        else if (!nodeExactly(a, b)) {
+            result.push(nodeReplace(
+                nodeRetrievePath(b, 'bElement', rootB),
+                nodeRetrievePath(a, 'aElement', rootA),
+                // Namespace is for current node, unfortunetly to replace element we need to
+                // do this operation on parent node, so thats wy we use 'nodePreviousNamespace'
+                nodePreviousNamespace(namespace)
+            ));
         }
 
-        return result.length ? result.join(";\n") : null;
+        return result.length ? result.join("\n") : null;
     }
 
     var exports = {};
 
     exports.diff = diff;
+    exports.isNode = isNode;
     exports.nodeSame = nodeSame;
     exports.nodeLeaf = nodeLeaf;
     exports.nodeExactly = nodeExactly;
     exports.nodePosition = nodePosition;
     exports.nodeNamespace = nodeNamespace;
     exports.nodeRetrievePath = nodeRetrievePath;
+    exports.nodePreviousNamespace = nodePreviousNamespace;
 
     return exports;
 });
