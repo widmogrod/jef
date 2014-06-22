@@ -36,7 +36,10 @@ describe('DomDiff', function() {
 
     describe('#diff', function(){
         it('should return string', function(){
-            console.log(domdiff.diff(refA, refB));
+            domdiff.diff(refA, refB).should.be.eql(
+            'aElement.children[0].children[1].appendChild(bElement.children[1].children[0]);\n' +
+            'aElement.children[0].children[2].appendChild(bElement.children[2].children[0])'
+            );
         })
     })
     describe('node manipulations', function() {
