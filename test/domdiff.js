@@ -1,7 +1,4 @@
 var domdiff = require('../domdiff.js');
-var ddiff = domdiff.ddiff;
-var nodeRetrievePath = domdiff.nodeRetrievePath;
-var nodePosition = domdiff.nodePosition;
 var jsdom = require("jsdom").jsdom;
 var document = jsdom("<html><head></head><body>hello world</body></html>");
 var window = document.parentWindow;
@@ -29,7 +26,7 @@ var tmplB = template(dataB);
 var refA, refB, elementOne, elementTwo, result;
 var elementTwoContext;
 
-describe('ddiff', function() {
+describe('DomDiff', function() {
     beforeEach(function() {
         refA = document.createElement('div');
         refA.innerHTML = tmplA;
@@ -37,10 +34,9 @@ describe('ddiff', function() {
         refB.innerHTML = tmplB;
     });
 
-    describe('#ddiff', function(){
+    describe('#diff', function(){
         it('should return string', function(){
-            console.log(ddiff(refA, refB));
-            // ddiff(refA, refB).should.be.string;
+            console.log(domdiff.diff(refA, refB));
         })
     })
     describe('node manipulations', function() {
@@ -63,21 +59,57 @@ describe('ddiff', function() {
             );
         })
 
+        describe('#nodeSame', function() {
+           it('node should be the same', function() {
+              domdiff.nodeSame(
+                  elementOne,
+                  elementTwo
+              ).should.be.true;
+           });
+        });
+        describe('#nodeExactly', function() {
+           it('node should be excatly', function() {
+              domdiff.nodeExactly(
+                  elementOne,
+                  elementTwo
+              ).should.be.true;
+           });
+           it('node should not be excatly', function() {
+              domdiff.nodeExactly(
+                  document.createTextNode('ccc'),
+                  document.createTextNode('asd')
+              ).should.be.false;
+           });
+        });
+        describe('#nodeLeaf', function() {
+           it('should return true', function() {
+              domdiff.nodeLeaf(
+                  elementOne,
+                  elementTwo
+              ).should.be.true;
+           });
+           it('should return false', function() {
+              domdiff.nodeLeaf(
+                  elementOne,
+                  elementTwoContext
+              ).should.be.false;
+           });
+        });
         describe('#nodePosition', function() {
             it('should retrieve node position', function() {
-                nodePosition(elementOne).should.be.eql(0);
-                nodePosition(elementTwo).should.be.eql(0);
+                domdiff.nodePosition(elementOne).should.be.eql(0);
+                domdiff.nodePosition(elementTwo).should.be.eql(0);
             });
         });
         describe('#nodeRetrievePath', function() {
             it('should retrieve element document path', function() {
-                result = nodeRetrievePath(elementOne) ;
+                result = domdiff.nodeRetrievePath(elementOne) ;
                 result.should.be.eql(
                     'document.children[0].children[1].children[0]'
                 );
             });
             it('should retrieve element memory path', function() {
-                result = nodeRetrievePath(elementTwo, 'element') ;
+                result = domdiff.nodeRetrievePath(elementTwo, 'element') ;
                 result.should.be.eql(
                     'element.children[0]'
                 );

@@ -82,8 +82,8 @@
      * @param {Node} b
      * @param {String} [namespace]
      */
-    function ddiff(a, b, namespace) {
-        var i, length, diff, nodeA, nodeB, inner, result = [];
+    function diff(a, b, namespace) {
+        var i, length, delta, nodeA, nodeB, inner, result = [];
 
         if (!namespace) {
             // Extract namespace from the 'a' node
@@ -93,17 +93,17 @@
         // nodes are the same, compare children
         if (!nodeLeaf(a, b) && nodeSame(a, b)) {
             length = nodeLength(a);
-            diff = length - nodeLength(b);
+            delta = length - nodeLength(b);
 
             for (i = 0; i < length; i++) {
                 nodeA = nodeRetrieve(a, i);
                 nodeB = nodeRetrieve(b, i);
 
-                inner = ddiff(nodeA, nodeB, nodeNamespace(i, namespace))
+                inner = diff(nodeA, nodeB, nodeNamespace(i, namespace))
                 inner && result.push(inner);
             }
 
-            if (diff < 0) {
+            if (delta < 0) {
                 // the 'a' node have less children than the 'b' node
                 // then since we poroceed all a nodes then we need
                 // add b nodes
@@ -128,12 +128,11 @@
 
     var exports = {};
 
-    exports.ddiff = ddiff;
+    exports.diff = diff;
     exports.nodeSame = nodeSame;
     exports.nodeLeaf = nodeLeaf;
     exports.nodeExactly = nodeExactly;
     exports.nodePosition = nodePosition;
-    exports.nodeNamespace = nodeNamespace;
     exports.nodeNamespace = nodeNamespace;
     exports.nodeRetrievePath = nodeRetrievePath;
 
