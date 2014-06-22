@@ -29,14 +29,14 @@
         return a.textContent === b.textContent && nodeSame(a, b);
     }
 
-    function nodeAction(action, node, namespace, context) {
-        return namespace + '.'+ action +'(' + nodeRetrievePath(node, context) + ')';
+    function nodeAction(action, nodePath, namespace) {
+        return namespace + '.'+ action +'(' + nodePath + ')';
     }
-    function nodeRemove(node, namespace, context) {
-        return nodeAction('removeChild', node, namespace, context);
+    function nodeRemove(nodePath, namespace, context) {
+        return nodeAction('removeChild', nodePath, namespace);
     }
-    function nodeAppend(node, namespace, context) {
-        return nodeAction('appendChild', node, namespace, context);
+    function nodeAppend(nodePath, namespace, context) {
+        return nodeAction('appendChild', nodePath, namespace);
     }
 
     function nodeLength(node) {
@@ -66,15 +66,13 @@
         context = context ? context : 'document';
 
         // Unit parent element exists, then build node path
-        while ((parent = child.parentNode) && parent)
-            {
-                index = nodePosition(child);
-                result = nodeNamespace(index, result);
-                child = parent;
-            }
+        while ((parent = child.parentNode) && parent) {
+            index = nodePosition(child);
+            result = '.children['+ index +']' + result
+            child = parent;
+        }
 
-
-            return context + result;
+        return context + result;
     }
 
     /**
@@ -83,11 +81,11 @@
      * @param {String} [namespace]
      */
     function diff(a, b, namespace) {
-        var i, length, delta, nodeA, nodeB, inner, result = [];
+        var i, length, delta, nodeA, nodeB, inner, path, result = [];
 
         if (!namespace) {
             // Extract namespace from the 'a' node
-            namespace = nodeRetrievePath(a, 'aElement');
+            namespace = 'aElement';
         }
 
         // nodes are the same, compare children
@@ -105,22 +103,21 @@
 
             if (delta < 0) {
                 // the 'a' node have less children than the 'b' node
-                // then since we poroceed all a nodes then we need
-                // add b nodes
+                // then since we compare all common 'a' and 'b' nodes
+                // then we need add remaining 'b' nodes
+                path = nodeRetrievePath(nodeRetrieve(b, i), 'bElement')
                 do {
-                    nodeB = nodeRetrieve(b, i++);
                     result.push(nodeAppend(
-                        nodeB,
-                        nodeNamespace(i-1, namespace),
-                        'bElement'
+                        path,
+                        namespace
                     ));
                 } while(++delta < 0);
             }
         }
         // no relation, use b remove a
         else if (!nodeExactly(a, b)){
-            result.push(nodeRemove(a, namespace, 'aElement'));
-            result.push(nodeAppend(b, namespace, 'bElement'));
+            result.push(nodeRemove(nodeRetrievePath(a, 'aElement'), namespace));
+            result.push(nodeAppend(nodeRetrievePath(b, 'bElement'), namespace));
         }
 
         return result.length ? result.join(";\n") : null;
