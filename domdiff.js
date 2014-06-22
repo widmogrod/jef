@@ -10,42 +10,40 @@
 })(this, function() {
     'use strict';
 
-    function same(a, b) {
+    /*
+       Node.removeChild
+       Node.replaceChild
+       Node.insertBefore
+       Node.hasChildNodes
+       Node.appendChild
+       */
+
+    function nodeSame(a, b) {
         return a.nodeName === b.nodeName;
     }
-/*
-Node.removeChild
-Node.replaceChild
-Node.insertBefore
-Node.hasChildNodes
-Node.appendChild
-*/
-
-    function node(action, node, namespace) {
-
-    };
-    function nodeRemove(node, namespace) {
+    function nodeLeaf(a, b) {
+        return nodeLength(a) === 0
+        && nodeLength(b) === 0;
     }
-    function nodeAppend(node, namespace) {
-        var result = '.appendChild()';
-        if (namespace) {
-            result = namespace + result;
-        }
-
-        return result;
+    function nodeExactly(a, b) {
+        return a.textContent === b.textContent && nodeSame(a, b);
     }
+
+    function nodeAction(action, node, namespace, context) {
+        return namespace + '.'+ action +'(' + nodeRetrievePath(node, context) + ')';
+    }
+    function nodeRemove(node, namespace, context) {
+        return nodeAction('removeChild', node, namespace, context);
+    }
+    function nodeAppend(node, namespace, context) {
+        return nodeAction('appendChild', node, namespace, context);
+    }
+
     function nodeLength(node) {
         return node.children.length;
     }
-    function nodeRetrieve(node, childIndex) {
-        return node.children[childIndex];
-    }
-    function nodeNamespace(index, namespace) {
-        var result = 'children[' + index + ']';
-        if (namespace) {
-            result = namespace + '.' + result;
-        }
-        return result;
+    function nodeRetrieve(node, index) {
+        return node.children[index];
     }
     function nodePosition(element) {
         return Array.prototype.indexOf.call(
@@ -53,29 +51,47 @@ Node.appendChild
             element
         );
     }
-    function nodeRetrievePath(node) {
-        var index, parent, child = node, result = '';
 
-        while ((parent = child.parentNode) && parent)
-        {
-            index = nodePosition(child);
-            result = '.children['+ index +']' + result;
-            child = parent;
-        }
-
-        return 'document' + result;
+    function nodeNamespace(index, namespace) {
+        var result;
+        result = 'children[' + index + ']';
+        result = namespace + '.' + result;
+        return result;
     }
 
+    function nodeRetrievePath(node, context) {
+        var index, parent, child = node, result = '';
+
+        // Use custome context or document
+        context = context ? context : 'document';
+
+        // Unit parent element exists, then build node path
+        while ((parent = child.parentNode) && parent)
+            {
+                index = nodePosition(child);
+                result = nodeNamespace(index, result);
+                child = parent;
+            }
+
+
+            return context + result;
+    }
+
+    /**
+     * @param {Node} a
+     * @param {Node} b
+     * @param {String} [namespace]
+     */
     function ddiff(a, b, namespace) {
         var i, length, diff, nodeA, nodeB, result = [];
 
         if (!namespace) {
-            namespace = nodeRetrievePath(a);
+            // Extract namespace from the 'a' node
+            namespace = nodeRetrievePath(a, 'aElement');
         }
 
-        // check if nodes are the same
-        if (same(a, b)) {
-            // if yes then compare children
+        // nodes are the same, compare children
+        if (!nodeLeaf(a, b) && nodeSame(a, b)) {
             length = nodeLength(a);
             diff = length - nodeLength(b);
 
@@ -93,14 +109,18 @@ Node.appendChild
                 // add b nodes
                 do {
                     nodeB = nodeRetrieve(b, i++);
-                    result.push(nodeAppend(nodeB, nodeNamespace(i-1, namespace)));
+                    result.push(nodeAppend(
+                        nodeB,
+                        nodeNamespace(i-1, namespace),
+                        'bElement'
+                    ));
                 } while(++diff < 0);
             }
-
-        } else {
-            // if not then use b and remove a
-            result.push(nodeRemove(a, namespace));
-            result.push(nodeAppend(b, namespace));
+        }
+        // no relation, use b remove a
+        else if (!nodeExactly(a, b)){
+            result.push(nodeRemove(a, namespace, 'aElement'));
+            result.push(nodeAppend(b, namespace, 'bElement'));
         }
 
         return result.join(";\n");
@@ -109,7 +129,12 @@ Node.appendChild
     var exports = {};
 
     exports.ddiff = ddiff;
+    exports.nodeSame = nodeSame;
+    exports.nodeLeaf = nodeLeaf;
+    exports.nodeExactly = nodeExactly;
     exports.nodePosition = nodePosition;
+    exports.nodeNamespace = nodeNamespace;
+    exports.nodeNamespace = nodeNamespace;
     exports.nodeRetrievePath = nodeRetrievePath;
 
     return exports;

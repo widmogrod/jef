@@ -27,6 +27,7 @@ var dataB = {
 var tmplA = template(dataA);
 var tmplB = template(dataB);
 var refA, refB, elementOne, elementTwo, result;
+var elementTwoContext;
 
 describe('ddiff', function() {
     beforeEach(function() {
@@ -38,7 +39,7 @@ describe('ddiff', function() {
 
     describe('#ddiff', function(){
         it('should return string', function(){
-            // console.log(ddiff(refA, refB));
+            console.log(ddiff(refA, refB));
             // ddiff(refA, refB).should.be.string;
         })
     })
@@ -48,29 +49,37 @@ describe('ddiff', function() {
             elementOne = document.createElement('div');
             document.body.appendChild(elementOne);
             elementTwo = document.createElement('div');
-            document.body.appendChild(elementTwo);
+            elementTwoContext = document.createElement('div');
+            elementTwoContext.appendChild(elementTwo);
+
         });
 
         it('should have valid reference', function() {
             elementOne.should.be.exactly(
                 document.children[0].children[1].children[0]
             );
-            elementTwo.should.be.exactly(
-                document.children[0].children[1].children[1]
-            );
+            // elementTwo.should.be.exactly(
+            //     document.children[0].children[1].children[1]
+            // );
         })
 
         describe('#nodePosition', function() {
             it('should retrieve node position', function() {
                 nodePosition(elementOne).should.be.eql(0);
-                nodePosition(elementTwo).should.be.eql(1);
+                nodePosition(elementTwo).should.be.eql(0);
             });
         });
         describe('#nodeRetrievePath', function() {
-            it('should retrieve element dom path', function() {
+            it('should retrieve element document path', function() {
                 result = nodeRetrievePath(elementOne) ;
                 result.should.be.eql(
                     'document.children[0].children[1].children[0]'
+                );
+            });
+            it('should retrieve element memory path', function() {
+                result = nodeRetrievePath(elementTwo, 'element') ;
+                result.should.be.eql(
+                    'element.children[0]'
                 );
             });
         });
