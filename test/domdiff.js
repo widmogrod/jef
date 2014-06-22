@@ -1,4 +1,6 @@
-var DomDiff = require('../domdiff.js');
+var domdiff = require('../domdiff.js');
+var ddiff = domdiff.ddiff;
+var nodeRetrievePath = domdiff.nodeRetrievePath;
 var jsdom = require("jsdom").jsdom;
 var document = jsdom("<html><head></head><body>hello world</body></html>");
 var window = document.parentWindow;
@@ -23,20 +25,38 @@ var dataB = {
 };
 var tmplA = template(dataA);
 var tmplB = template(dataB);
-var refA, refB;
+var refA, refB, element, result;
 
-describe('DomDiff', function() {
+describe('ddiff', function() {
     beforeEach(function() {
-        object = new DomDiff();
         refA = document.createElement('div');
         refA.innerHTML = tmplA;
         refB = document.createElement('div');
         refB.innerHTML = tmplB;
     });
 
-    describe('#construction', function(){
-        it('should construct object instane of DomDiff', function(){
-            object.should.be.an.instanceOf(DomDiff);
+    describe('#ddiff', function(){
+        it('should return string', function(){
+            // console.log(ddiff(refA, refB));
+            // ddiff(refA, refB).should.be.string;
         })
     })
+    describe('#nodeRetrievePath', function() {
+        beforeEach(function() {
+            document.body.innerHTML = '';
+            element = document.createElement('div');
+            document.body.appendChild(element);
+        });
+        it('should have valid reference', function() {
+            element.should.be.exactly(
+                document.children[0].children[1].children[0]
+            );
+        })
+        it('should retrieve element dom path', function() {
+            result = nodeRetrievePath(element) ;
+            result.should.be.eql(
+                'document.children[0].children[1].children[0]'
+            );
+        });
+    });
 })
