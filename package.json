@@ -1,6 +1,6 @@
 {
   "name": "jef",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "JavaScript experimental functions ",
   "main": "functional.js",
   "dependencies": {},
@@ -20,7 +20,9 @@
   },
   "keywords": [
     "functional",
-    "reactive"
+    "reactive",
+    "react.js",
+    "diff DOM"
   ],
   "author": "Gabriel Habryn",
   "license": "MIT",
