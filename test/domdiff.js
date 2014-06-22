@@ -41,22 +41,25 @@ describe('ddiff', function() {
             // ddiff(refA, refB).should.be.string;
         })
     })
-    describe('#nodeRetrievePath', function() {
+    describe('node manipulations', function() {
         beforeEach(function() {
             document.body.innerHTML = '';
             element = document.createElement('div');
             document.body.appendChild(element);
         });
-        it('should have valid reference', function() {
-            element.should.be.exactly(
-                document.children[0].children[1].children[0]
-            );
-        })
-        it('should retrieve element dom path', function() {
-            result = nodeRetrievePath(element) ;
-            result.should.be.eql(
-                'document.children[0].children[1].children[0]'
-            );
+
+        describe('#nodeRetrievePath', function() {
+            it('should have valid reference', function() {
+                element.should.be.exactly(
+                    document.children[0].children[1].children[0]
+                );
+            })
+            it('should retrieve element dom path', function() {
+                result = nodeRetrievePath(element) ;
+                result.should.be.eql(
+                    'document.children[0].children[1].children[0]'
+                );
+            });
         });
     });
 })

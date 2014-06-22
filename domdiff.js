@@ -106,6 +106,7 @@ Node.appendChild
     var exports = {};
 
     exports.ddiff = ddiff;
+    exports.nodePosition = nodePosition;
     exports.nodeRetrievePath = nodeRetrievePath;
 
     return exports;
