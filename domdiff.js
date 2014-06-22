@@ -47,15 +47,18 @@ Node.appendChild
         }
         return result;
     }
-    function nodePosition(parent, element) {
-        return Array.prototype.indexOf.call(parent.children, element);
+    function nodePosition(element) {
+        return Array.prototype.indexOf.call(
+            element.parentNode.children,
+            element
+        );
     }
     function nodeRetrievePath(node) {
         var index, parent, child = node, result = '';
 
         while ((parent = child.parentNode) && parent)
         {
-            index = nodePosition(parent, child);
+            index = nodePosition(child);
             result = '.children['+ index +']' + result;
             child = parent;
         }

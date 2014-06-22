@@ -1,6 +1,7 @@
 var domdiff = require('../domdiff.js');
 var ddiff = domdiff.ddiff;
 var nodeRetrievePath = domdiff.nodeRetrievePath;
+var nodePosition = domdiff.nodePosition;
 var jsdom = require("jsdom").jsdom;
 var document = jsdom("<html><head></head><body>hello world</body></html>");
 var window = document.parentWindow;
@@ -25,7 +26,7 @@ var dataB = {
 };
 var tmplA = template(dataA);
 var tmplB = template(dataB);
-var refA, refB, element, result;
+var refA, refB, elementOne, elementTwo, result;
 
 describe('ddiff', function() {
     beforeEach(function() {
@@ -44,22 +45,35 @@ describe('ddiff', function() {
     describe('node manipulations', function() {
         beforeEach(function() {
             document.body.innerHTML = '';
-            element = document.createElement('div');
-            document.body.appendChild(element);
+            elementOne = document.createElement('div');
+            document.body.appendChild(elementOne);
+            elementTwo = document.createElement('div');
+            document.body.appendChild(elementTwo);
         });
 
+        it('should have valid reference', function() {
+            elementOne.should.be.exactly(
+                document.children[0].children[1].children[0]
+            );
+            elementTwo.should.be.exactly(
+                document.children[0].children[1].children[1]
+            );
+        })
+
+        describe('#nodePosition', function() {
+            it('should retrieve node position', function() {
+                nodePosition(elementOne).should.be.eql(0);
+                nodePosition(elementTwo).should.be.eql(1);
+            });
+        });
         describe('#nodeRetrievePath', function() {
-            it('should have valid reference', function() {
-                element.should.be.exactly(
-                    document.children[0].children[1].children[0]
-                );
-            })
             it('should retrieve element dom path', function() {
-                result = nodeRetrievePath(element) ;
+                result = nodeRetrievePath(elementOne) ;
                 result.should.be.eql(
                     'document.children[0].children[1].children[0]'
                 );
             });
         });
+
     });
 })
