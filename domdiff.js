@@ -125,6 +125,9 @@
                 // remove unused elements form 'a' node
                 path = nodeRetrievePath(nodeRetrieve(a, i), 'aElement', rootA);
                 do {
+                    // We use the same 'path' for removed elements because
+                    // When removing elementa at index 1, element at index 2 changes its possition
+                    // and became element at position 1
                     result.push(nodeRemove(
                         path,
                         namespace
