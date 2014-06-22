@@ -4,25 +4,33 @@
 
 J.E.F is collection of JavaScript experimental functions, written to lern and test `functional` & `reactive` programming.
 
-
-## Testing
-
-This library is using mocha as a test framework.
-
-```
-npm install
-npm test
-```
-
-
-## Other
-
-Deploy to GitHub Pages
-```
-npm run deploy
-```
-
 ## Components
+### DOM Diff
+
+Compare two DOM nodes and create DOM diff;
+Lets assume that we have markup like so:
+
+```
+<ul><li>First element</li></ul>
+```
+
+And you want to change it to:
+```
+<ul><li>First element</li><li>Second element</li></ul>
+```
+
+DOM Diff tool will generate diff like so:
+```
+aElement.children[0].appendChild(bElement.children[0].children[1]);
+```
+
+Example jQuery code that will do everything for you:
+```
+$('demo').diffhtml('<ul><li>First element</li></ul>');
+$('demo').diffhtml('<ul><li>First element</li><li>Second element</li></ul>');
+```
+
+
 ### Stream
 
 Given I have three streams A, B and C which stream value over time:
@@ -42,5 +50,21 @@ When I pass given stream to `stream.when` then new stream will be created,
 and will stream merged streamed data from given streams, but only when all streams emit at least one value.
 ```
 stream.when(A,B,C)  --------------[a2,b3,c1]--------[a3,b3,c1]-
+```
+
+## Testing
+
+This library is using mocha as a test framework.
+
+```
+npm install
+npm test
+```
+
+## Other
+
+Deploy to GitHub Pages
+```
+npm run deploy
 ```
 
