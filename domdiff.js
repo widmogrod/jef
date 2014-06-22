@@ -83,7 +83,7 @@
      * @param {String} [namespace]
      */
     function ddiff(a, b, namespace) {
-        var i, length, diff, nodeA, nodeB, result = [];
+        var i, length, diff, nodeA, nodeB, inner, result = [];
 
         if (!namespace) {
             // Extract namespace from the 'a' node
@@ -98,9 +98,9 @@
             for (i = 0; i < length; i++) {
                 nodeA = nodeRetrieve(a, i);
                 nodeB = nodeRetrieve(b, i);
-                result.push(
-                    ddiff(nodeA, nodeB, nodeNamespace(i, namespace))
-                );
+
+                inner = ddiff(nodeA, nodeB, nodeNamespace(i, namespace))
+                inner && result.push(inner);
             }
 
             if (diff < 0) {
@@ -123,7 +123,7 @@
             result.push(nodeAppend(b, namespace, 'bElement'));
         }
 
-        return result.join(";\n");
+        return result.length ? result.join(";\n") : null;
     }
 
     var exports = {};

@@ -58,9 +58,9 @@ describe('ddiff', function() {
             elementOne.should.be.exactly(
                 document.children[0].children[1].children[0]
             );
-            // elementTwo.should.be.exactly(
-            //     document.children[0].children[1].children[1]
-            // );
+            elementTwo.should.be.exactly(
+                elementTwoContext.children[0]
+            );
         })
 
         describe('#nodePosition', function() {
