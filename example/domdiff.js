@@ -1,34 +1,18 @@
 (function(root, factory) {
     if (typeof exports === 'object') { // Node.js
         module.exports = factory(
-            require('../domdiff.js')
+            require('../integration/jquery.domdiff.js')
         );
     } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/domdiff'], factory);
+        define(['jef/integration/jquery.domdiff'], factory);
     } else {  // Browser globals
         root.jefdemo = root.jefdemo || {};
         root.jefdemo.domdiff = factory(
-            root.jef.domdiff
+            jQuery
         );
     }
-})(this, function(domdiff){
+})(this, function(jQuery){
     'use strict';
-
-    jQuery.fn.dhtml = function(html) {
-        var ref, diff, func;
-
-        ref = document.createElement('div');
-        return this.each(function() {
-            // Create in memory dom nodes
-            ref.innerHTML = html;
-            // Compare document state with memory state
-            diff = domdiff.diff(this, ref);
-            // Create function to apply difference
-            func = new Function('aElement', 'bElement', diff)
-            // Apply difference
-            func(this, ref);
-        });
-    }
 
     var dataA = {
         rows:[
@@ -45,9 +29,9 @@
 
     return {
         main: function(element, document, template) {
-            $(element).dhtml(template(dataA));
+            $(element).diffhtml(template(dataA));
             $('#js-render').on('click', function() {
-                $(element).dhtml(template(dataB));
+                $(element).diffhtml(template(dataB));
             });
         }
     };
