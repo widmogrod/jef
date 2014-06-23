@@ -34,17 +34,33 @@
         && nodeLength(b) === 0;
     }
 
-
+    /**
+     * Find common attributes in elements 'a' & 'b'
+     * and return array of common attribites names
+     *
+     * @param {NamedNodeMap} a
+     * @param {NamedNodeMap} b
+     * @return {Array}
+     */
     function attrIntersection(aAttr, bAttr) {
         var name, result = [];
         Array.prototype.forEach.call(aAttr, function(value) {
             name = value.nodeName;
-            if (name && null !== bAttr[name]) {
+            if (name && bAttr[name]) {
                 result.push(name);
             }
         });
         return result;
     }
+
+    /**
+     * Find attributes in 'a' that do not exists in 'b'
+     * and return array of different attribitutes names
+     *
+     * @param {NamedNodeMap} a
+     * @param {Array} b
+     * @return {Array}
+     */
     function attrDifference(aAttr, bArray) {
         var result = [];
         Array.prototype.forEach.call(aAttr, function(value) {
@@ -55,38 +71,102 @@
         return result;
     }
 
+    /**
+     * Helper function, testing if attribute is the same in two given elements.
+     *
+     * @param {Element} a
+     * @param {Element} b
+     * @param {String} name
+     * @return {Boolean}
+     */
     function nodeAttrValueEqual(a, b, name) {
         return a.attributes[name].value === b.attributes[name].value;
     }
-    function nodeAttrRemove(from, attrName) {
-       return from + '.removeAttribute("'+ attrName +'");';
+
+    /**
+     * Prepare action to remove attribute {name} from given {node}
+     *
+     * @param {String} node
+     * @param {String} name
+     * @return {String}
+     */
+    function nodeAttrRemove(node, name) {
+        return node + '.removeAttribute("'+ name +'");\n';
     }
-    function nodeAttrReplace(from, to, attrName) {
-       return to + '.setAttribute("'+ attrName +'", '+ from +'.getAttribute("'+ attrName +'"));';
+
+    /**
+     * Prepare action to replace attribute value;
+     *
+     * @param {String} from
+     * @param {String} to
+     * @param {String} name
+     * @return {String}
+     */
+    function nodeAttrReplace(from, to, name) {
+        return to + '.setAttribute("'+ name +'", '+ from +'.getAttribute("'+ name +'"));\n';
     }
+
+    /**
+     * Check if given nodes are exacly the same
+     * (textContent and nodeName are equal)
+     *
+     * @param {Element} a
+     * @param {Element} b
+     * @return {Boolean}
+     */
     function nodeExactly(a, b) {
         return a.textContent === b.textContent
-            && nodeSame(a, b);
+        && nodeSame(a, b);
     }
+
+    /**
+     * Helper function to generate node actions
+     *
+     * @param {String} namespace
+     * @param {String} action
+     * @param {String} nodePath
+     * @return {String}
+     */
     function nodeAction(namespace, action, nodePath) {
-        return namespace + '.'+ action +'(' + nodePath + ');';
+        return namespace + '.'+ action +'(' + nodePath + ');\n';
     }
     function nodeRemove(nodePath, namespace) {
         return nodeAction(namespace, 'removeChild', nodePath);
     }
     function nodeReplace(newPath, oldPath, namespace) {
-        return namespace + '.replaceChild('+ newPath +', '+ oldPath +');';
+        return namespace + '.replaceChild('+ newPath +', '+ oldPath +');\n';
     }
     function nodeAppend(nodePath, namespace) {
         return nodeAction(namespace, 'appendChild', nodePath);
     }
 
+    /**
+     * Retrive number of children for given node
+     *
+     * @param {Element} node
+     * @return {Integer}
+     */
     function nodeLength(node) {
         return node.children.length;
     }
+
+    /**
+     * Retrive child node at {index} for given element;
+     *
+     * @param {Element} node
+     * @param {Integer} index
+     * @return {Element}
+     */
     function nodeRetrieve(node, index) {
         return node.children[index];
     }
+
+    /**
+     * Retrive node position in parent element child nodes;
+     *
+     * @param {Element} element
+     * @return {Integer}
+     */
     function nodePosition(element) {
         return Array.prototype.indexOf.call(
             element.parentNode.children,
@@ -94,16 +174,38 @@
         );
     }
 
+    /**
+     * Generate node namespace/path
+     *
+     * @param {Integer} index
+     * @param {String} namespace
+     * @return {String}
+     */
     function nodeNamespace(index, namespace) {
         var result;
         result = 'children[' + index + ']';
         result = namespace + '.' + result;
         return result;
     }
+
+    /**
+     * Retrieve namespace of a parent from given namespace
+     *
+     * @param {String} namespace
+     * @return {String}
+     */
     function nodeParentNamespace(namespace) {
-       return namespace.replace(/(\.[^\.]+)$/, '');
+        return namespace.replace(/(\.[^\.]+)$/, '');
     }
 
+    /**
+     * Retrieve node path
+     *
+     * @param {Element} node
+     * @param {String} [contextName]
+     * @param {Element} [to]
+     * @return {String}
+     */
     function nodeRetrievePath(node, contextName, to) {
         var index, parent, child = node, result = '';
 
@@ -122,105 +224,99 @@
     }
 
     /**
+     * Create DOM API diff from given elements
+     *
      * @param {Node} a
      * @param {Node} b
-     * @param {String} [namespace]
-     * @param {Node} [rootA]
-     * @param {Node} [rootB]
      */
-    function diff(a, b, namespace, rootA, rootB) {
-        var i, length, delta, inner, nodeA, nodeB, path, isLeaf, result = [];
-        var common, remove, create;
+    function diff(rootA, rootB) {
+        function diffrecursice(a, b, namespace) {
+            var i, length, delta, inner, nodeA, nodeB, path, isLeaf, common, remove, create,
+                result = '';
 
-        // Remember root element
-        rootA = rootA || a;
-        rootB = rootB || b;
+            isLeaf = nodeLeaf(a, b);
 
-        if (!namespace) {
-            // Extract namespace from the 'a' node
-            namespace = 'aElement';
-        }
+            // Nodes are the same, compare children
+            if (!isLeaf && nodeSame(a, b)) {
+                length = nodeLength(a);
+                delta = length - nodeLength(b);
 
-        isLeaf = nodeLeaf(a, b);
-
-        // Nodes are the same, compare children
-        if (!isLeaf && nodeSame(a, b)) {
-            length = nodeLength(a);
-            delta = length - nodeLength(b);
-
-            if (delta > 0) {
-                // 'b' has leser length so we need to reduce
-                // 'a' loop length to 'b' length; if we haven't do this
-                // then we would have null elements in nodeB var
-                length -= delta;
-            }
-
-            for (i = 0; i < length; i++) {
-                nodeA = nodeRetrieve(a, i);
-                nodeB = nodeRetrieve(b, i);
-
-                inner = diff(nodeA, nodeB, nodeNamespace(i, namespace), rootA, rootB);
-                inner && result.push(inner);
-            }
-
-            if (delta > 0) {
-                // remove unused elements form 'a' node
-                path = nodeRetrievePath(nodeRetrieve(a, i), 'aElement', rootA);
-                do {
-                    // We use the same 'path' for removed elements because
-                    // When removing elementa at index 1, element at index 2 changes its possition
-                    // and became element at position 1
-                    result.push(nodeRemove(
-                        path,
-                        namespace
-                    ));
-                } while(--delta > 0);
-            } else if (delta < 0) {
-                // the 'a' node have less children than the 'b' node
-                // then since we compare all common 'a' and 'b' nodes
-                // then we need add remaining 'b' nodes
-                path = nodeRetrievePath(nodeRetrieve(b, i), 'bElement', rootB);
-                do {
-                    result.push(nodeAppend(
-                        path,
-                        namespace
-                    ));
-                } while(++delta < 0);
-            }
-        }
-        // Are exacly, then compare arguments
-        else if (isLeaf && nodeExactly(a, b)) {
-            common = attrIntersection(a.attributes, b.attributes);
-            remove = attrDifference(a.attributes, common);
-            create = attrDifference(b.attributes, common);
-
-            nodeB = nodeRetrievePath(b, 'bElement', rootB);
-            nodeA = nodeRetrievePath(a, 'aElement', rootA);
-
-            common.forEach(function(name) {
-                if (!nodeAttrValueEqual(a, b, name)) {
-                    result.push(nodeAttrReplace(nodeB, nodeA, name));
+                if (delta > 0) {
+                    // 'b' has leser length so we need to reduce
+                    // 'a' loop length to 'b' length; if we haven't do this
+                    // then we would have null elements in nodeB var
+                    length -= delta;
                 }
-            });
-            remove.forEach(function(name) {
-                result.push(nodeAttrRemove(nodeA, name));
-            });
-            create.forEach(function(name) {
-                result.push(nodeAttrReplace(nodeB, nodeA, name));
-            });
-        }
-        // No relation, use b remove a
-        else {
-            result.push(nodeReplace(
-                nodeRetrievePath(b, 'bElement', rootB),
-                nodeRetrievePath(a, 'aElement', rootA),
-                // Namespace is for current node, unfortunetly to replace element we need to
-                // do this operation on parent node, so thats wy we use 'nodeParentNamespace'
-                nodeParentNamespace(namespace)
-            ));
+
+                for (i = 0; i < length; i++) {
+                    nodeA = nodeRetrieve(a, i);
+                    nodeB = nodeRetrieve(b, i);
+
+                    inner = diffrecursice(nodeA, nodeB, nodeNamespace(i, namespace))
+                    inner && (result += inner);
+                }
+
+                if (delta > 0) {
+                    // remove unused elements form 'a' node
+                    path = nodeRetrievePath(nodeRetrieve(a, i), 'aElement', rootA);
+                    do {
+                        // We use the same 'path' for removed elements because
+                        // When removing elementa at index 1, element at index 2 changes its possition
+                        // and became element at position 1
+                        result += nodeRemove(
+                            path,
+                            namespace
+                        );
+                    } while(--delta > 0);
+                } else if (delta < 0) {
+                    // the 'a' node have less children than the 'b' node
+                    // then since we compare all common 'a' and 'b' nodes
+                    // then we need add remaining 'b' nodes
+                    path = nodeRetrievePath(nodeRetrieve(b, i), 'bElement', rootB);
+                    do {
+                        result += nodeAppend(
+                            path,
+                            namespace
+                        );
+                    } while(++delta < 0);
+                }
+            }
+            // Are exacly, then compare arguments
+            else if (isLeaf && nodeExactly(a, b)) {
+                common = attrIntersection(a.attributes, b.attributes);
+                remove = attrDifference(a.attributes, common);
+                create = attrDifference(b.attributes, common);
+
+                nodeB = nodeRetrievePath(b, 'bElement', rootB);
+                nodeA = nodeRetrievePath(a, 'aElement', rootA);
+
+                common.forEach(function(name) {
+                    if (!nodeAttrValueEqual(a, b, name)) {
+                        result += nodeAttrReplace(nodeB, nodeA, name);
+                    }
+                });
+                remove.forEach(function(name) {
+                    result += nodeAttrRemove(nodeA, name);
+                });
+                create.forEach(function(name) {
+                    result += nodeAttrReplace(nodeB, nodeA, name);
+                });
+            }
+            // No relation, use b remove a
+            else {
+                result += nodeReplace(
+                    nodeRetrievePath(b, 'bElement', rootB),
+                    nodeRetrievePath(a, 'aElement', rootA),
+                    // Namespace is for current node, unfortunetly to replace element we need to
+                    // do this operation on parent node, so thats wy we use 'nodeParentNamespace'
+                    nodeParentNamespace(namespace)
+                );
+            }
+
+            return result;
         }
 
-        return result.length ? result.join("\n") : null;
+        return diffrecursice(rootA, rootB, 'aElement');
     }
 
     var exports = {};

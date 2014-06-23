@@ -38,56 +38,56 @@ describe('DomDiff', function() {
         it('should return string', function(){
             domdiff.diff(refA, refB).should.be.eql(
                 'aElement.children[0].appendChild(bElement.children[0].children[1]);\n' +
-                'aElement.children[0].appendChild(bElement.children[0].children[1]);'
+                'aElement.children[0].appendChild(bElement.children[0].children[1]);\n'
             );
         })
         it('should replace elements', function() {
             refA.innerHTML = '<ul><li>First element</li></ul>';
             refB.innerHTML = '<ul><li>Second element</li></ul>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);'
+                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'
             );
         });
         it('should replace arguments', function() {
             refA.innerHTML = '<ul><li class="a">First element</li></ul>';
             refB.innerHTML = '<ul><li class="b">First element</li></ul>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));'
+                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));\n'
             );
         });
         it('should add arguments', function() {
             refA.innerHTML = '<ul><li>First element</li></ul>';
             refB.innerHTML = '<ul><li class="b">First element</li></ul>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));'
+                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));\n'
             );
         });
         it('should remove arguments', function() {
             refA.innerHTML = '<ul><li class="a">First element</li></ul>';
             refB.innerHTML = '<ul><li>First element</li></ul>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].children[0].removeAttribute("class");'
+                'aElement.children[0].children[0].removeAttribute("class");\n'
             );
         });
         it('should remove unused elements', function() {
             refA.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             refB.innerHTML = '<ul><li>First element</li></ul>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].removeChild(aElement.children[0].children[1]);'
+                'aElement.children[0].removeChild(aElement.children[0].children[1]);\n'
             );
         });
         it('should add new elements', function() {
             refA.innerHTML = '<ul><li>First element</li></ul>';
             refB.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].appendChild(bElement.children[0].children[1]);'
+                'aElement.children[0].appendChild(bElement.children[0].children[1]);\n'
             );
         });
         it('should replace elements', function() {
             refA.innerHTML = '<div><b>First element</b></div>';
             refB.innerHTML = '<div><span>First element</span></div>';
             domdiff.diff(refA, refB).should.be.eql(
-                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);'
+                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'
             );
         });
     })
