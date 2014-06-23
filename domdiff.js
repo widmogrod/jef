@@ -34,20 +34,21 @@
         && nodeLength(b) === 0;
     }
 
-    function attrIntersection(a, b) {
+
+    function attrIntersection(aAttr, bAttr) {
         var name, result = [];
-        Array.prototype.forEach.call(a, function(value) {
+        Array.prototype.forEach.call(aAttr, function(value) {
             name = value.nodeName;
-            if (name && b[name]) {
+            if (name && null !== bAttr[name]) {
                 result.push(name);
             }
         });
         return result;
     }
-    function attrDifference(a, b) {
+    function attrDifference(aAttr, bArray) {
         var result = [];
-        Array.prototype.forEach.call(a, function(value) {
-            if (-1 === b.indexOf(value.nodeName)) {
+        Array.prototype.forEach.call(aAttr, function(value) {
+            if (-1 === bArray.indexOf(value.nodeName)) {
                 result.push(value.nodeName);
             }
         });
