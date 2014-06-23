@@ -142,39 +142,6 @@ describe('DomDiff', function() {
             )
         });
     });
-    describe('#nodeExactlyAttributes', function() {
-        beforeEach(function() {
-            elementOne = document.createElement('div');
-            elementTwo = document.createElement('div');
-        })
-        it('should be exacly', function() {
-            elementOne.className = 'test';
-            elementTwo.className = 'test';
-            elementOne.id = 'test';
-            elementTwo.id = 'test';
-            domdiff.nodeExactlyAttributes(
-                elementOne,
-                elementTwo
-            ).should.be.true;
-        });
-        it('should be different by length', function() {
-            elementOne.className = 'test';
-            elementTwo.className = 'test';
-            elementOne.id = 'test';
-            domdiff.nodeExactlyAttributes(
-                elementOne,
-                elementTwo
-            ).should.be.false;
-        });
-        it('should be different by attribute value', function() {
-            elementOne.className = 'test';
-            elementTwo.className = 'test2';
-            domdiff.nodeExactlyAttributes(
-                elementOne,
-                elementTwo
-            ).should.be.false;
-        });
-    });
     describe('#nodeExactly', function() {
         beforeEach(function() {
             elementOne = document.createElement('div');
