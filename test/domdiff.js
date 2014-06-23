@@ -48,6 +48,27 @@ describe('DomDiff', function() {
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);'
             );
         });
+        it('should replace arguments', function() {
+            refA.innerHTML = '<ul><li class="a">First element</li></ul>';
+            refB.innerHTML = '<ul><li class="b">First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));'
+            );
+        });
+        it('should add arguments', function() {
+            refA.innerHTML = '<ul><li>First element</li></ul>';
+            refB.innerHTML = '<ul><li class="b">First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));'
+            );
+        });
+        it('should remove arguments', function() {
+            refA.innerHTML = '<ul><li class="a">First element</li></ul>';
+            refB.innerHTML = '<ul><li>First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].children[0].removeAttribute("class");'
+            );
+        });
         it('should remove unused elements', function() {
             refA.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             refB.innerHTML = '<ul><li>First element</li></ul>';
@@ -63,6 +84,48 @@ describe('DomDiff', function() {
             );
         });
     })
+    describe('#attrDifference', function() {
+        beforeEach(function() {
+            elementOne = document.createElement('div');
+            elementTwo = document.createElement('div');
+        })
+        it('should find diff with mixed', function() {
+            elementOne.className = 'test';
+            domdiff.attrDifference(
+                elementOne.attributes,
+                ['test']
+            ).should.be.eql(['class']);
+        });
+        it('should not find diff with mixed', function() {
+            elementOne.className = 'test';
+            domdiff.attrDifference(
+                elementOne.attributes,
+                ['class']
+            ).should.be.eql([]);
+        });
+    });
+    describe('#attrIntersection', function() {
+        beforeEach(function() {
+            elementOne = document.createElement('div');
+            elementTwo = document.createElement('div');
+        })
+        it('should not have intersection', function() {
+            elementOne.attributes['class'] = 'test';
+            elementTwo.attributes['id'] = 'id';
+            domdiff.attrIntersection(
+                elementOne.attributes,
+                elementTwo.attributes
+            ).should.be.eql([]);
+        });
+        it('should have intersection', function() {
+            elementOne.className = 'test';
+            elementTwo.className = 'test2';
+            domdiff.attrIntersection(
+                elementOne.attributes,
+                elementTwo.attributes
+            ).should.be.eql(['class']);
+        });
+    });
     describe('#nodeParentNamespace', function() {
         it('should return parent namespace part', function() {
             domdiff.nodeParentNamespace(

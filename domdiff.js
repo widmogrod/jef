@@ -40,10 +40,39 @@
 
         return true;
     }
+
+    function attrIntersection(a, b) {
+        var name, result = [];
+        Array.prototype.forEach.call(a, function(value) {
+            name = value.nodeName;
+            if (name && b[name]) {
+                result.push(name);
+            }
+        });
+        return result;
+    }
+    function attrDifference(a, b) {
+        var result = [];
+        Array.prototype.forEach.call(a, function(value) {
+            if (-1 === b.indexOf(value.nodeName)) {
+                result.push(value.nodeName);
+            }
+        });
+        return result;
+    }
+
+    function nodeAttrValueEqual(a, b, name) {
+        return a.attributes[name].value === b.attributes[name].value;
+    }
+    function nodeAttrRemove(from, attrName) {
+       return from + '.removeAttribute("'+ attrName +'");';
+    }
+    function nodeAttrReplace(from, to, attrName) {
+       return to + '.setAttribute("'+ attrName +'", '+ from +'.getAttribute("'+ attrName +'"));';
+    }
     function nodeExactly(a, b) {
         return a.textContent === b.textContent
-            && nodeSame(a, b)
-            && nodeExactlyAttributes(a, b)
+            && nodeSame(a, b);
     }
     function nodeAction(namespace, action, nodePath) {
         return namespace + '.'+ action +'(' + nodePath + ');';
@@ -106,7 +135,8 @@
      * @param {Node} [rootB]
      */
     function diff(a, b, namespace, rootA, rootB) {
-        var i, length, delta, nodeA, nodeB, inner, path, result = [];
+        var i, length, delta, inner, nodeA, nodeB, path, isLeaf, result = [];
+        var common, remove, create;
 
         // Remember root element
         rootA = rootA || a;
@@ -117,8 +147,10 @@
             namespace = 'aElement';
         }
 
-        // nodes are the same, compare children
-        if (!nodeLeaf(a, b) && nodeSame(a, b)) {
+        isLeaf = nodeLeaf(a, b);
+
+        // Nodes are the same, compare children
+        if (!isLeaf && nodeSame(a, b)) {
             length = nodeLength(a);
             delta = length - nodeLength(b);
 
@@ -162,8 +194,29 @@
                 } while(++delta < 0);
             }
         }
-        // no relation, use b remove a
-        else if (!nodeExactly(a, b)) {
+        // Are exacly, then compare arguments
+        else if (isLeaf && nodeExactly(a, b)) {
+            common = attrIntersection(a.attributes, b.attributes);
+            remove = attrDifference(a.attributes, common);
+            create = attrDifference(b.attributes, common);
+
+            nodeB = nodeRetrievePath(b, 'bElement', rootB);
+            nodeA = nodeRetrievePath(a, 'aElement', rootA);
+
+            common.forEach(function(name) {
+                if (!nodeAttrValueEqual(a, b, name)) {
+                    result.push(nodeAttrReplace(nodeB, nodeA, name));
+                }
+            });
+            remove.forEach(function(name) {
+                result.push(nodeAttrRemove(nodeA, name));
+            });
+            create.forEach(function(name) {
+                result.push(nodeAttrReplace(nodeB, nodeA, name));
+            });
+        }
+        // No relation, use b remove a
+        else {
             result.push(nodeReplace(
                 nodeRetrievePath(b, 'bElement', rootB),
                 nodeRetrievePath(a, 'aElement', rootA),
@@ -180,6 +233,8 @@
 
     exports.diff = diff;
     exports.isNode = isNode;
+    exports.attrDifference = attrDifference;
+    exports.attrIntersection = attrIntersection;
     exports.nodeSame = nodeSame;
     exports.nodeLeaf = nodeLeaf;
     exports.nodeExactly = nodeExactly;
