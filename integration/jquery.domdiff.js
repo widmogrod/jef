@@ -16,7 +16,8 @@
     'use strict';
 
     var DEFAULT_OPTIONS = {
-        debug: false
+        debug: false,
+        returnDiff: false
     };
 
     jQuery.fn.diffhtml = function(html, options) {
@@ -25,7 +26,7 @@
         options = jQuery.extend(true, {}, DEFAULT_OPTIONS, options)
 
         ref = document.createElement('div');
-        return this.each(function() {
+        return this.map(function() {
             // Create in memory DOM nodes
             ref.innerHTML = html;
             // Compare document state with memory state
@@ -36,10 +37,15 @@
                 console.debug('to', ref.innerHTML);
                 console.debug('diff', diff);
             }
+            if (options.returnDiff) {
+                return diff;
+            }
             // Create function to apply difference
             func = new Function('aElement', 'bElement', diff)
             // Apply difference
             func(this, ref);
+
+            return this;
         });
     }
 

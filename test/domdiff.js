@@ -63,6 +63,15 @@ describe('DomDiff', function() {
             );
         });
     })
+    describe('#nodeParentNamespace', function() {
+        it('should return parent namespace part', function() {
+            domdiff.nodeParentNamespace(
+                "element.children[1].children[2]"
+            ).should.be.eql(
+                "element.children[1]"
+            )
+        });
+    });
     describe('node manipulations', function() {
         beforeEach(function() {
             document.body.innerHTML = '';

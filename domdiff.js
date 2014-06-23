@@ -61,8 +61,8 @@
         result = namespace + '.' + result;
         return result;
     }
-    function nodePreviousNamespace(namespace) {
-       return namespace.replace(/(\.[^\.]+)/, '');
+    function nodeParentNamespace(namespace) {
+       return namespace.replace(/(\.[^\.]+)$/, '');
     }
 
     function nodeRetrievePath(node, contextName, to) {
@@ -152,8 +152,8 @@
                 nodeRetrievePath(b, 'bElement', rootB),
                 nodeRetrievePath(a, 'aElement', rootA),
                 // Namespace is for current node, unfortunetly to replace element we need to
-                // do this operation on parent node, so thats wy we use 'nodePreviousNamespace'
-                nodePreviousNamespace(namespace)
+                // do this operation on parent node, so thats wy we use 'nodeParentNamespace'
+                nodeParentNamespace(namespace)
             ));
         }
 
@@ -170,7 +170,7 @@
     exports.nodePosition = nodePosition;
     exports.nodeNamespace = nodeNamespace;
     exports.nodeRetrievePath = nodeRetrievePath;
-    exports.nodePreviousNamespace = nodePreviousNamespace;
+    exports.nodeParentNamespace = nodeParentNamespace;
 
     return exports;
 });
