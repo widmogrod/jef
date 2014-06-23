@@ -10,15 +10,6 @@
 })(this, function() {
     'use strict';
 
-    function isNode(node) {
-        // var type = Object.prototype.toString.call(node);
-        // return type.match(/HTML\w*Element/i);
-        return node
-            && node.children
-            && node.replaceChild
-            && node.appendChild
-            && node.removeChild
-    }
     /**
      * Test if given nodes are the same
      *
@@ -234,7 +225,6 @@
     var exports = {};
 
     exports.diff = diff;
-    exports.isNode = isNode;
     exports.attrDifference = attrDifference;
     exports.attrIntersection = attrIntersection;
     exports.nodeSame = nodeSame;
