@@ -118,6 +118,14 @@ describe('DomDiff', function() {
                 elementTwo
             ).should.be.true;
         });
+        it('should not be exacly', function() {
+            elementOne.textContent = 'asd2';
+            elementTwo.textContent = 'asd';
+            domdiff.nodeExactly(
+                elementOne,
+                elementTwo
+            ).should.be.true;
+        });
     });
     describe('node manipulations', function() {
         beforeEach(function() {
