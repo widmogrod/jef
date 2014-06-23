@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DomDiff example</title>
+    <meta charset="utf-8" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../domdiff.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../integration/jquery.domdiff.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./domdiff_diff.js" type="text/javascript" charset="utf-8"></script>
+    <style type="text/css" media="screen">
+        textarea {
+            margin: 0;
+            width: 48%;
+            height: 200px;
+            float:left;
+        }
+        #domdiff {
+            clear:both;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="first-source" ></textarea>
+    <textarea id="second-source" ></textarea>
+    <pre id="domdiff"></pre>
+
+    <script>
+    jefdemo.domdiff.main(
+        document.getElementById('first-source'),
+        document.getElementById('second-source'),
+        document.getElementById('domdiff')
+    );
+    </script>
+</body>
+</html>
