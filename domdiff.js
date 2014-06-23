@@ -26,8 +26,24 @@
         return nodeLength(a) === 0
         && nodeLength(b) === 0;
     }
+    function nodeExactlyAttributes(a, b) {
+        var i, len;
+        if (a.attributes.length !== b.attributes.length) {
+            return false;
+        }
+
+        for (i = 0, len = a.attributes.length; i < len; i++) {
+            if (a.attributes[i].value !== b.attributes[i].value) {
+                return false;
+            }
+        }
+
+        return true;
+    }
     function nodeExactly(a, b) {
-        return a.textContent === b.textContent && nodeSame(a, b);
+        return a.textContent === b.textContent
+            && nodeSame(a, b)
+            && nodeExactlyAttributes(a, b)
     }
     function nodeAction(namespace, action, nodePath) {
         return namespace + '.'+ action +'(' + nodePath + ');';
@@ -167,6 +183,7 @@
     exports.nodeSame = nodeSame;
     exports.nodeLeaf = nodeLeaf;
     exports.nodeExactly = nodeExactly;
+    exports.nodeExactlyAttributes = nodeExactlyAttributes;
     exports.nodePosition = nodePosition;
     exports.nodeNamespace = nodeNamespace;
     exports.nodeRetrievePath = nodeRetrievePath;
