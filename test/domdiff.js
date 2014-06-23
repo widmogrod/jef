@@ -124,7 +124,7 @@ describe('DomDiff', function() {
             domdiff.nodeExactly(
                 elementOne,
                 elementTwo
-            ).should.be.true;
+            ).should.be.false;
         });
     });
     describe('node manipulations', function() {
