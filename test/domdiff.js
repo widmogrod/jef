@@ -83,6 +83,13 @@ describe('DomDiff', function() {
                 'aElement.children[0].appendChild(bElement.children[0].children[1]);'
             );
         });
+        it('should replace elements', function() {
+            refA.innerHTML = '<div><b>First element</b></div>';
+            refB.innerHTML = '<div><span>First element</span></div>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);'
+            );
+        });
     })
     describe('#attrDifference', function() {
         beforeEach(function() {
