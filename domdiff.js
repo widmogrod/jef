@@ -274,19 +274,9 @@
                     // 'a' loop length to 'b' length; if we haven't do this
                     // then we would have null elements in nodeB var
                     length -= delta;
-                }
 
-                for (i = 0; i < length; i++) {
-                    nodeA = nodeRetrieve(a, i);
-                    nodeB = nodeRetrieve(b, i);
-
-                    inner = diffrecursive(nodeA, nodeB, nodeNamespace(i, namespace))
-                    inner && (result += inner);
-                }
-
-                if (delta > 0) {
                     // remove unused elements form 'a' node
-                    path = nodeRetrievePath(nodeRetrieve(a, i), 'aElement', rootA);
+                    path = nodeRetrievePath(nodeRetrieve(a, length), 'aElement', rootA);
                     do {
                         // We use the same 'path' for removed elements because
                         // When removing elementa at index 1, element at index 2 changes its possition
@@ -300,7 +290,7 @@
                     // the 'a' node have less children than the 'b' node
                     // then since we compare all common 'a' and 'b' nodes
                     // then we need add remaining 'b' nodes
-                    path = nodeRetrievePath(nodeRetrieve(b, i), 'bElement', rootB);
+                    path = nodeRetrievePath(nodeRetrieve(b, length), 'bElement', rootB);
                     do {
                         result += nodeAppend(
                             path,
@@ -308,6 +298,15 @@
                         );
                     } while(++delta < 0);
                 }
+
+                for (i = 0; i < length; i++) {
+                    nodeA = nodeRetrieve(a, i);
+                    nodeB = nodeRetrieve(b, i);
+
+                    inner = diffrecursive(nodeA, nodeB, nodeNamespace(i, namespace))
+                    inner && (result += inner);
+                }
+
             }
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){

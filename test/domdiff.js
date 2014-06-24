@@ -50,10 +50,10 @@ describe('DomDiff', function() {
         });
         it('should replace elements if not same', function() {
             refA.innerHTML = '<div><b>a</b><p>First element</p></div>';
-            refB.innerHTML = '<div><i>a</i><p>Second element</p></div>';
+            refB.innerHTML = '<div><i>a</i><p>First element</p><b>test</b></div>';
             domdiff.diff(refA, refB).should.be.eql(
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'+
-                'aElement.children[0].replaceChild(bElement.children[0].children[1], aElement.children[0].children[1]);\n'
+                'aElement.children[0].appendChild(bElement.children[0].children[1]);\n'
             );
         });
         it('should replace arguments', function() {
