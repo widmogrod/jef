@@ -86,24 +86,24 @@
     /**
      * Prepare action to remove attribute {name} from given {node}
      *
-     * @param {String} node
+     * @param {NamespaceString} namespace
      * @param {String} name
      * @return {String}
      */
-    function nodeAttrRemove(node, name) {
-        return node + '.removeAttribute("'+ name +'");\n';
+    function nodeAttrRemove(namespace, name) {
+        return namespace.namespace + '.removeAttribute("'+ name +'");\n';
     }
 
     /**
      * Prepare action to replace attribute value;
      *
-     * @param {String} from
-     * @param {String} to
+     * @param {NamespaceString} fromNamespace
+     * @param {NamespaceString} toNamespace
      * @param {String} name
      * @return {String}
      */
-    function nodeAttrReplace(from, to, name) {
-        return to + '.setAttribute("'+ name +'", '+ from +'.getAttribute("'+ name +'"));\n';
+    function nodeAttrReplace(fromNamespace, toNamespace, name) {
+        return toNamespace.toString() + '.setAttribute("'+ name +'", '+ fromNamespace.toString() +'.getAttribute("'+ name +'"));\n';
     }
 
     /**
@@ -178,65 +178,14 @@
     }
 
     /**
-     * Generate node namespace/path
+     * Namespace object
      *
-     * @param {Integer} index
-     * @param {String} namespace
-     * @return {String}
+     * @constructor
      */
-    function nodeNamespace(index, namespace) {
-        var result;
-        result = 'children[' + index + ']';
-        result = namespace + '.' + result;
-        return result;
-    }
-
-    /**
-     * Retrieve namespace of a parent from given namespace
-     *
-     * @param {String} namespace
-     * @return {String}
-     */
-    function nodeParentNamespace(namespace) {
-        return namespace.replace(/(\.[^\.]+)$/, '');
-    }
-
-    /**
-     * Retrieve node path
-     *
-     * @param {Element} node
-     * @param {String} [contextName]
-     * @param {Element} [to]
-     * @return {String}
-     */
-    function nodeRetrievePath(node, contextName, to) {
-        var index, parent, child = node, result = '';
-
-        // Use custom contextName or document
-        contextName = contextName ? contextName : 'document';
-
-        // Unit parent element exists, then build node path
-        while ((parent = child.parentNode) && parent && (!to || to !== child )) {
-            index = nodePosition(child);
-            result = '.children['+ index +']' + result
-            // result = '.children['+ index +'/*'+ child.nodeName +'*/]' + result
-            child = parent;
-        }
-
-        return contextName + result;
-    }
-
-    function nodePath(node, namespace) {
-        var index, result;
-        index = nodePosition(node);
-        result = namespace.toString();
-        return result;
-    }
-
     function NamespaceString(namespace, index) {
         this.namespace = namespace;
         this.index = index || 0;
-    }
+    };
     NamespaceString.prototype.parent = function() {
         return this;
     };
@@ -246,62 +195,90 @@
     NamespaceString.prototype.pop = function() {
         --this.index;
         return this;
-    }
+    };
     NamespaceString.prototype.push = function() {
         ++this.index;
         return this;
-    }
+    };
     NamespaceString.prototype.next = function(index) {
         return new NamespaceNext(this, index);
-    }
+    };
+
+    /**
+     * Generalisation of namespace
+     *
+     * @constructor
+     */
     function NamespaceNext(namespace, index) {
         NamespaceString.call(this, namespace, index)
-    }
+    };
     NamespaceNext.prototype = Object.create(NamespaceString.prototype);
     NamespaceNext.prototype.parent = function() {
         return this.namespace;
-    }
+    };
     NamespaceNext.prototype.toString = function() {
-        return nodeNamespace(this.index, this.namespace.toString());
+        return this.namespace.toString() + '.children[' + this.index + ']';
+    };
+
+
+    /**
+     * Calculate diff actions to make 'a' attributes the exactly the same as in 'b'
+     *
+     * @param {Element} a
+     * @param {Element} b
+     * @param {NamespaceString} namespaceA
+     * @param {NamespaceString} namespaceB
+     * @return {String}
+     */
+    function diffattributes(a, b, namespaceA, namespaceB) {
+        var common, remove, create, result = '';
+
+        // Calculate changes in attributes
+        common = attrIntersection(a.attributes, b.attributes);
+        remove = attrDifference(a.attributes, common);
+        create = attrDifference(b.attributes, common);
+
+        // Generate actions
+        common.forEach(function(name) {
+            if (!nodeAttrValueEqual(a, b, name)) {
+                result += nodeAttrReplace(namespaceB, namespaceA, name);
+            }
+        });
+        remove.forEach(function(name) {
+            result += nodeAttrRemove(namespaceA, name);
+        });
+        create.forEach(function(name) {
+            result += nodeAttrReplace(namespaceB, namespaceA, name);
+        });
+
+        return result;
     }
 
     /**
      * Create DOM API diff from given elements
      *
-     * @param {Node} a
-     * @param {Node} b
+     * @param {Element} a
+     * @param {Element} b
+     * @return {Stirng}
      */
     function diff(rootA, rootB) {
-        function diffattributes(a, b, namespaceA, namespaceB) {
-            var common, remove, create, pathA, pathB, result = '';
-            common = attrIntersection(a.attributes, b.attributes);
-            remove = attrDifference(a.attributes, common);
-            create = attrDifference(b.attributes, common);
-
-            pathB = nodePath(b, namespaceB);
-            pathA = nodePath(a, namespaceA);
-
-            common.forEach(function(name) {
-                if (!nodeAttrValueEqual(a, b, name)) {
-                    result += nodeAttrReplace(pathB, pathA, name);
-                }
-            });
-            remove.forEach(function(name) {
-                result += nodeAttrRemove(pathA, name);
-            });
-            create.forEach(function(name) {
-                result += nodeAttrReplace(pathB, pathA, name);
-            });
-
-            return result;
-        }
+        /**
+         * Helper function
+         *
+         * @param {Element} a
+         * @param {Element} b
+         * @param {NamespaceString} namespaceA
+         * @param {NamespaceString} namespaceB
+         * @return {Stirng}
+         */
         function diffrecursive(a, b, namespaceA, namespaceB) {
-            var i, length, delta, inner, nodeA, nodeB, path, isLeaf, isSame,
+            var i, length, delta, isLeaf, isSame,
                 result = '';
 
             isLeaf = nodeLeaf(a, b);
             isSame = nodeSame(a, b);
 
+            // Node are the same so compare difference in attributes
             if (isSame) {
                 result += diffattributes(a, b, namespaceA, namespaceB);
             }
@@ -311,6 +288,7 @@
                 length = nodeLength(a);
                 delta = length - nodeLength(b);
 
+                // Create namespace for children
                 namespaceA = namespaceA.next();
                 namespaceB = namespaceB.next();
 
@@ -322,41 +300,36 @@
                 }
 
                 for (i = 0; i < length; i++) {
-                    nodeA = nodeRetrieve(a, i);
-                    nodeB = nodeRetrieve(b, i);
+                    result += diffrecursive(
+                        nodeRetrieve(a, i),
+                        nodeRetrieve(b, i),
+                        namespaceA,
+                        namespaceB
+                    );
 
-                    inner = diffrecursive(nodeA, nodeB, namespaceA, namespaceB);
-                    inner && (result += inner);
-
+                    // Push namespace child further
                     namespaceA.push();
                     namespaceB.push();
                 }
 
                 if (delta > 0) {
-                    // namespaceA.parent().pop();
                     // remove unused elements form 'a' node
-                    nodeA = nodeRetrieve(a, length);
-                    path = nodePath(nodeA, namespaceA);
                     do {
                         // We use the same 'path' for removed elements because
                         // When removing elementa at index 1, element at index 2 changes its possition
                         // and became element at position 1
                         result += nodeRemove(
-                            path,
+                            namespaceA.toString(),
                             namespaceA.parent().toString()
                         );
                     } while(--delta > 0);
-                    // namespaceA.pop();
                 } else if (delta < 0) {
                     // the 'a' node have less children than the 'b' node
                     // then since we compare all common 'a' and 'b' nodes
                     // then we need add remaining 'b' nodes
-                    nodeB = nodeRetrieve(b, length);
-                    path = nodePath(nodeB, namespaceB)
-
                     do {
                         result += nodeAppend(
-                            path,
+                            namespaceB.toString(),
                             namespaceA.parent().toString()
                         );
                     } while(++delta < 0);
@@ -364,21 +337,21 @@
             }
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){
-                nodeA = nodePath(a, namespaceA);
-                nodeB = nodePath(b, namespaceB);
-
                 result += nodeReplace(
-                    nodeB,
-                    nodeA,
+                    namespaceB.toString(),
+                    namespaceA.toString(),
                     namespaceA.parent().toString()
                 );
 
+                // When we replace element A with B then B's children number decremented
                 namespaceB.pop();
             }
 
             return result;
         }
 
+
+        // Perform two node comparision
         return diffrecursive(
             rootA,
             rootB,
@@ -401,9 +374,6 @@
     exports.nodeLeaf = nodeLeaf;
     exports.nodeExactly = nodeExactly;
     exports.nodePosition = nodePosition;
-    exports.nodeNamespace = nodeNamespace;
-    exports.nodeRetrievePath = nodeRetrievePath;
-    exports.nodeParentNamespace = nodeParentNamespace;
     exports.NamespaceString = NamespaceString;
     exports.NamespaceNext = NamespaceNext;
 

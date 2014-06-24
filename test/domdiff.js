@@ -206,15 +206,6 @@ describe('DomDiff', function() {
             ).should.be.eql(['class']);
         });
     });
-    describe('#nodeParentNamespace', function() {
-        it('should return parent namespace part', function() {
-            domdiff.nodeParentNamespace(
-                "element.children[1].children[2]"
-            ).should.be.eql(
-                "element.children[1]"
-            )
-        });
-    });
     describe('#nodeExactly', function() {
         it('should be exacly', function() {
             elementOne.textContent = 'asd';
@@ -292,26 +283,6 @@ describe('DomDiff', function() {
             it('should retrieve node position', function() {
                 domdiff.nodePosition(elementOne).should.be.eql(0);
                 domdiff.nodePosition(elementTwo).should.be.eql(0);
-            });
-        });
-        describe('#nodeRetrievePath', function() {
-            it('should retrieve element document path', function() {
-                result = domdiff.nodeRetrievePath(elementOne) ;
-                result.should.be.eql(
-                    'document.children[0].children[1].children[0]'
-                );
-            });
-            it('should retrieve element path to specific element', function() {
-                result = domdiff.nodeRetrievePath(elementOne, 'element', document.children[0]) ;
-                result.should.be.eql(
-                    'element.children[1].children[0]'
-                );
-            });
-            it('should retrieve element memory path', function() {
-                result = domdiff.nodeRetrievePath(elementTwo, 'element') ;
-                result.should.be.eql(
-                    'element.children[0]'
-                );
             });
         });
     });
