@@ -185,22 +185,6 @@
     }
 
     /**
-     * Retrive node position in parent element child nodes;
-     *
-     * @param {Element} element
-     * @return {Integer}
-     */
-    function nodePosition(element) {
-        if (!element.parentNode) {
-            return 0;
-        }
-        return Array.prototype.indexOf.call(
-            element.parentNode.children,
-            element
-        );
-    }
-
-    /**
      * Namespace object
      *
      * @constructor
@@ -379,6 +363,13 @@
         );
     }
 
+    /**
+     * Apply on element 'a' changes from 'b' using given diff
+     *
+     * @param {Element} a
+     * @param {Element} b
+     * @param {String} diff
+     */
     function applyDiff(a, b, diff) {
         return new Function('aElement', 'bElement', diff)(a, b);
     }
@@ -392,7 +383,6 @@
     exports.nodeSame = nodeSame;
     exports.nodeLeaf = nodeLeaf;
     exports.nodeExactly = nodeExactly;
-    exports.nodePosition = nodePosition;
     exports.NamespaceString = NamespaceString;
     exports.NamespaceNext = NamespaceNext;
 

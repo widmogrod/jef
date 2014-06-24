@@ -279,12 +279,6 @@ describe('DomDiff', function() {
               ).should.be.false;
            });
         });
-        describe('#nodePosition', function() {
-            it('should retrieve node position', function() {
-                domdiff.nodePosition(elementOne).should.be.eql(0);
-                domdiff.nodePosition(elementTwo).should.be.eql(0);
-            });
-        });
     });
     describe('#NamespaceString', function() {
         beforeEach(function() {
