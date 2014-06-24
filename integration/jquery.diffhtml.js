@@ -5,7 +5,7 @@
             require('jquery')
         );
     } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/domdiff','jQuery'], factory);
+        define(['jef/domdiff','jquery'], factory);
     } else { // Browser globals
         factory(
             root.jef.domdiff,
@@ -40,10 +40,8 @@
             if (options.returnDiff) {
                 return diff;
             }
-            // Create function to apply difference
-            func = new Function('aElement', 'bElement', diff)
             // Apply difference
-            func(this, ref);
+            domdiff.applyDiff(this, ref, diff);
 
             return this;
         });

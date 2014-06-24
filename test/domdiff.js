@@ -5,8 +5,8 @@ var window = document.parentWindow;
 var elementOne, elementTwo, result, next, elementTwoContext;
 
 function execute(a, b, diff) {
-   new Function('aElement', 'bElement', diff)(a, b);
-   return a.innerHTML;
+    domdiff.applyDiff(a, b, diff);
+    return a.innerHTML;
 }
 
 describe('DomDiff', function() {

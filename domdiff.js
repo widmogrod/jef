@@ -387,9 +387,14 @@
         );
     }
 
+    function applyDiff(a, b, diff) {
+        return new Function('aElement', 'bElement', diff)(a, b);
+    }
+
     var exports = {};
 
     exports.diff = diff;
+    exports.applyDiff = applyDiff;
     exports.attrDifference = attrDifference;
     exports.attrIntersection = attrIntersection;
     exports.nodeSame = nodeSame;
