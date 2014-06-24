@@ -334,6 +334,7 @@
                 }
 
                 if (delta > 0) {
+                    namepspace.pop();
                     namespace.parent().pop();
                     // remove unused elements form 'a' node
                     nodeA = nodeRetrieve(a, length);
@@ -348,6 +349,7 @@
                         );
                     } while(--delta > 0);
                 } else if (delta < 0) {
+                    namespace.pop();
                     namespace.parent().pop();
                     // the 'a' node have less children than the 'b' node
                     // then since we compare all common 'a' and 'b' nodes
@@ -364,6 +366,7 @@
             }
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){
+                namepspace.pop();
                 result += nodeReplace(
                     nodePath(b, namespace, 'bElement'),
                     nodePath(a, namespace),
