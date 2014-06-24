@@ -130,14 +130,37 @@
     function nodeAction(namespace, action, nodePath) {
         return namespace + '.'+ action +'(' + nodePath + ');\n';
     }
-    function nodeRemove(nodePath, namespace) {
-        return nodeAction(namespace, 'removeChild', nodePath);
+
+    /**
+     * Generate action to remove namespace from dom
+     *
+     * @param {NamespaceString} namespace
+     * @return {String}
+     */
+    function nodeRemove(namespace) {
+        return nodeAction(namespace.parent(), 'removeChild', namespace);
     }
-    function nodeReplace(newPath, oldPath, namespace) {
-        return namespace + '.replaceChild('+ newPath +', '+ oldPath +');\n';
+
+    /**
+     * Generate action to replace {new} with {old}
+     *
+     * @param {NamespaceString} new
+     * @param {NamespaceString} old
+     * @return {String}
+     */
+    function nodeReplace(new, old) {
+        return old.parent() + '.replaceChild('+ new +', '+ old +');\n';
     }
-    function nodeAppend(nodePath, namespace) {
-        return nodeAction(namespace, 'appendChild', nodePath);
+
+    /**
+     * Generate action to append {newNamespace} into {namespace}
+     *
+     * @param {NamespaceString} newNamespace
+     * @param {NamespaceString} namespace
+     * @return {String}
+     */
+    function nodeAppend(newNamespace, namespace) {
+        return nodeAction(namespace, 'appendChild', newNamespace);
     }
 
     /**
@@ -318,10 +341,7 @@
                         // We use the same 'path' for removed elements because
                         // When removing elementa at index 1, element at index 2 changes its possition
                         // and became element at position 1
-                        result += nodeRemove(
-                            namespaceA,
-                            namespaceA.parent()
-                        );
+                        result += nodeRemove(namespaceA);
                     } while(--delta > 0);
                 } else if (delta < 0) {
                     // the 'a' node have less children than the 'b' node
@@ -339,8 +359,7 @@
             else if (!nodeExactly(a, b)){
                 result += nodeReplace(
                     namespaceB,
-                    namespaceA,
-                    namespaceA.parent()
+                    namespaceA
                 );
 
                 // When we replace element A with B then B's children number decremented
