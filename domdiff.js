@@ -91,7 +91,7 @@
      * @return {String}
      */
     function nodeAttrRemove(namespace, name) {
-        return namespace.namespace + '.removeAttribute("'+ name +'");\n';
+        return namespace + '.removeAttribute("'+ name +'");\n';
     }
 
     /**
@@ -103,7 +103,7 @@
      * @return {String}
      */
     function nodeAttrReplace(fromNamespace, toNamespace, name) {
-        return toNamespace.toString() + '.setAttribute("'+ name +'", '+ fromNamespace.toString() +'.getAttribute("'+ name +'"));\n';
+        return toNamespace + '.setAttribute("'+ name +'", '+ fromNamespace +'.getAttribute("'+ name +'"));\n';
     }
 
     /**
@@ -217,7 +217,7 @@
         return this.namespace;
     };
     NamespaceNext.prototype.toString = function() {
-        return this.namespace.toString() + '.children[' + this.index + ']';
+        return this.namespace + '.children[' + this.index + ']';
     };
 
 
@@ -319,8 +319,8 @@
                         // When removing elementa at index 1, element at index 2 changes its possition
                         // and became element at position 1
                         result += nodeRemove(
-                            namespaceA.toString(),
-                            namespaceA.parent().toString()
+                            namespaceA,
+                            namespaceA.parent()
                         );
                     } while(--delta > 0);
                 } else if (delta < 0) {
@@ -329,8 +329,8 @@
                     // then we need add remaining 'b' nodes
                     do {
                         result += nodeAppend(
-                            namespaceB.toString(),
-                            namespaceA.parent().toString()
+                            namespaceB,
+                            namespaceA.parent()
                         );
                     } while(++delta < 0);
                 }
@@ -338,9 +338,9 @@
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){
                 result += nodeReplace(
-                    namespaceB.toString(),
-                    namespaceA.toString(),
-                    namespaceA.parent().toString()
+                    namespaceB,
+                    namespaceA,
+                    namespaceA.parent()
                 );
 
                 // When we replace element A with B then B's children number decremented
