@@ -357,7 +357,16 @@ describe('DomDiff', function() {
                 result.toString().should.be.eql('test.children[1].children[4]');
                 result.parent().pop();
                 result.toString().should.be.eql('test.children[0].children[4]')
+                result.parent().push();
+                result.toString().should.be.eql('test.children[1].children[4]')
+            });
+            it('pop and push should give same result', function() {
+               next = result.next(2);
+               next.pop();
+               next.toString().should.be.eql('test.children[1]');
+               next.push();
+               next.toString().should.be.eql('test.children[2]');
             });
         });
     });
-})
+});

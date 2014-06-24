@@ -349,12 +349,15 @@
                     } while(--delta > 0);
                     // namespace.pop();
                 } else if (delta < 0) {
-                    // namespace.parent().pop();
                     // the 'a' node have less children than the 'b' node
                     // then since we compare all common 'a' and 'b' nodes
                     // then we need add remaining 'b' nodes
                     nodeB = nodeRetrieve(b, length);
+
+                    // namespace.parent().pop();
                     path = nodePath(nodeB, namespace, 'bElement');
+                    // namespace.parent().push();
+
                     do {
                         result += nodeAppend(
                             path,
@@ -366,12 +369,16 @@
             }
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){
+                // namespace.parent().pop();
+                nodeA = nodePath(a, namespace),
+                nodeB = nodePath(b, namespace, 'bElement'),
+                // namespace.parent().push();
+
                 result += nodeReplace(
-                    nodePath(b, namespace, 'bElement'),
-                    nodePath(a, namespace),
+                    nodeB,
+                    nodeA,
                     namespace.parent().toString()
                 );
-                // namespace.pop();
             }
 
             return result;
