@@ -230,7 +230,7 @@
      * @param {Node} b
      */
     function diff(rootA, rootB) {
-        function diffrecursice(a, b, namespace) {
+        function diffrecursive(a, b, namespace) {
             var i, length, delta, inner, nodeA, nodeB, path, isLeaf, common, remove, create,
                 result = '';
 
@@ -252,7 +252,7 @@
                     nodeA = nodeRetrieve(a, i);
                     nodeB = nodeRetrieve(b, i);
 
-                    inner = diffrecursice(nodeA, nodeB, nodeNamespace(i, namespace))
+                    inner = diffrecursive(nodeA, nodeB, nodeNamespace(i, namespace))
                     inner && (result += inner);
                 }
 
@@ -316,7 +316,7 @@
             return result;
         }
 
-        return diffrecursice(rootA, rootB, 'aElement');
+        return diffrecursive(rootA, rootB, 'aElement');
     }
 
     var exports = {};
