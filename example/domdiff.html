@@ -16,7 +16,7 @@
         <% _.each(rows, function(row) { %>
         <li>
             <b><%= name %></b>
-            <span><%= row.comment %></span>
+            <span style="color: <%= _.random(1) ? 'red' : 'blue' %>"><%= row.comment %></span>
             <% if (_.random(1)) { %>
             <p>another node</p>
             <% } %>
