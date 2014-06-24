@@ -230,14 +230,42 @@
      * @param {Node} b
      */
     function diff(rootA, rootB) {
+        function diffattributes(a, b) {
+            var common, remove, create, pathA, pathB, result = '';
+            common = attrIntersection(a.attributes, b.attributes);
+            remove = attrDifference(a.attributes, common);
+            create = attrDifference(b.attributes, common);
+
+            pathB = nodeRetrievePath(b, 'bElement', rootB);
+            pathA = nodeRetrievePath(a, 'aElement', rootA);
+
+            common.forEach(function(name) {
+                if (!nodeAttrValueEqual(a, b, name)) {
+                    result += nodeAttrReplace(pathB, pathA, name);
+                }
+            });
+            remove.forEach(function(name) {
+                result += nodeAttrRemove(pathA, name);
+            });
+            create.forEach(function(name) {
+                result += nodeAttrReplace(pathB, pathA, name);
+            });
+
+            return result;
+        }
         function diffrecursive(a, b, namespace) {
-            var i, length, delta, inner, nodeA, nodeB, path, isLeaf, common, remove, create,
+            var i, length, delta, inner, nodeA, nodeB, path, isLeaf, isSame,
                 result = '';
 
             isLeaf = nodeLeaf(a, b);
+            isSame = nodeSame(a, b);
+
+            if (isSame) {
+                result += diffattributes(a, b);
+            }
 
             // Nodes are the same, compare children
-            if (!isLeaf && nodeSame(a, b)) {
+            if (!isLeaf && isSame) {
                 length = nodeLength(a);
                 delta = length - nodeLength(b);
 
@@ -281,29 +309,8 @@
                     } while(++delta < 0);
                 }
             }
-            // Are exacly, then compare arguments
-            else if (isLeaf && nodeExactly(a, b)) {
-                common = attrIntersection(a.attributes, b.attributes);
-                remove = attrDifference(a.attributes, common);
-                create = attrDifference(b.attributes, common);
-
-                nodeB = nodeRetrievePath(b, 'bElement', rootB);
-                nodeA = nodeRetrievePath(a, 'aElement', rootA);
-
-                common.forEach(function(name) {
-                    if (!nodeAttrValueEqual(a, b, name)) {
-                        result += nodeAttrReplace(nodeB, nodeA, name);
-                    }
-                });
-                remove.forEach(function(name) {
-                    result += nodeAttrRemove(nodeA, name);
-                });
-                create.forEach(function(name) {
-                    result += nodeAttrReplace(nodeB, nodeA, name);
-                });
-            }
             // No relation, use b remove a
-            else {
+            else if (isLeaf && !nodeExactly(a, b)){
                 result += nodeReplace(
                     nodeRetrievePath(b, 'bElement', rootB),
                     nodeRetrievePath(a, 'aElement', rootA),
