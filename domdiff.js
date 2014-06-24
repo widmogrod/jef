@@ -168,6 +168,9 @@
      * @return {Integer}
      */
     function nodePosition(element) {
+        if (!element.parentNode) {
+            return 0;
+        }
         return Array.prototype.indexOf.call(
             element.parentNode.children,
             element
@@ -223,16 +226,10 @@
         return contextName + result;
     }
 
-    function nodePath(node, namespace, context) {
+    function nodePath(node, namespace) {
         var index, result;
         index = nodePosition(node);
-        // result = namespace.next(index).toString();
         result = namespace.toString();
-
-        if (context) {
-            result = result.replace(/^\w+/, context)
-        }
-
         return result;
     }
 
@@ -275,14 +272,14 @@
      * @param {Node} b
      */
     function diff(rootA, rootB) {
-        function diffattributes(a, b) {
+        function diffattributes(a, b, namespaceA, namespaceB) {
             var common, remove, create, pathA, pathB, result = '';
             common = attrIntersection(a.attributes, b.attributes);
             remove = attrDifference(a.attributes, common);
             create = attrDifference(b.attributes, common);
 
-            pathB = nodeRetrievePath(b, 'bElement', rootB);
-            pathA = nodeRetrievePath(a, 'aElement', rootA);
+            pathB = nodePath(b, namespaceB);
+            pathA = nodePath(a, namespaceA);
 
             common.forEach(function(name) {
                 if (!nodeAttrValueEqual(a, b, name)) {
@@ -306,7 +303,7 @@
             isSame = nodeSame(a, b);
 
             if (isSame) {
-                result += diffattributes(a, b);
+                result += diffattributes(a, b, namespaceA, namespaceB);
             }
 
             // Nodes are the same, compare children
