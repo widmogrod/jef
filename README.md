@@ -8,6 +8,8 @@ J.E.F is collection of JavaScript experimental functions, written to lern and te
 ### DOM Diff
 
 Compare two DOM nodes and create DOM diff;
+You can se benchmark here [innerHtml vs $.diffhtml vs $.html](http://jsperf.com/innerhtml-vs-dom-diff);
+Basically this solution is ~94% faster than innerHTML.
 Lets assume that we have markup like so:
 
 ```
