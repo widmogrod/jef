@@ -144,12 +144,12 @@
     /**
      * Generate action to replace {new} with {old}
      *
-     * @param {NamespaceString} new
-     * @param {NamespaceString} old
+     * @param {NamespaceString} newNamespace
+     * @param {NamespaceString} oldNamespace
      * @return {String}
      */
-    function nodeReplace(new, old) {
-        return old.parent() + '.replaceChild('+ new +', '+ old +');\n';
+    function nodeReplace(newNamespace, oldNamespace) {
+        return oldNamespace.parent() + '.replaceChild('+ newNamespace +', '+ oldNamespace +');\n';
     }
 
     /**
