@@ -49,11 +49,11 @@ describe('DomDiff', function() {
             );
         });
         it('should replace elements if not same', function() {
-            refA.innerHTML = '<div><b>a</b><p>First element</p></div>';
-            refB.innerHTML = '<div><i>a</i><p>First element</p><b>test</b></div>';
+            refA.innerHTML = '<div><b>a</b><p>First element</p><div></div></div>';
+            refB.innerHTML = '<div><i>a</i><p>First element</p><div><b>test</b></div></div>';
             domdiff.diff(refA, refB).should.be.eql(
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'+
-                'aElement.children[0].appendChild(bElement.children[0].children[1]);\n'
+                'aElement.children[0].children[1].appendChild(bElement.children[0].children[1].children[0]);\n'
             );
         });
         it('should replace arguments', function() {
