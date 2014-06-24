@@ -69,6 +69,27 @@ describe('DomDiff', function() {
                 'aElement.children[0].children[0].removeAttribute("class");\n'
             );
         });
+        it('should add boolean argument', function() {
+            refA.innerHTML = '<ul><li>First element</li></ul>';
+            refB.innerHTML = '<ul><li disabled>First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].children[0].setAttribute("disabled", bElement.children[0].children[0].getAttribute("disabled"));\n'
+            );
+        });
+        it('should replace boolean argument', function() {
+            refA.innerHTML = '<ul><li disabled>First element</li></ul>';
+            refB.innerHTML = '<ul><li required>First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].children[0].removeAttribute("disabled");\naElement.children[0].children[0].setAttribute("required", bElement.children[0].children[0].getAttribute("required"));\n'
+            );
+        });
+        it('should remove boolean argument', function() {
+            refA.innerHTML = '<ul><li disabled>First element</li></ul>';
+            refB.innerHTML = '<ul><li>First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].children[0].removeAttribute("disabled");\n'
+            );
+        });
         it('should remove unused elements', function() {
             refA.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             refB.innerHTML = '<ul><li>First element</li></ul>';
