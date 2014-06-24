@@ -4,6 +4,11 @@ var document = jsdom("<html><head></head><body>hello world</body></html>");
 var window = document.parentWindow;
 var elementOne, elementTwo, result, next, elementTwoContext;
 
+function execute(a, b, diff) {
+   new Function('aElement', 'bElement', diff)(a, b);
+   return a.innerHTML;
+}
+
 describe('DomDiff', function() {
     beforeEach(function() {
         elementOne = document.createElement('div');
@@ -17,16 +22,42 @@ describe('DomDiff', function() {
         it('should replace elements', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>Second element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li>Second element</li></ul>'
             );
         });
         it('should replace elements if not same', function() {
             elementOne.innerHTML = '<div><b>a</b><p>First element</p><div></div></div>';
             elementTwo.innerHTML = '<div><i>a</i><p>First element</p><div><b>test</b></div></div>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'+
                 'aElement.children[0].children[1].appendChild(bElement.children[0].children[1].children[0]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<div><i>a</i><p>First element</p><div><b>test</b></div></div>'
+            );
+        });
+        it('should replace elements if not same 2', function() {
+            elementOne.innerHTML = '<ul><li><b>guest</b><span></span><p>another node</p></li>'+
+                                       '<li><b>guest</b><span>a</span></li></ul>';
+            elementTwo.innerHTML = '<ul><li><b>guest</b><span></span></li>'+
+                                       '<li><b>guest</b><span>a</span><p>another node</p></li>'+
+                                       '<li><b>guest</b><span>b</span></li></ul>';
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
+                'aElement.children[0].children[0].removeChild(aElement.children[0].children[0].children[2]);\n'+
+                'aElement.children[0].children[1].appendChild(bElement.children[0].children[1].children[2]);\n'+
+                'aElement.children[0].appendChild(bElement.children[0].children[2]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li><b>guest</b><span></span></li>'+
+                '<li><b>guest</b><span>a</span><p>another node</p></li>'+
+                '<li><b>guest</b><span>b</span></li></ul>'
             );
         });
         it('should replace arguments', function() {

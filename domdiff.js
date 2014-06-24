@@ -334,8 +334,7 @@
                 }
 
                 if (delta > 0) {
-                    namepspace.pop();
-                    namespace.parent().pop();
+                    // namespace.parent().pop();
                     // remove unused elements form 'a' node
                     nodeA = nodeRetrieve(a, length);
                     path = nodePath(nodeA, namespace);
@@ -347,10 +346,10 @@
                             path,
                             namespace.parent().toString()
                         );
+                        // namespace.pop();
                     } while(--delta > 0);
                 } else if (delta < 0) {
-                    namespace.pop();
-                    namespace.parent().pop();
+                    // namespace.parent().pop();
                     // the 'a' node have less children than the 'b' node
                     // then since we compare all common 'a' and 'b' nodes
                     // then we need add remaining 'b' nodes
@@ -361,17 +360,18 @@
                             path,
                             namespace.parent().toString()
                         );
+                        // namespace.pop();
                     } while(++delta < 0);
                 }
             }
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){
-                namepspace.pop();
                 result += nodeReplace(
                     nodePath(b, namespace, 'bElement'),
                     nodePath(a, namespace),
                     namespace.parent().toString()
                 );
+                // namespace.pop();
             }
 
             return result;
