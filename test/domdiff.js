@@ -2,7 +2,7 @@ var domdiff = require('../domdiff.js');
 var jsdom = require("jsdom").jsdom;
 var document = jsdom("<html><head></head><body>hello world</body></html>");
 var window = document.parentWindow;
-var elementOne, elementTwo, result, elementTwoContext;
+var elementOne, elementTwo, result, next, elementTwoContext;
 
 describe('DomDiff', function() {
     beforeEach(function() {
@@ -274,6 +274,17 @@ describe('DomDiff', function() {
             });
             it('should return next and after push have valid string representation', function() {
                 result.next(2).push().toString().should.be.eql('test.children[3]');
+            });
+            it('should pop from parent', function() {
+                next = result.next();
+                next.push();
+                next.toString().should.be.eql('test.children[1]');
+
+                result = next.next(4);
+
+                result.toString().should.be.eql('test.children[1].children[4]');
+                result.parent().pop();
+                result.toString().should.be.eql('test.children[0].children[4]')
             });
         });
     });

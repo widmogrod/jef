@@ -247,7 +247,7 @@
         return this.namespace;
     };
     NamespaceString.prototype.pop = function() {
-        --this.index;
+        this.index && --this.index;
         return this;
     }
     NamespaceString.prototype.push = function() {
@@ -334,9 +334,10 @@
                 }
 
                 if (delta > 0) {
+                    namespace.parent().pop();
                     // remove unused elements form 'a' node
-                    path = nodePath(nodeRetrieve(a, length), namespace);
-                    // path = nodeRetrievePath(nodeRetrieve(a, length), 'aElement', rootA);
+                    nodeA = nodeRetrieve(a, length);
+                    path = nodePath(nodeA, namespace);
                     do {
                         // We use the same 'path' for removed elements because
                         // When removing elementa at index 1, element at index 2 changes its possition
@@ -346,23 +347,19 @@
                             namespace.parent().toString()
                         );
                     } while(--delta > 0);
-
-                    namespace.pop();
-
                 } else if (delta < 0) {
+                    namespace.parent().pop();
                     // the 'a' node have less children than the 'b' node
                     // then since we compare all common 'a' and 'b' nodes
                     // then we need add remaining 'b' nodes
-                    path = nodePath(nodeRetrieve(b, length), namespace, 'bElement');
-                    // path = nodeRetrievePath(nodeRetrieve(b, length), 'bElement', rootB);
+                    nodeB = nodeRetrieve(b, length);
+                    path = nodePath(nodeB, namespace, 'bElement');
                     do {
                         result += nodeAppend(
                             path,
                             namespace.parent().toString()
                         );
                     } while(++delta < 0);
-
-                    namespace.pop();
                 }
             }
             // No relation, use b remove a
@@ -370,8 +367,6 @@
                 result += nodeReplace(
                     nodePath(b, namespace, 'bElement'),
                     nodePath(a, namespace),
-                    // nodeRetrievePath(b, 'bElement', rootB),
-                    // nodeRetrievePath(a, 'aElement', rootA),
                     namespace.parent().toString()
                 );
             }
