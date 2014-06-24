@@ -90,6 +90,13 @@ describe('DomDiff', function() {
                 'aElement.children[0].children[0].removeAttribute("disabled");\n'
             );
         });
+        it('should remove argument not in child', function() {
+            refA.innerHTML = '<ul class="active"><li>First element</li></ul>';
+            refB.innerHTML = '<ul class="inactive"><li>First element</li></ul>';
+            domdiff.diff(refA, refB).should.be.eql(
+                'aElement.children[0].setAttribute("class", bElement.children[0].getAttribute("class"));\n'
+            );
+        });
         it('should remove unused elements', function() {
             refA.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             refB.innerHTML = '<ul><li>First element</li></ul>';
