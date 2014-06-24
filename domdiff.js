@@ -247,7 +247,7 @@
         return this.namespace;
     };
     NamespaceString.prototype.pop = function() {
-        this.index && --this.index;
+        --this.index;
         return this;
     }
     NamespaceString.prototype.push = function() {
@@ -346,8 +346,8 @@
                             path,
                             namespace.parent().toString()
                         );
-                        // namespace.pop();
                     } while(--delta > 0);
+                    // namespace.pop();
                 } else if (delta < 0) {
                     // namespace.parent().pop();
                     // the 'a' node have less children than the 'b' node
@@ -360,8 +360,8 @@
                             path,
                             namespace.parent().toString()
                         );
-                        // namespace.pop();
                     } while(++delta < 0);
+                    // namespace.pop();
                 }
             }
             // No relation, use b remove a

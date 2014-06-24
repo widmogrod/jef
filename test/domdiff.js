@@ -36,7 +36,7 @@ describe('DomDiff', function() {
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'+
-                'aElement.children[0].children[1].appendChild(bElement.children[0].children[1].children[0]);\n'
+                'aElement.children[0].children[2].appendChild(bElement.children[0].children[1].children[0]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<div><i>a</i><p>First element</p><div><b>test</b></div></div>'
@@ -63,71 +63,112 @@ describe('DomDiff', function() {
         it('should replace arguments', function() {
             elementOne.innerHTML = '<ul><li class="a">First element</li></ul>';
             elementTwo.innerHTML = '<ul><li class="b">First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li class="b">First element</li></ul>'
             );
         });
         it('should add arguments', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li class="b">First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li class="b">First element</li></ul>'
             );
         });
         it('should remove arguments', function() {
             elementOne.innerHTML = '<ul><li class="a">First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].children[0].removeAttribute("class");\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li>First element</li></ul>'
             );
         });
         it('should add boolean argument', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li disabled>First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].children[0].setAttribute("disabled", bElement.children[0].children[0].getAttribute("disabled"));\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li disabled="">First element</li></ul>'
             );
         });
         it('should replace boolean argument', function() {
             elementOne.innerHTML = '<ul><li disabled>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li required>First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
-                'aElement.children[0].children[0].removeAttribute("disabled");\naElement.children[0].children[0].setAttribute("required", bElement.children[0].children[0].getAttribute("required"));\n'
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
+                'aElement.children[0].children[0].removeAttribute("disabled");\n'+
+                'aElement.children[0].children[0].setAttribute("required", bElement.children[0].children[0].getAttribute("required"));\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li required="">First element</li></ul>'
             );
         });
         it('should remove boolean argument', function() {
             elementOne.innerHTML = '<ul><li disabled>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].children[0].removeAttribute("disabled");\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li>First element</li></ul>'
             );
         });
         it('should remove argument not in child', function() {
             elementOne.innerHTML = '<ul class="active"><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul class="inactive"><li>First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].setAttribute("class", bElement.children[0].getAttribute("class"));\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul class="inactive"><li>First element</li></ul>'
             );
         });
         it('should remove unused elements', function() {
             elementOne.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].removeChild(aElement.children[0].children[1]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li>First element</li></ul>'
             );
         });
         it('should add new elements', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].appendChild(bElement.children[0].children[1]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<ul><li>First element</li><li>Second element</li></ul>'
             );
         });
         it('should replace elements', function() {
             elementOne.innerHTML = '<div><b>First element</b></div>';
             elementTwo.innerHTML = '<div><span>First element</span></div>';
-            domdiff.diff(elementOne, elementTwo).should.be.eql(
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
                 'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<div><span>First element</span></div>'
             );
         });
     })
