@@ -310,7 +310,7 @@
                 }
             }
             // No relation, use b remove a
-            else if (isLeaf && !nodeExactly(a, b)){
+            else if (!nodeExactly(a, b)){
                 result += nodeReplace(
                     nodeRetrievePath(b, 'bElement', rootB),
                     nodeRetrievePath(a, 'aElement', rootA),
