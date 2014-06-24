@@ -242,6 +242,34 @@ describe('DomDiff', function() {
                 );
             });
         });
-
+    });
+    describe('#NamespaceString', function() {
+        beforeEach(function() {
+            result = new domdiff.NamespaceString('test');
+        });
+        it('should have string representation', function() {
+            result.toString().should.be.string
+            result.toString().should.be.eql('test');
+        });
+        it('should return parent', function() {
+            result.parent().should.be.eql('test');
+        });
+        describe('#next', function() {
+            it('should return next', function() {
+                result.next().should.be.an.instanceOf(domdiff.NamespaceNext);
+            });
+            it('should return next with valid parent reference', function() {
+                result.next().parent().should.be.eql(result.toString());
+            });
+            it('should return next namespace and have valid string representation', function() {
+                result.next().toString().should.be.eql('test.children[0]');
+            });
+            it('should return next on specific index', function() {
+               result.next(2).toString().should.be.eql('test.children[2]');
+            });
+            it('should return next and after shift have valid string representation', function() {
+                result.next(2).shift().toString().should.be.eql('test.children[1]');
+            });
+        });
     });
 })

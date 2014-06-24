@@ -223,6 +223,34 @@
         return contextName + result;
     }
 
+    function NamespaceString(namespace, index) {
+        this.namespace = namespace;
+        this.index = index || 0;
+    }
+    NamespaceString.prototype.parent = function() {
+        return this.namespace;
+    };
+    NamespaceString.prototype.toString = function() {
+        return this.namespace;
+    };
+    NamespaceString.prototype.shift = function() {
+        --this.index;
+        return this;
+    }
+    NamespaceString.prototype.next = function(index) {
+        return new NamespaceNext(this, index);
+    }
+    function NamespaceNext(namespace, index) {
+        NamespaceString.call(this, namespace, index)
+    }
+    NamespaceNext.prototype = Object.create(NamespaceString.prototype);
+    NamespaceNext.prototype.parent = function() {
+        return this.namespace.toString();
+    }
+    NamespaceNext.prototype.toString = function() {
+        return nodeNamespace(this.index, this.namespace.toString());
+    }
+
     /**
      * Create DOM API diff from given elements
      *
@@ -337,6 +365,8 @@
     exports.nodeNamespace = nodeNamespace;
     exports.nodeRetrievePath = nodeRetrievePath;
     exports.nodeParentNamespace = nodeParentNamespace;
+    exports.NamespaceString = NamespaceString;
+    exports.NamespaceNext = NamespaceNext;
 
     return exports;
 });
