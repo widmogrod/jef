@@ -354,9 +354,9 @@
                     // then we need add remaining 'b' nodes
                     nodeB = nodeRetrieve(b, length);
 
-                    // namespace.parent().pop();
+                    namespace.pop();
                     path = nodePath(nodeB, namespace, 'bElement');
-                    // namespace.parent().push();
+                    namespace.push();
 
                     do {
                         result += nodeAppend(
