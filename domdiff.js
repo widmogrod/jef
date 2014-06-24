@@ -223,18 +223,35 @@
         return contextName + result;
     }
 
+    function nodePath(node, namespace, context) {
+        var index, result;
+        index = nodePosition(node);
+        // result = namespace.next(index).toString();
+        result = namespace.toString();
+
+        if (context) {
+            result = result.replace(/^\w+/, context)
+        }
+
+        return result;
+    }
+
     function NamespaceString(namespace, index) {
         this.namespace = namespace;
         this.index = index || 0;
     }
     NamespaceString.prototype.parent = function() {
-        return this.namespace;
+        return this;
     };
     NamespaceString.prototype.toString = function() {
         return this.namespace;
     };
-    NamespaceString.prototype.shift = function() {
+    NamespaceString.prototype.pop = function() {
         --this.index;
+        return this;
+    }
+    NamespaceString.prototype.push = function() {
+        ++this.index;
         return this;
     }
     NamespaceString.prototype.next = function(index) {
@@ -245,7 +262,7 @@
     }
     NamespaceNext.prototype = Object.create(NamespaceString.prototype);
     NamespaceNext.prototype.parent = function() {
-        return this.namespace.toString();
+        return this.namespace;
     }
     NamespaceNext.prototype.toString = function() {
         return nodeNamespace(this.index, this.namespace.toString());
@@ -297,60 +314,72 @@
                 length = nodeLength(a);
                 delta = length - nodeLength(b);
 
+                namespace = namespace.next();
+
                 if (delta > 0) {
                     // 'b' has leser length so we need to reduce
                     // 'a' loop length to 'b' length; if we haven't do this
                     // then we would have null elements in nodeB var
                     length -= delta;
-
-                    // remove unused elements form 'a' node
-                    path = nodeRetrievePath(nodeRetrieve(a, length), 'aElement', rootA);
-                    do {
-                        // We use the same 'path' for removed elements because
-                        // When removing elementa at index 1, element at index 2 changes its possition
-                        // and became element at position 1
-                        result += nodeRemove(
-                            path,
-                            namespace
-                        );
-                    } while(--delta > 0);
-                } else if (delta < 0) {
-                    // the 'a' node have less children than the 'b' node
-                    // then since we compare all common 'a' and 'b' nodes
-                    // then we need add remaining 'b' nodes
-                    path = nodeRetrievePath(nodeRetrieve(b, length), 'bElement', rootB);
-                    do {
-                        result += nodeAppend(
-                            path,
-                            namespace
-                        );
-                    } while(++delta < 0);
                 }
 
                 for (i = 0; i < length; i++) {
                     nodeA = nodeRetrieve(a, i);
                     nodeB = nodeRetrieve(b, i);
 
-                    inner = diffrecursive(nodeA, nodeB, nodeNamespace(i, namespace))
+                    inner = diffrecursive(nodeA, nodeB, namespace);
                     inner && (result += inner);
+
+                    namespace.push();
                 }
 
+                if (delta > 0) {
+                    // remove unused elements form 'a' node
+                    path = nodePath(nodeRetrieve(a, length), namespace);
+                    // path = nodeRetrievePath(nodeRetrieve(a, length), 'aElement', rootA);
+                    do {
+                        // We use the same 'path' for removed elements because
+                        // When removing elementa at index 1, element at index 2 changes its possition
+                        // and became element at position 1
+                        result += nodeRemove(
+                            path,
+                            namespace.parent().toString()
+                        );
+                    } while(--delta > 0);
+
+                    namespace.pop();
+
+                } else if (delta < 0) {
+                    // the 'a' node have less children than the 'b' node
+                    // then since we compare all common 'a' and 'b' nodes
+                    // then we need add remaining 'b' nodes
+                    path = nodePath(nodeRetrieve(b, length), namespace, 'bElement');
+                    // path = nodeRetrievePath(nodeRetrieve(b, length), 'bElement', rootB);
+                    do {
+                        result += nodeAppend(
+                            path,
+                            namespace.parent().toString()
+                        );
+                    } while(++delta < 0);
+
+                    namespace.pop();
+                }
             }
             // No relation, use b remove a
             else if (!nodeExactly(a, b)){
                 result += nodeReplace(
-                    nodeRetrievePath(b, 'bElement', rootB),
-                    nodeRetrievePath(a, 'aElement', rootA),
-                    // Namespace is for current node, unfortunetly to replace element we need to
-                    // do this operation on parent node, so thats wy we use 'nodeParentNamespace'
-                    nodeParentNamespace(namespace)
+                    nodePath(b, namespace, 'bElement'),
+                    nodePath(a, namespace),
+                    // nodeRetrievePath(b, 'bElement', rootB),
+                    // nodeRetrievePath(a, 'aElement', rootA),
+                    namespace.parent().toString()
                 );
             }
 
             return result;
         }
 
-        return diffrecursive(rootA, rootB, 'aElement');
+        return diffrecursive(rootA, rootB, new NamespaceString('aElement'));
     }
 
     var exports = {};
