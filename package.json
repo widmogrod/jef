@@ -14,7 +14,7 @@
   "scripts": {
     "test": "mocha",
     "build": "grunt build",
-    "deploy": "git checkout gh-pages && git merge master && npm run build && git add dist && git commit -am 'update dist files' && git push origin gh-pages && git checkout master"
+    "deploy": "git checkout gh-pages && git merge master && git rm dist -r && npm run build && git add dist/* && git commit -am 'update dist files' && git push origin gh-pages && git checkout master"
   },
   "repository": {
     "type": "git",
