@@ -19,6 +19,10 @@ module.exports = function(grunt) {
                 }
             },
             integration: {
+                 options: {
+                    banner: '/*! jquery.diffhtml <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                    preserveComments: false
+                },
                 files: {
                     'dist/integration/jquery.diffhtml.min.js': ['domdiff.js', 'integration/jquery.diffhtml.js'],
                 }
