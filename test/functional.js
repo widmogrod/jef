@@ -76,6 +76,30 @@ describe('Functional', function(){
             })
             looped.should.be.eql(3);
         })
+        it('should allow to loop from specific index', function() {
+            var value, data, test;
+            data = [1, 2, 3];
+            test = function(i) {
+                value = i;
+            };
+            f.each([1, 2, 3], test, 0, 1);
+            value.should.be.eql(1);
+
+            f.each([1, 2, 3], test, -1);
+            value.should.be.eql(3);
+
+        });
+        it('should allow to loop on array like objects', function() {
+           var list = function() {
+               var looped = 0;
+               f.each(arguments, function() {
+                    ++looped;
+               });
+               return looped;
+           }
+
+           list(1, 2, 3, 4).should.be.eql(4);
+        });
     })
     describe('#map()', function(){
         var addOne = function(i) {return i + 1; };
