@@ -17,8 +17,7 @@
     events.constructor = events;
     events.prototype.eachEvent = function(name, func) {
         name.split(/\s+/).forEach(function(name) {
-            this.events[name] = name in this.events ? this.events[name] : [];
-            func(name, this.events[name]);
+            func(name, (this.events[name] = name in this.events ? this.events[name] : []));
         }.bind(this));
     };
     events.prototype.on = function(name, func) {
