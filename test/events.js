@@ -1,6 +1,5 @@
 var events = require('../events.js');
-var object, context, args, called;
-var callback = function() {};
+var object, context, args, called, callback;
 var params = [1, 2, 'test'];
 
 describe('Events', function() {
@@ -9,6 +8,7 @@ describe('Events', function() {
         args = [];
         context = null;
         called = 0;
+        callback = function() {};
     });
 
     describe('#construction', function(){
@@ -20,6 +20,14 @@ describe('Events', function() {
         it('should allow to add events', function() {
              object.events.should.be.empty;
              object.on('a', callback);
+             object.events.should.have.property('a');
+             object.events['a'].should.containEql(callback)
+        });
+    })
+    describe('#once', function() {
+        it('should allow to add event', function() {
+             object.events.should.be.empty;
+             object.once('a', callback);
              object.events.should.have.property('a');
              object.events['a'].should.containEql(callback)
         });
@@ -71,6 +79,14 @@ describe('Events', function() {
              });
              object.trigger('a');
              called.should.be.eql(2);
+        });
+        it('should trigger once', function() {
+             object.once('a', function() {
+                 called++;
+             });
+             object.trigger('a');
+             object.trigger('a');
+             called.should.be.eql(1);
         });
     })
 });

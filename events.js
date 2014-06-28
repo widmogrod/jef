@@ -27,6 +27,10 @@
 
         return this;
     };
+    events.prototype.once = function(name, func) {
+        func.once = true;
+        return this.on(name, func);
+    }
     events.prototype.off = function(name, func) {
         var idx;
         this.eachEvent(name, function(name, events) {
@@ -44,8 +48,10 @@
     };
     events.prototype.trigger = function(name, args, context) {
         this.eachEvent(name, function(name, events) {
-            events.forEach(function(func) {
+            events.forEach(function(func, idx) {
                 func.apply(context || func, args);
+                // If once then remove after triggering
+                func.once && events.splice(idx, 1);
             });
         }.bind(this));
 
