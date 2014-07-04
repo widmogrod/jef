@@ -15,31 +15,16 @@
 })(this, function(domdiff, jQuery) {
     'use strict';
 
-    var DEFAULT_OPTIONS = {
-        debug: false,
-        returnDiff: false
-    };
-
-    jQuery.fn.diffhtml = function(html, options) {
+    jQuery.fn.diffhtml = function(html) {
         var ref, diff, func;
 
-        options = jQuery.extend(true, {}, DEFAULT_OPTIONS, options)
-
         ref = document.createElement('div');
+
         return this.map(function() {
             // Create in memory DOM nodes
             ref.innerHTML = html;
             // Compare document state with memory state
             diff = domdiff.diff(this, ref);
-            // For debug purposes
-            if (options.debug) {
-                console.debug('from', this.innerHTML);
-                console.debug('to', ref.innerHTML);
-                console.debug('diff', diff);
-            }
-            if (options.returnDiff) {
-                return diff;
-            }
             // Apply difference
             domdiff.applyDiff(this, ref, diff);
 
