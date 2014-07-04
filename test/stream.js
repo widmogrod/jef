@@ -108,38 +108,6 @@ describe('Stream', function() {
             args.should.be.eql(4);
         });
     });
-    describe('#merge', function() {
-        var streamA, streamB;
-        beforeEach(function() {
-            streamA = new stream();
-            streamB = new stream();
-            object = streamA.merge(streamB)
-        });
-
-        it('should merge streams', function() {
-            object.should.be.an.instanceOf(stream);
-        });
-        it('should trigger "out" event when not all stream have data', function() {
-            object.on('out', function() { called = true; });
-            streamA.push(1);
-            called.should.be.true;
-        });
-        it('should trigger "data" event when all stream have data', function() {
-            object.on('data', function(a, b) { called = true; args = [a, b]});
-            streamA.push(1);
-            streamB.push(2);
-            called.should.be.true;
-            args.should.be.eql([1, 2]);
-        });
-        it('should remove references when destroyed', function() {
-            object.on('data', function() {
-                called = true;
-            });
-            object.destroy();
-            object.push(2);
-            called.should.be.false;
-        });
-    });
     describe('#when', function() {
         var streamA, streamB;
         beforeEach(function() {
@@ -234,17 +202,17 @@ describe('Stream', function() {
             args.should.be.eql([[2],[3]]);
         });
     });
-    describe('flat', function() {
+    describe('#merge', function() {
         beforeEach(function() {
             streamA = new stream();
             streamB = new stream();
-            object = stream.flat(streamA, streamB);
+            object = stream.merge(streamA, streamB);
             called = 0;
         });
         it('should create stream', function() {
             object.should.be.an.instanceOf(stream)
         });
-        it('should stream values from flatten streams', function() {
+        it('should stream values from merged streams', function() {
             object.on('data', function(value) {
                 called++;
                 args = [value];

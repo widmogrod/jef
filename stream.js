@@ -146,7 +146,7 @@
         return this;
     };
     stream.prototype.merge = function(next) {
-        return stream.when(this, next);
+        return stream.merge(this, next);
     };
     stream.prototype.destroy = function() {
         // Custom destroy function
@@ -159,10 +159,10 @@
         stream.call(this);
     };
 
-    stream.flat = function () {
+    stream.merge = function () {
         var streams = slice(arguments);
         var refs = [];
-        var flatten = new stream({
+        var merged = new stream({
             destroy: function() {
                 streams.forEach(function(item, index) {
                     item.off('data', refs[index]);
@@ -171,11 +171,11 @@
         });
         streams.forEach(function (stream, index) {
             stream.on('data', refs[index] = function () {
-                flatten.push.apply(flatten, arguments)
+                merged.push.apply(merged, arguments)
             });
         });
 
-        return flatten;
+        return merged;
     }
     stream.when = function() {
         var streams = slice(arguments);
