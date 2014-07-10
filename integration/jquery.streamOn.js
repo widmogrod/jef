@@ -15,7 +15,7 @@
 })(this, function(stream, jQuery) {
     'use strict';
 
-    jQuery.fn.streamOn = function(html, options) {
+    jQuery.fn.streamOn = function(eventName, selector) {
         var result = new stream();
         this.on(eventName, selector, function (e) {
             result.push(e);
