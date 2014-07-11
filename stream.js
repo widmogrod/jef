@@ -26,29 +26,29 @@
     stream.constructor = stream;
     stream.prototype = new events();
 
-    stream.prototype.pipe = function(func, from, limit) {
-        if (from < 0) {
-            from += this.buffer.length;
+    stream.prototype.hasReaders = function() {
+        return this.chain.length || this.eventsCallbacks;
+    };
+    stream.prototype.pipe = function(toStream) {
+        // Accept only streams
+        if (!toStream instanceof stream) {
+            throw new Error('You can pipe to another stream, but given ' + toStream);
         }
-        this.buffer.forEach(function(value, index) {
-            if (undefined !== from && from > index) {
-                return;
-            }
-            if (undefined !== limit && --limit < 0) {
-                return;
-            }
 
-            func.apply(func, value);
-            // func.apply(func, this.options.apply ? value : [value]);
-        }.bind(this));
+        // If stream dont have readers then pipe all buffered values to this stream
+        if (!this.hasReaders()) {
+            // Assign bufer to temporary variable
+            var buffer = this.buffer;
+            // And clean current buffer
+            this.buffer = [];
+            // Then push everyting to next stream
+            buffer.forEach(function(value) {
+                toStream.push.apply(toStream, value)
+            });
+        }
 
-        return this.on('data', func);
-    };
-    stream.prototype.last = function(func) {
-        return this.pipe(func, -1, 1);
-    };
-    stream.prototype.first = function(func) {
-        return this.pipe(func, 0, 1);
+        this.on('data', toStream.push.bind(toStream));
+        return toStream;
     };
     stream.prototype.take = function (limit, skip, allowEmpty) {
         // Create new stream that will reject values that don't filter test
@@ -74,9 +74,7 @@
         // Create new stream that will accept values that pass filter test
         this.chain.push(new stream({
             apply: this.options.apply,
-            filter: function() {
-                return !func.apply(func, arguments);
-            }
+            filter: func
         }));
         return this.chain[this.chain.length - 1];
     };
@@ -84,7 +82,9 @@
         // Create new stream that will reject values that don't filter test
         this.chain.push(new stream({
             apply: this.options.apply,
-            filter: func
+            filter: function() {
+                return !func.apply(func, arguments);
+            }
         }));
         return this.chain[this.chain.length - 1];
     };
@@ -97,10 +97,9 @@
         this.filtered = false;
 
         // Test data if this part of the stream would like to accept it
-        if (this.options.filter && this.options.filter.apply(this.options.filter, data)) {
+        if (this.options.filter && !this.options.filter.apply(this.options.filter, data)) {
             this.filtered = true;
             return this.trigger('out', data, this);
-            // return this.trigger('out', this.options.apply ? data : [data], this);
         }
 
         // Lets map our result
@@ -116,6 +115,11 @@
         // Collect streamed data
         this.buffer.push(data);
 
+        // // Dont have readers buffer everything
+        if (!this.hasReaders()) {
+            return this;
+        }
+
         if (this.options.take) {
             var length = this.buffer.length;
             var end = length - this.options.take.skip;
@@ -123,7 +127,6 @@
 
             start = start < 0 ? 0 : start;
 
-            // console.log('take', start, end, this.options.take);
             data = this.buffer.slice(start, end);
 
             // Will take only when will have given limit in buffer
@@ -136,7 +139,6 @@
 
         // Notify that data was set
         this.trigger('data', data, this);
-        // this.trigger('data', this.options.apply ? data : [data], this);
 
         // Notify children nodes
         this.chain.forEach(function(stream) {
@@ -183,9 +185,9 @@
         var buffer = new Array(streams.length);
         var called = new Array(streams.length);
         var result = new stream({
-            // apply: true,
             filter: function(streams) {
-                return -1 !== streams.called.indexOf(false);
+                // if true then is valid
+                return -1 === streams.called.indexOf(false);
             },
             map: function(streams) {
                 return streams.arguments;
@@ -206,7 +208,7 @@
                 result.push({arguments: buffer, called: called });
             }
             item.on('out', refs[index]);
-            item.last(refs[index]);
+            item.on('data', refs[index]);
         });
 
         return result;

@@ -2,6 +2,7 @@ var stream = require('../stream.js');
 var events = require('../events.js');
 var object, context, args, next, called;
 var callback = function() {};
+var callbackInc = function() { called++ };
 var params = [1, 2, 'test'];
 var greaterThan3 = function(v) { return v > 3; }
 var addTwo = function(v) { return v + 2; }
@@ -146,30 +147,23 @@ describe('Stream', function() {
             object.push(2);
             object.push('test');
             called = 0;
+            next = new stream();
+            next.on('data', callbackInc)
         });
-        it('should pipe all values in stream to given function', function() {
-            object.pipe(function(v) {
-                called++;
-                args.push(v);
-            });
+        it('should not notifie on values since have no reader', function() {
+           object.buffer.length.should.be.eql(3);
+        });
+        it('should pipe all values in stream to next stream', function() {
+            object.pipe(next);
             called.should.be.eql(3);
-            args.should.be.eql(params);
         });
-        it('should pipe last value to given function', function() {
-            object.pipe(function(v) {
-                called++;
-                args.push(v);
-            }, -1);
-            called.should.be.eql(1);
-            args.should.be.eql(['test']);
-        });
-        it('should pipe first value to given function', function() {
-            object.pipe(function(v) {
-                called++;
-                args.push(v);
-            }, 0, 1);
-            called.should.be.eql(1);
-            args.should.be.eql([1]);
+        it('should only accept valid stream objects', function(done) {
+            try {
+                object.pipe(function() {});
+            } catch (e) {
+                e.should.be.an.instanceOf(Error);
+                done();
+            }
         });
     });
     describe('take', function() {

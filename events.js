@@ -12,6 +12,7 @@
 
     function events() {
         this.events = {};
+        this.eventsCallbacks = 0;
     }
 
     events.constructor = events;
@@ -23,6 +24,7 @@
     events.prototype.on = function(name, func) {
         this.eachEvent(name, function(name, events) {
             events.push(func);
+            ++this.eventsCallbacks;
         }.bind(this));
 
         return this;
@@ -38,8 +40,10 @@
                 idx = events.indexOf(func);
                 if (-1 !== idx) {
                     events.splice(idx, 1);
+                    --this.eventsCallbacks;
                 }
             } else {
+                this.eventsCallbacks -= events.length;
                 events.length = 0;
             }
         }.bind(this));
@@ -47,13 +51,17 @@
         return this;
     };
     events.prototype.trigger = function(name, args, context) {
+        var self = this;
         this.eachEvent(name, function(name, events) {
             events.forEach(function(func, idx) {
-                func.apply(context || func, args);
                 // If once then remove after triggering
-                func.once && events.splice(idx, 1);
+                if (func.once) {
+                    events.splice(idx, 1);
+                    --self.eventsCallbacks;
+                }
+                func.apply(context || func, args);
             });
-        }.bind(this));
+        });
 
         return this;
     };
