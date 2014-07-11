@@ -225,4 +225,21 @@ describe('Stream', function() {
             called.should.be.eql(0);
         });
     });
+    describe('#reduce', function() {
+        beforeEach(function() {
+            streamA = new stream();
+            object = streamA.reduce(function(a, sum) { return a + sum; }, 0);
+        });
+        it('should reduce value', function() {
+            object.on('data', function(i) {
+                called = i;
+            });
+            object.push(1);
+            called.should.be.eql(1);
+            object.push(2);
+            called.should.be.eql(3);
+            object.push(3);
+            called.should.be.eql(6);
+       });
+    });
 });

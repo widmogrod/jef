@@ -88,7 +88,15 @@
         }));
         return this.chain[this.chain.length - 1];
     };
-
+    stream.prototype.reduce = function(func, base) {
+        this.chain.push(new stream({
+            reduce: {
+                func: func,
+                base: base
+            }
+        }));
+        return this.chain[this.chain.length - 1];
+    };
     stream.prototype.push = function(data) {
         // Arguments to array
         data = slice(arguments);
@@ -112,10 +120,21 @@
             data = Array.isArray(data) ? data : [data];
         }
 
+        if (this.options.reduce) {
+            data = this.options.reduce.func.apply(
+                this,
+                data.concat(
+                    this.options.reduce.base
+                )
+            );
+            this.options.reduce.base = data;
+            data = Array.isArray(data) ? data : [data];
+        }
+
         // Collect streamed data
         this.buffer.push(data);
 
-        // // Dont have readers buffer everything
+        // Dont have readers buffer everything
         if (!this.hasReaders()) {
             return this;
         }
@@ -213,6 +232,11 @@
 
         return result;
     };
+    stream.fromArray = function(array) {
+        var result = new stream();
+        array.forEach(result.push.bind(result));
+        return result;
+    }
 
     return stream;
 });
