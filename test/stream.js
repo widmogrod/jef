@@ -1,6 +1,6 @@
 var stream = require('../stream.js');
 var events = require('../events.js');
-var object, context, args, next, called;
+var object, context, args, next, called, result;
 var callback = function() {};
 var callbackInc = function() { called++ };
 var params = [1, 2, 'test'];
@@ -226,20 +226,59 @@ describe('Stream', function() {
         });
     });
     describe('#reduce', function() {
-        beforeEach(function() {
-            streamA = new stream();
-            object = streamA.reduce(function(a, sum) { return a + sum; }, 0);
-        });
-        it('should reduce value', function() {
-            object.on('data', function(i) {
-                called = i;
+        describe('to numeric base', function() {
+            beforeEach(function() {
+                streamA = new stream();
+                object = streamA.reduce(function(a, sum) { return a + sum; }, 0);
+                called = null;
+                object.on('data', function(i) {
+                    called = i;
+                })
             });
-            object.push(1);
-            called.should.be.eql(1);
-            object.push(2);
-            called.should.be.eql(3);
-            object.push(3);
-            called.should.be.eql(6);
+            it('should reduce value', function() {
+                object.push(1);
+                called.should.be.eql(1);
+                object.push(2);
+                called.should.be.eql(3);
+                object.push(3);
+                called.should.be.eql(6);
+            });
+        });
+        describe('to object base', function() {
+            it('should reduce to object', function() {
+                beforeEach(function() {
+                    streamA = new stream();
+                    result = {a: 0};
+                    object = streamA.reduce(function(a, base) {
+                        base.a += a;
+                        return base;
+                    }, result);
+                    object.on('data', function(i) {
+                        called = i;
+                    })
+                });
+
+                it('should aggregate integer values and return updated base object', function() {
+                   object.push(1);
+                   result.should.be.eql({a: 1});
+                   called.should.ne.eql(result);
+                   object.push(2);
+                   result.should.be.eql({a: 3});
+                   called.should.ne.eql(result);
+                });
+            });
+        });
+    });
+    describe('#fromArray', function() {
+       beforeEach(function() {
+           object = stream.fromArray([1,2,3]);
+           called = [];
+       });
+       it('should be a stream', function() {
+            object.should.be.an.instanceOf(stream);
+       });
+       it('should have given values', function() {
+
        });
     });
 });
