@@ -48,6 +48,7 @@
         this.chain = [];
         this.buffer = [];
         this.filtered = false;
+        this.lastValue = [];
     }
     Stream.constructor = Stream;
     Stream.prototype = new events();
@@ -276,6 +277,8 @@
             }
         }
 
+        this.lastValue = data;
+
         // Notify that data was set
         this.trigger('data', data, this);
 
@@ -283,6 +286,21 @@
         this.chain.forEach(function(stream) {
             stream.push.apply(stream, data);
         });
+
+        return this;
+    };
+
+    /**
+     * Function to be called on recent value from stream and on future values
+     *
+     * @param {Function} func
+     * @return this
+     */
+    Stream.prototype.last = function(func) {
+        // Call function with last value in stream
+        func.apply(func, this.lastValue);
+        // Subscribe function to new data
+        this.on('data', func);
 
         return this;
     };
@@ -330,11 +348,31 @@
         return merged;
     }
     Stream.when = function() {
-        var streams = slice(arguments);
-        var refs = [];
-        var buffer = new Array(streams.length);
-        var called = new Array(streams.length);
+        return new Stream.When(slice(arguments));
+    };
+    Stream.fromArray = function(array) {
+        var index = -1, length = array.length;
         var result = new Stream({
+            drain: function() {
+                return ++index < length ? array[index] : undefined;
+            }
+        });
+        return result;
+    }
+
+    /**
+     * New stream type, that conumes streams
+     *
+     * @param {Stream[]} streams
+     * @constructor
+     */
+    Stream.When = function(streams) {
+        var refs = [],
+            self = this,
+            buffer = new Array(streams.length),
+            called = new Array(streams.length);
+
+        Stream.call(this, {
             filter: function(streams) {
                 // if true then is valid
                 return -1 === streams.called.indexOf(false);
@@ -355,23 +393,15 @@
             refs[index] = function(value) {
                 called[index] = !this.filtered;
                 buffer[index] = value;
-                result.push({arguments: buffer, called: called });
+                self.push({ arguments: buffer, called: called });
             }
             item.on('out', refs[index]);
             item.on('data', refs[index]);
+            self.lastValue.push(item.lastValue);
         });
-
-        return result;
     };
-    Stream.fromArray = function(array) {
-        var index = -1, length = array.length;
-        var result = new Stream({
-            drain: function() {
-                return ++index < length ? array[index] : undefined;
-            }
-        });
-        return result;
-    }
+    Stream.When.constructor = Stream.When;
+    Stream.When.prototype = new Stream();
 
     return Stream;
 });
