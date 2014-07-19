@@ -31,7 +31,6 @@
             'return jef.stream.when(streams["'+ args.join('"], streams["') +'"])'
                    // for last merged values in stream (if any)
                 + '.last(function() {'
-                    + 'console.log(arguments); '
                     // apply function and set this value for given cellName
                     + 'streams[cellName].push('
                         + 'functions["' + name + '"].apply(null, arguments)'
