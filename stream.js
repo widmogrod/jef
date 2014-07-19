@@ -14,65 +14,177 @@
 })(this, function(events, undefined) {
     'use strict';
 
+    // Helper functions
     var slice =  Function.prototype.call.bind(Array.prototype.slice);
 
-    function stream(options) {
+    /**
+     * Drain the stream
+     *
+     * @this Stream
+     */
+    function drain() {
+        var value,
+        drain = this.options.drain;
+
+        // You can drain once given stream
+        this.options.drain = null;
+
+        // Drain untill will be empty
+        while (typeof (value = drain()) !== 'undefined') {
+            this.push(value);
+        }
+    }
+
+    /**
+     * Represents a stream
+     *
+     * @constructor
+     * @param {Object} options - Options object
+     */
+    function Stream(options) {
         events.call(this);
+
         this.options = options || {};
         this.chain = [];
         this.buffer = [];
         this.filtered = false;
+        this.lastValue = [];
     }
-    stream.constructor = stream;
-    stream.prototype = new events();
+    Stream.constructor = Stream;
+    Stream.prototype = new events();
 
-    stream.prototype.pipe = function(func, from, limit) {
-        if (from < 0) {
-            from += this.buffer.length;
+    /**
+     * Check if stream has readers
+     *
+     * @return {Boolean}
+     */
+    Stream.prototype.hasReaders = function() {
+        return this.eventsCallbacks > 0;
+    };
+
+    /**
+     * Check wether we can drain data on not
+     *
+     * @return {Boolean}
+     */
+    Stream.prototype.canDrain = function() {
+        return typeof this.options.drain === 'function';
+    };
+
+    /**
+     * Register new event handler, and trigger the 'drain' event that stream is ready to datin.
+     *
+     * @param {String} name     An event to which attach listener
+     * @param {Function} func   An listener to listne to the event
+     * @return {Stream}
+     */
+    Stream.prototype.on = function(name, func) {
+        var result = events.prototype.on.call(this, name, func);
+        this.trigger('drain');
+        return result;
+    };
+
+    /**
+     * Pipe one stream to another
+     *
+     * @param {Stream} stream   An stream to pipe
+     */
+    Stream.prototype.pipe = function(stream) {
+        // Accept only streams
+        if (!stream instanceof Stream) {
+            throw new Error('You can pipe to another stream, but given ' + stream);
         }
-        this.buffer.forEach(function(value, index) {
-            if (undefined !== from && from > index) {
-                return;
-            }
-            if (undefined !== limit && --limit < 0) {
-                return;
-            }
 
-            func.apply(func, value);
-            // func.apply(func, this.options.apply ? value : [value]);
-        }.bind(this));
+        // Connect two streams
+        this.on('data', stream.push.bind(stream));
 
-        return this.on('data', func);
+        // If we can drain this stream then do it,
+        // Otherwise just connect streams
+        if (!this.canDrain()) {
+            return stream;
+        }
+
+        // If next stream dont have readers,
+        // and we have drain function postpone drain
+        // until this stream or next will have stream readers
+        if (!stream.hasReaders()) {
+            stream.on('drain', drain.bind(this));
+            return stream;
+        }
+
+        // Drain data from stream
+        drain.call(this);
+
+        return stream;
     };
-    stream.prototype.last = function(func) {
-        return this.pipe(func, -1, 1);
-    };
-    stream.prototype.first = function(func) {
-        return this.pipe(func, 0, 1);
-    };
-    stream.prototype.take = function (limit, skip, allowEmpty) {
+
+    /**
+     * Create new stream based on current.
+     *
+     * Stream will buffer values and push them only when reach given {size}.
+     * If flag {allowEmpty} is set this stream wont waint till
+     * buffer size will be equal {size}, and will push data along the stream
+     * even if doesn't have enough size.
+     *
+     * @param {Integer} size
+     * @param {Integer} skip
+     * @param {Boolean} allowEmpty
+     * @return {Stream}
+     */
+    Stream.prototype.take = function (size, skip, allowEmpty) {
         // Create new stream that will reject values that don't filter test
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
             // apply: true,
             take: {
-                limit: limit,
+                limit: size,
                 skip: skip || 0,
                 allowEmpty: !! allowEmpty
             }
         }));
         return this.chain[this.chain.length - 1];
     }
-    stream.prototype.map = function(func) {
+
+    /**
+     * Create new stream which will map values in to new representation.
+     *
+     * @param {Function} func
+     * @return {Stream}
+     */
+    Stream.prototype.map = function(func) {
         // Create new stream with that maps values to new form
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
             apply: this.options.apply,
             map: func
         }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.accept = function(func) {
+
+    /**
+     * Create new stream which will accept only values
+     * that test by given function {func}
+     *
+     * @param {Function} func
+     * @return {Stream}
+     */
+    Stream.prototype.accept = function(func) {
         // Create new stream that will accept values that pass filter test
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
+            apply: this.options.apply,
+            filter: func
+        }));
+        return this.chain[this.chain.length - 1];
+    };
+
+    /**
+     * Create new stream which wont accept values
+     * when given text function {func} wont accept them.
+     *
+     * @param {Function} func
+     * @return {Stream}
+     */
+    Stream.prototype.reject = function(func) {
+        // Create new stream that will reject values that don't filter test
+        this.chain.push(new Stream({
             apply: this.options.apply,
             filter: function() {
                 return !func.apply(func, arguments);
@@ -80,16 +192,36 @@
         }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.reject = function(func) {
-        // Create new stream that will reject values that don't filter test
-        this.chain.push(new stream({
-            apply: this.options.apply,
-            filter: func
+
+    /**
+     * Create new stream that will take all incomming values
+     * And reduce them to the {base} by applying given function {func}
+     *
+     * @param {Function} func
+     * @param {Function} base
+     * @return {Stream}
+     */
+    Stream.prototype.reduce = function(func, base) {
+        this.chain.push(new Stream({
+            reduce: {
+                func: func,
+                base: base
+            }
         }));
         return this.chain[this.chain.length - 1];
     };
 
-    stream.prototype.push = function(data) {
+    /**
+     * Push data along the stream
+     *
+     * @param {Object} data
+     * @return {Stream}
+     */
+    Stream.prototype.push = function(data) {
+        if (this.canDrain()) {
+            throw new Error('Stream cant push data because it has drain function');
+        }
+
         // Arguments to array
         data = slice(arguments);
 
@@ -97,10 +229,9 @@
         this.filtered = false;
 
         // Test data if this part of the stream would like to accept it
-        if (this.options.filter && this.options.filter.apply(this.options.filter, data)) {
+        if (this.options.filter && !this.options.filter.apply(this.options.filter, data)) {
             this.filtered = true;
             return this.trigger('out', data, this);
-            // return this.trigger('out', this.options.apply ? data : [data], this);
         }
 
         // Lets map our result
@@ -113,17 +244,29 @@
             data = Array.isArray(data) ? data : [data];
         }
 
-        // Collect streamed data
-        this.buffer.push(data);
+        // Lets reduce our stream
+        if (this.options.reduce) {
+            data = this.options.reduce.func.apply(
+                this,
+                data.concat(
+                    this.options.reduce.base
+                )
+            );
+            this.options.reduce.base = data;
+            data = Array.isArray(data) ? data : [data];
+        }
 
+        // Lets buffer some values in stream
         if (this.options.take) {
+            // Collect streamed data
+            this.buffer.push(data);
+
             var length = this.buffer.length;
             var end = length - this.options.take.skip;
             var start = end - this.options.take.limit;
 
             start = start < 0 ? 0 : start;
 
-            // console.log('take', start, end, this.options.take);
             data = this.buffer.slice(start, end);
 
             // Will take only when will have given limit in buffer
@@ -134,9 +277,10 @@
             }
         }
 
+        this.lastValue = data;
+
         // Notify that data was set
         this.trigger('data', data, this);
-        // this.trigger('data', this.options.apply ? data : [data], this);
 
         // Notify children nodes
         this.chain.forEach(function(stream) {
@@ -145,10 +289,36 @@
 
         return this;
     };
-    stream.prototype.merge = function(next) {
-        return stream.when(this, next);
+
+    /**
+     * Function to be called on recent value from stream and on future values
+     *
+     * @param {Function} func
+     * @return this
+     */
+    Stream.prototype.last = function(func) {
+        // Call function with last value in stream
+        func.apply(func, this.lastValue);
+        // Subscribe function to new data
+        this.on('data', func);
+
+        return this;
     };
-    stream.prototype.destroy = function() {
+
+    /**
+     * Crate new stream that merge two stream into one
+     *
+     * @param {Stream} next
+     * @return {Stream}
+     */
+    Stream.prototype.merge = function(next) {
+        return Stream.merge(this, next);
+    };
+
+    /**
+     * Destroy stream
+     */
+    Stream.prototype.destroy = function() {
         // Custom destroy function
         this.options.destroy && this.options.destroy();
         // Destroy childs
@@ -156,13 +326,13 @@
             stream.destroy();
         });
         // Invoking constructor clean properties
-        stream.call(this);
+        Stream.call(this);
     };
 
-    stream.flat = function () {
+    Stream.merge = function () {
         var streams = slice(arguments);
         var refs = [];
-        var flatten = new stream({
+        var merged = new Stream({
             destroy: function() {
                 streams.forEach(function(item, index) {
                     item.off('data', refs[index]);
@@ -171,21 +341,41 @@
         });
         streams.forEach(function (stream, index) {
             stream.on('data', refs[index] = function () {
-                flatten.push.apply(flatten, arguments)
+                merged.push.apply(merged, arguments)
             });
         });
 
-        return flatten;
+        return merged;
     }
-    stream.when = function() {
-        var streams = slice(arguments);
-        var refs = [];
-        var buffer = new Array(streams.length);
-        var called = new Array(streams.length);
-        var result = new stream({
-            // apply: true,
+    Stream.when = function() {
+        return new Stream.When(slice(arguments));
+    };
+    Stream.fromArray = function(array) {
+        var index = -1, length = array.length;
+        var result = new Stream({
+            drain: function() {
+                return ++index < length ? array[index] : undefined;
+            }
+        });
+        return result;
+    }
+
+    /**
+     * New stream type, that conumes streams
+     *
+     * @param {Stream[]} streams
+     * @constructor
+     */
+    Stream.When = function(streams) {
+        var refs = [],
+            self = this,
+            buffer = new Array(streams.length),
+            called = new Array(streams.length);
+
+        Stream.call(this, {
             filter: function(streams) {
-                return -1 !== streams.called.indexOf(false);
+                // if true then is valid
+                return -1 === streams.called.indexOf(false);
             },
             map: function(streams) {
                 return streams.arguments;
@@ -203,14 +393,15 @@
             refs[index] = function(value) {
                 called[index] = !this.filtered;
                 buffer[index] = value;
-                result.push({arguments: buffer, called: called });
+                self.push({ arguments: buffer, called: called });
             }
             item.on('out', refs[index]);
-            item.last(refs[index]);
+            item.on('data', refs[index]);
+            self.lastValue.push(item.lastValue);
         });
-
-        return result;
     };
+    Stream.When.constructor = Stream.When;
+    Stream.When.prototype = new Stream();
 
-    return stream;
+    return Stream;
 });

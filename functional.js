@@ -15,28 +15,42 @@
      */
     function is(type, obj) {
         var clas = Object.prototype.toString.call(obj).slice(8, -1);
-        return obj !== undefined && obj !== null && clas.toLowerCase() === type.toLowerCase();
+        return obj !== undefined && obj !== null && clas === type;
     }
 
     /**
      * Check if value is function
      */
     function isFunction(value) {
-        return is('function', value);
+        return is('Function', value);
     }
 
     /**
      * Check if value is array
      */
     function isArray(value) {
-        return is('array', value);
+        return is('Array', value);
     }
 
     /**
      * Check if value is object
      */
     function isObject(value) {
-        return is('object', value);
+        return is('Object', value);
+    }
+
+    /**
+     * Check if valie is number
+     */
+    function isNumber(value) {
+        return is('Number', value);
+    }
+
+    /**
+     * Check if valie is defined
+     */
+    function isDefined(value) {
+        return 'undefined' !== typeof value;
     }
 
     /**
@@ -248,23 +262,18 @@
     /**
      * Apply function on each data element
      */
-    function each(data, func) {
-        var i, length, hasProp;
-        switch(true) {
-            case isArray(data):
-                length = data.length;
-                for (i = 0; i < length; i++) {
-                    func(data[i], i);
-                }
-                break;
+    function each(data, func, start, end) {
+        var i = 0,
+            keys = Object.keys(data),
+            length = keys.length,
+            key;
 
-            case isObject(data):
-                for (i in data) {
-                    if (data.hasOwnProperty(i)) {
-                        func(data[i], i);
-                    }
-                }
-                break;
+        isNumber(start) && (i = (start < 0) ? length + start : start);
+        isNumber(end) && (length = (end < 0) ? length + end : end);
+
+        for (; i < length; i++) {
+            key = keys[i];
+            func(data[key], key);
         }
     }
 
@@ -277,7 +286,7 @@
      *
      * @return []
      */
-    function map(data, func) {
+    function map(data, func, start, end) {
         data = slice(arguments, 0, -1);
         func = first(slice(arguments, -1));
         var result = [];
@@ -285,7 +294,7 @@
             result[idx] = [];
             each(item, function(value, col) {
                 result[idx][col] = func(value);
-            })
+            }, start, end)
         });
         return data.length > 1 ? result : first(result);
     }

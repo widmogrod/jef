@@ -1,7 +1,8 @@
 var stream = require('../stream.js');
 var events = require('../events.js');
-var object, context, args, next, called;
+var object, context, args, next, called, result, data;
 var callback = function() {};
+var callbackInc = function() { called++ };
 var params = [1, 2, 'test'];
 var greaterThan3 = function(v) { return v > 3; }
 var addTwo = function(v) { return v + 2; }
@@ -108,38 +109,6 @@ describe('Stream', function() {
             args.should.be.eql(4);
         });
     });
-    describe('#merge', function() {
-        var streamA, streamB;
-        beforeEach(function() {
-            streamA = new stream();
-            streamB = new stream();
-            object = streamA.merge(streamB)
-        });
-
-        it('should merge streams', function() {
-            object.should.be.an.instanceOf(stream);
-        });
-        it('should trigger "out" event when not all stream have data', function() {
-            object.on('out', function() { called = true; });
-            streamA.push(1);
-            called.should.be.true;
-        });
-        it('should trigger "data" event when all stream have data', function() {
-            object.on('data', function(a, b) { called = true; args = [a, b]});
-            streamA.push(1);
-            streamB.push(2);
-            called.should.be.true;
-            args.should.be.eql([1, 2]);
-        });
-        it('should remove references when destroyed', function() {
-            object.on('data', function() {
-                called = true;
-            });
-            object.destroy();
-            object.push(2);
-            called.should.be.false;
-        });
-    });
     describe('#when', function() {
         var streamA, streamB;
         beforeEach(function() {
@@ -178,30 +147,24 @@ describe('Stream', function() {
             object.push(2);
             object.push('test');
             called = 0;
+            next = new stream();
+            next.on('data', callbackInc)
         });
-        it('should pipe all values in stream to given function', function() {
-            object.pipe(function(v) {
-                called++;
-                args.push(v);
-            });
-            called.should.be.eql(3);
-            args.should.be.eql(params);
+        it('should not notifie on values since have no reader', function() {
+           object.buffer.length.should.be.eql(0);
         });
-        it('should pipe last value to given function', function() {
-            object.pipe(function(v) {
-                called++;
-                args.push(v);
-            }, -1);
+        it('should pipe all values in stream to next stream', function() {
+            object.pipe(next);
+            object.push('test');
             called.should.be.eql(1);
-            args.should.be.eql(['test']);
         });
-        it('should pipe first value to given function', function() {
-            object.pipe(function(v) {
-                called++;
-                args.push(v);
-            }, 0, 1);
-            called.should.be.eql(1);
-            args.should.be.eql([1]);
+        it('should only accept valid stream objects', function(done) {
+            try {
+                object.pipe(function() {});
+            } catch (e) {
+                e.should.be.an.instanceOf(Error);
+                done();
+            }
         });
     });
     describe('take', function() {
@@ -234,17 +197,17 @@ describe('Stream', function() {
             args.should.be.eql([[2],[3]]);
         });
     });
-    describe('flat', function() {
+    describe('#merge', function() {
         beforeEach(function() {
             streamA = new stream();
             streamB = new stream();
-            object = stream.flat(streamA, streamB);
+            object = stream.merge(streamA, streamB);
             called = 0;
         });
         it('should create stream', function() {
             object.should.be.an.instanceOf(stream)
         });
-        it('should stream values from flatten streams', function() {
+        it('should stream values from merged streams', function() {
             object.on('data', function(value) {
                 called++;
                 args = [value];
@@ -261,6 +224,75 @@ describe('Stream', function() {
             object.destroy();
             streamA.push(1);
             called.should.be.eql(0);
+        });
+    });
+    describe('#reduce', function() {
+        describe('to numeric base', function() {
+            beforeEach(function() {
+                streamA = new stream();
+                object = streamA.reduce(function(a, sum) { return a + sum; }, 0);
+                called = null;
+                object.on('data', function(i) {
+                    called = i;
+                })
+            });
+            it('should reduce value', function() {
+                object.push(1);
+                called.should.be.eql(1);
+                object.push(2);
+                called.should.be.eql(3);
+                object.push(3);
+                called.should.be.eql(6);
+            });
+        });
+        describe('to object base', function() {
+            it('should reduce to object', function() {
+                beforeEach(function() {
+                    streamA = new stream();
+                    result = {a: 0};
+                    object = streamA.reduce(function(a, base) {
+                        base.a += a;
+                        return base;
+                    }, result);
+                    object.on('data', function(i) {
+                        called = i;
+                    })
+                });
+
+                it('should aggregate integer values and return updated base object', function() {
+                   object.push(1);
+                   result.should.be.eql({a: 1});
+                   called.should.ne.eql(result);
+                   object.push(2);
+                   result.should.be.eql({a: 3});
+                   called.should.ne.eql(result);
+                });
+            });
+        });
+    });
+    describe('#fromArray', function() {
+        beforeEach(function() {
+            data = [1, 2, 3, true, false, null, -1];
+            object = stream.fromArray(data);
+            result = [];
+        });
+        it('should be a stream', function() {
+            object.should.be.an.instanceOf(stream);
+        });
+        it('should not use buffer', function() {
+            object.buffer.should.be.eql([]);
+        });
+        it('should drain on pipe', function() {
+            next = new stream();
+            next.on('data', function(value) {
+                result.push(value);
+            });
+            object.pipe(next);
+            result.should.be.eql(data);
+
+            it('and buffer must be empty', function() {
+               object.buffer.length.should.be.eql(0);
+            });
         });
     });
 });

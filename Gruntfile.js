@@ -25,6 +25,7 @@ module.exports = function(grunt) {
                 },
                 files: {
                     'dist/integration/jquery.diffhtml.min.js': ['domdiff.js', 'integration/jquery.diffhtml.js'],
+                    'dist/integration/jquery.streamOn.min.js': ['events.js', 'stream.js', 'integration/jquery.streamOn.js'],
                 }
             }
         }
