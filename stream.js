@@ -7,7 +7,7 @@
         define(['jef/events'], factory);
     } else { // Browser globals
         root.jef = root.jef || {};
-        root.jef.Stream = factory(
+        root.jef.stream = factory(
             root.jef.events
         );
     }
