@@ -347,32 +347,13 @@
 
         return merged;
     }
+
     Stream.when = function() {
-        return new Stream.When(slice(arguments));
-    };
-    Stream.fromArray = function(array) {
-        var index = -1, length = array.length;
+        var streams = slice(arguments);
+        var refs = [];
+        var buffer = new Array(streams.length);
+        var called = new Array(streams.length);
         var result = new Stream({
-            drain: function() {
-                return ++index < length ? array[index] : undefined;
-            }
-        });
-        return result;
-    }
-
-    /**
-     * New stream type, that conumes streams
-     *
-     * @param {Stream[]} streams
-     * @constructor
-     */
-    Stream.When = function(streams) {
-        var refs = [],
-            self = this,
-            buffer = new Array(streams.length),
-            called = new Array(streams.length);
-
-        Stream.call(this, {
             filter: function(streams) {
                 // if true then is valid
                 return -1 === streams.called.indexOf(false);
@@ -393,15 +374,27 @@
             refs[index] = function(value) {
                 called[index] = !this.filtered;
                 buffer[index] = value;
-                self.push({ arguments: buffer, called: called });
+                result.push({arguments: buffer, called: called });
             }
             item.on('out', refs[index]);
             item.on('data', refs[index]);
-            self.lastValue.push(item.lastValue);
+
+            // If stream have last value then set it
+            result.lastValue.push(item.lastValue);
         });
+
+        return result;
     };
-    Stream.When.constructor = Stream.When;
-    Stream.When.prototype = new Stream();
+
+    Stream.fromArray = function(array) {
+        var index = -1, length = array.length;
+        var result = new Stream({
+            drain: function() {
+                return ++index < length ? array[index] : undefined;
+            }
+        });
+        return result;
+    }
 
     return Stream;
 });
