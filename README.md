@@ -44,10 +44,10 @@ stream B streams    -b1--b2---------b3-------------------------
 stream C streams    ------------------c1-----------------------
 ```
 
-When I pass given stream to `stream.flat()` then new stream will be created,
-and will flat all events into one like so:
+When I pass given stream to `stream.merge()` then new stream will be created,
+and will merge all events into one like so:
 ```
-stream.flat(A,B,C)  -b1--b2a1------a2b3c1------------a3--------
+stream.merge(A,B,C)  -b1--b2a1------a2b3c1------------a3--------
 ```
 
 When I pass given stream to `stream.when` then new stream will be created,
