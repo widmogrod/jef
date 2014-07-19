@@ -17,7 +17,11 @@
     // Helper functions
     var slice =  Function.prototype.call.bind(Array.prototype.slice);
 
-    // Private functions
+    /**
+     * Drain the stream
+     *
+     * @this Stream
+     */
     function drain() {
         var value,
         drain = this.options.drain;
@@ -35,6 +39,7 @@
      * Represents a stream
      *
      * @constructor
+     * @param {Object} options - Options object
      */
     function Stream(options) {
         events.call(this);
@@ -47,56 +52,103 @@
     Stream.constructor = Stream;
     Stream.prototype = new events();
 
+    /**
+     * Check if stream has readers
+     *
+     * @return {Boolean}
+     */
     Stream.prototype.hasReaders = function() {
         return this.eventsCallbacks > 0;
     };
-    Stream.prototype.hasDrain = function() {
+
+    /**
+     * Check wether we can drain data on not
+     *
+     * @return {Boolean}
+     */
+    Stream.prototype.canDrain = function() {
         return typeof this.options.drain === 'function';
     };
+
+    /**
+     * Register new event handler, and trigger the 'drain' event that stream is ready to datin.
+     *
+     * @param {String} name     An event to which attach listener
+     * @param {Function} func   An listener to listne to the event
+     * @return {Stream}
+     */
     Stream.prototype.on = function(name, func) {
         var result = events.prototype.on.call(this, name, func);
         this.trigger('drain');
         return result;
     };
-    Stream.prototype.pipe = function(toStream) {
+
+    /**
+     * Pipe one stream to another
+     *
+     * @param {Stream} stream   An stream to pipe
+     */
+    Stream.prototype.pipe = function(stream) {
         // Accept only streams
-        if (!toStream instanceof Stream) {
-            throw new Error('You can pipe to another stream, but given ' + toStream);
+        if (!stream instanceof Stream) {
+            throw new Error('You can pipe to another stream, but given ' + stream);
         }
 
         // Connect two streams
-        this.on('data', toStream.push.bind(toStream));
+        this.on('data', stream.push.bind(stream));
 
-        // If we can drain this stream then do it
-        if (!this.hasDrain()) {
-            return toStream;
+        // If we can drain this stream then do it,
+        // Otherwise just connect streams
+        if (!this.canDrain()) {
+            return stream;
         }
 
         // If next stream dont have readers,
         // and we have drain function postpone drain
         // until this stream or next will have stream readers
-        if (!toStream.hasReaders()) {
-            toStream.on('drain', drain.bind(this));
-            return toStream;
+        if (!stream.hasReaders()) {
+            stream.on('drain', drain.bind(this));
+            return stream;
         }
 
         // Drain data from stream
         drain.call(this);
 
-        return toStream;
+        return stream;
     };
-    Stream.prototype.take = function (limit, skip, allowEmpty) {
+
+    /**
+     * Create new stream based on current.
+     *
+     * Stream will buffer values and push them only when reach given {size}.
+     * If flag {allowEmpty} is set this stream wont waint till
+     * buffer size will be equal {size}, and will push data along the stream
+     * even if doesn't have enough size.
+     *
+     * @param {Integer} size
+     * @param {Integer} skip
+     * @param {Boolean} allowEmpty
+     * @return {Stream}
+     */
+    Stream.prototype.take = function (size, skip, allowEmpty) {
         // Create new stream that will reject values that don't filter test
         this.chain.push(new Stream({
             // apply: true,
             take: {
-                limit: limit,
+                limit: size,
                 skip: skip || 0,
                 allowEmpty: !! allowEmpty
             }
         }));
         return this.chain[this.chain.length - 1];
     }
+
+    /**
+     * Create new stream which will map values in to new representation.
+     *
+     * @param {Function} func
+     * @return {Stream}
+     */
     Stream.prototype.map = function(func) {
         // Create new stream with that maps values to new form
         this.chain.push(new Stream({
@@ -105,6 +157,14 @@
         }));
         return this.chain[this.chain.length - 1];
     };
+
+    /**
+     * Create new stream which will accept only values
+     * that test by given function {func}
+     *
+     * @param {Function} func
+     * @return {Stream}
+     */
     Stream.prototype.accept = function(func) {
         // Create new stream that will accept values that pass filter test
         this.chain.push(new Stream({
@@ -113,6 +173,14 @@
         }));
         return this.chain[this.chain.length - 1];
     };
+
+    /**
+     * Create new stream which wont accept values
+     * when given text function {func} wont accept them.
+     *
+     * @param {Function} func
+     * @return {Stream}
+     */
     Stream.prototype.reject = function(func) {
         // Create new stream that will reject values that don't filter test
         this.chain.push(new Stream({
@@ -123,6 +191,15 @@
         }));
         return this.chain[this.chain.length - 1];
     };
+
+    /**
+     * Create new stream that will take all incomming values
+     * And reduce them to the {base} by applying given function {func}
+     *
+     * @param {Function} func
+     * @param {Function} base
+     * @return {Stream}
+     */
     Stream.prototype.reduce = function(func, base) {
         this.chain.push(new Stream({
             reduce: {
@@ -132,8 +209,15 @@
         }));
         return this.chain[this.chain.length - 1];
     };
+
+    /**
+     * Push data along the stream
+     *
+     * @param {Object} data
+     * @return {Stream}
+     */
     Stream.prototype.push = function(data) {
-        if (this.hasDrain()) {
+        if (this.canDrain()) {
             throw new Error('Stream cant push data because it has drain function');
         }
 
@@ -202,9 +286,20 @@
 
         return this;
     };
+
+    /**
+     * Crate new stream that merge two stream into one
+     *
+     * @param {Stream} next
+     * @return {Stream}
+     */
     Stream.prototype.merge = function(next) {
         return Stream.merge(this, next);
     };
+
+    /**
+     * Destroy stream
+     */
     Stream.prototype.destroy = function() {
         // Custom destroy function
         this.options.destroy && this.options.destroy();
