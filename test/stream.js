@@ -1,6 +1,6 @@
 var stream = require('../stream.js');
 var events = require('../events.js');
-var object, context, args, next, called, result;
+var object, context, args, next, called, result, data;
 var callback = function() {};
 var callbackInc = function() { called++ };
 var params = [1, 2, 'test'];
@@ -151,11 +151,12 @@ describe('Stream', function() {
             next.on('data', callbackInc)
         });
         it('should not notifie on values since have no reader', function() {
-           object.buffer.length.should.be.eql(3);
+           object.buffer.length.should.be.eql(0);
         });
         it('should pipe all values in stream to next stream', function() {
             object.pipe(next);
-            called.should.be.eql(3);
+            object.push('test');
+            called.should.be.eql(1);
         });
         it('should only accept valid stream objects', function(done) {
             try {
@@ -270,15 +271,28 @@ describe('Stream', function() {
         });
     });
     describe('#fromArray', function() {
-       beforeEach(function() {
-           object = stream.fromArray([1,2,3]);
-           called = [];
-       });
-       it('should be a stream', function() {
+        beforeEach(function() {
+            data = [1, 2, 3, true, false, null, -1];
+            object = stream.fromArray(data);
+            result = [];
+        });
+        it('should be a stream', function() {
             object.should.be.an.instanceOf(stream);
-       });
-       it('should have given values', function() {
+        });
+        it('should not use buffer', function() {
+            object.buffer.should.be.eql([]);
+        });
+        it('should drain on pipe', function() {
+            next = new stream();
+            next.on('data', function(value) {
+                result.push(value);
+            });
+            object.pipe(next);
+            result.should.be.eql(data);
 
-       });
+            it('and buffer must be empty', function() {
+               object.buffer.length.should.be.eql(0);
+            });
+        });
     });
 });

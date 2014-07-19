@@ -7,52 +7,87 @@
         define(['jef/events'], factory);
     } else { // Browser globals
         root.jef = root.jef || {};
-        root.jef.stream = factory(
+        root.jef.Stream = factory(
             root.jef.events
         );
     }
 })(this, function(events, undefined) {
     'use strict';
 
+    // Helper functions
     var slice =  Function.prototype.call.bind(Array.prototype.slice);
 
-    function stream(options) {
+    // Private functions
+    function drain() {
+        var value,
+        drain = this.options.drain;
+
+        // You can drain once given stream
+        this.options.drain = null;
+
+        // Drain untill will be empty
+        while (typeof (value = drain()) !== 'undefined') {
+            this.push(value);
+        }
+    }
+
+    /**
+     * Represents a stream
+     *
+     * @constructor
+     */
+    function Stream(options) {
         events.call(this);
+
         this.options = options || {};
         this.chain = [];
         this.buffer = [];
         this.filtered = false;
     }
-    stream.constructor = stream;
-    stream.prototype = new events();
+    Stream.constructor = Stream;
+    Stream.prototype = new events();
 
-    stream.prototype.hasReaders = function() {
-        return this.chain.length || this.eventsCallbacks;
+    Stream.prototype.hasReaders = function() {
+        return this.eventsCallbacks > 0;
     };
-    stream.prototype.pipe = function(toStream) {
+    Stream.prototype.hasDrain = function() {
+        return typeof this.options.drain === 'function';
+    };
+    Stream.prototype.on = function(name, func) {
+        var result = events.prototype.on.call(this, name, func);
+        this.trigger('drain');
+        return result;
+    };
+    Stream.prototype.pipe = function(toStream) {
         // Accept only streams
-        if (!toStream instanceof stream) {
+        if (!toStream instanceof Stream) {
             throw new Error('You can pipe to another stream, but given ' + toStream);
         }
 
-        // If stream dont have readers then pipe all buffered values to this stream
-        if (!this.hasReaders()) {
-            // Assign bufer to temporary variable
-            var buffer = this.buffer;
-            // And clean current buffer
-            this.buffer = [];
-            // Then push everyting to next stream
-            buffer.forEach(function(value) {
-                toStream.push.apply(toStream, value)
-            });
+        // Connect two streams
+        this.on('data', toStream.push.bind(toStream));
+
+        // If we can drain this stream then do it
+        if (!this.hasDrain()) {
+            return toStream;
         }
 
-        this.on('data', toStream.push.bind(toStream));
+        // If next stream dont have readers,
+        // and we have drain function postpone drain
+        // until this stream or next will have stream readers
+        if (!toStream.hasReaders()) {
+            toStream.on('drain', drain.bind(this));
+            return toStream;
+        }
+
+        // Drain data from stream
+        drain.call(this);
+
         return toStream;
     };
-    stream.prototype.take = function (limit, skip, allowEmpty) {
+    Stream.prototype.take = function (limit, skip, allowEmpty) {
         // Create new stream that will reject values that don't filter test
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
             // apply: true,
             take: {
                 limit: limit,
@@ -62,25 +97,25 @@
         }));
         return this.chain[this.chain.length - 1];
     }
-    stream.prototype.map = function(func) {
+    Stream.prototype.map = function(func) {
         // Create new stream with that maps values to new form
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
             apply: this.options.apply,
             map: func
         }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.accept = function(func) {
+    Stream.prototype.accept = function(func) {
         // Create new stream that will accept values that pass filter test
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
             apply: this.options.apply,
             filter: func
         }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.reject = function(func) {
+    Stream.prototype.reject = function(func) {
         // Create new stream that will reject values that don't filter test
-        this.chain.push(new stream({
+        this.chain.push(new Stream({
             apply: this.options.apply,
             filter: function() {
                 return !func.apply(func, arguments);
@@ -88,8 +123,8 @@
         }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.reduce = function(func, base) {
-        this.chain.push(new stream({
+    Stream.prototype.reduce = function(func, base) {
+        this.chain.push(new Stream({
             reduce: {
                 func: func,
                 base: base
@@ -97,7 +132,11 @@
         }));
         return this.chain[this.chain.length - 1];
     };
-    stream.prototype.push = function(data) {
+    Stream.prototype.push = function(data) {
+        if (this.hasDrain()) {
+            throw new Error('Stream cant push data because it has drain function');
+        }
+
         // Arguments to array
         data = slice(arguments);
 
@@ -120,6 +159,7 @@
             data = Array.isArray(data) ? data : [data];
         }
 
+        // Lets reduce our stream
         if (this.options.reduce) {
             data = this.options.reduce.func.apply(
                 this,
@@ -131,15 +171,11 @@
             data = Array.isArray(data) ? data : [data];
         }
 
-        // Collect streamed data
-        this.buffer.push(data);
-
-        // Dont have readers buffer everything
-        if (!this.hasReaders()) {
-            return this;
-        }
-
+        // Lets buffer some values in stream
         if (this.options.take) {
+            // Collect streamed data
+            this.buffer.push(data);
+
             var length = this.buffer.length;
             var end = length - this.options.take.skip;
             var start = end - this.options.take.limit;
@@ -166,10 +202,10 @@
 
         return this;
     };
-    stream.prototype.merge = function(next) {
-        return stream.merge(this, next);
+    Stream.prototype.merge = function(next) {
+        return Stream.merge(this, next);
     };
-    stream.prototype.destroy = function() {
+    Stream.prototype.destroy = function() {
         // Custom destroy function
         this.options.destroy && this.options.destroy();
         // Destroy childs
@@ -177,13 +213,13 @@
             stream.destroy();
         });
         // Invoking constructor clean properties
-        stream.call(this);
+        Stream.call(this);
     };
 
-    stream.merge = function () {
+    Stream.merge = function () {
         var streams = slice(arguments);
         var refs = [];
-        var merged = new stream({
+        var merged = new Stream({
             destroy: function() {
                 streams.forEach(function(item, index) {
                     item.off('data', refs[index]);
@@ -198,12 +234,12 @@
 
         return merged;
     }
-    stream.when = function() {
+    Stream.when = function() {
         var streams = slice(arguments);
         var refs = [];
         var buffer = new Array(streams.length);
         var called = new Array(streams.length);
-        var result = new stream({
+        var result = new Stream({
             filter: function(streams) {
                 // if true then is valid
                 return -1 === streams.called.indexOf(false);
@@ -232,11 +268,15 @@
 
         return result;
     };
-    stream.fromArray = function(array) {
-        var result = new stream();
-        array.forEach(result.push.bind(result));
+    Stream.fromArray = function(array) {
+        var index = -1, length = array.length;
+        var result = new Stream({
+            drain: function() {
+                return ++index < length ? array[index] : undefined;
+            }
+        });
         return result;
     }
 
-    return stream;
+    return Stream;
 });
