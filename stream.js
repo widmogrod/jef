@@ -394,7 +394,19 @@
             }
         });
         return result;
-    }
+    };
+
+    Stream.fromPromise = function(promise) {
+        var result = new Stream();
+
+        promise.then(function(value) {
+            result.push(value);
+        }, function(error) {
+            result.trigg('error', arguments);
+        });
+
+        return result;
+    };
 
     return Stream;
 });
