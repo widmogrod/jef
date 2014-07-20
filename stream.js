@@ -396,13 +396,13 @@
         return result;
     };
 
-    Stream.fromPromise = function(promise) {
-        var result = new Stream();
+    Stream.fromPromise = function(promise, stream) {
+        var result = stream instanceof Stream ? stream : new Stream();
 
         promise.then(function(value) {
             result.push(value);
         }, function(error) {
-            result.trigg('error', arguments);
+            result.trigger('error', arguments);
         });
 
         return result;
