@@ -228,6 +228,10 @@
         // On new data mark stream as not filtered
         this.filtered = false;
 
+        // Clear last value in case filter function wont accept this input
+        // Experimental.
+        this.lastValue = [];
+
         // Test data if this part of the stream would like to accept it
         if (this.options.filter && !this.options.filter.apply(this.options.filter, data)) {
             this.filtered = true;
@@ -396,13 +400,13 @@
         return result;
     };
 
-    Stream.fromPromise = function(promise) {
-        var result = new Stream();
+    Stream.fromPromise = function(promise, stream) {
+        var result = stream instanceof Stream ? stream : new Stream();
 
         promise.then(function(value) {
             result.push(value);
         }, function(error) {
-            result.trigg('error', arguments);
+            result.trigger('error', arguments);
         });
 
         return result;
