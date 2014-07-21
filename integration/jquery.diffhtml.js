@@ -18,9 +18,9 @@
     jQuery.fn.diffhtml = function(html) {
         var ref, diff, func;
 
-        ref = document.createElement('div');
-
         return this.map(function() {
+            // Create clone
+            ref = this.cloneNode(false);
             // Create in memory DOM nodes
             ref.innerHTML = html;
             // Compare document state with memory state
