@@ -18,7 +18,13 @@
      * @return {Boolean}
      */
     function nodeSame(a, b) {
-        return a.nodeName === b.nodeName;
+        if (a.nodeType !== b.nodeType) {
+            return false;
+        }
+        if (a.nodeName !== b.nodeName) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -170,7 +176,7 @@
      * @return {Integer}
      */
     function nodeLength(node) {
-        return node.children.length;
+        return node.childNodes.length;
     }
 
     /**
@@ -181,7 +187,7 @@
      * @return {Element}
      */
     function nodeRetrieve(node, index) {
-        return node.children[index];
+        return node.childNodes[index];
     }
 
     /**
@@ -224,7 +230,7 @@
         return this.namespace;
     };
     NamespaceNext.prototype.toString = function() {
-        return this.namespace + '.children[' + this.index + ']';
+        return this.namespace + '.childNodes[' + this.index + ']';
     };
 
 
@@ -286,7 +292,8 @@
             isSame = nodeSame(a, b);
 
             // Node are the same so compare difference in attributes
-            if (isSame) {
+            // Add attributes only for element type nodes
+            if (isSame && a.nodeType === 1) {
                 result += diffattributes(a, b, namespaceA, namespaceB);
             }
 
