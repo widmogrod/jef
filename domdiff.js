@@ -11,7 +11,7 @@
     'use strict';
 
     /**
-     * Test if given nodes are the same
+     * Test if given nodes are the same.
      *
      * @param {Element} a
      * @param {Element} b
