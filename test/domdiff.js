@@ -24,7 +24,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li>Second element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'
+                'aElement.childNodes[0].childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0].childNodes[0]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li>Second element</li></ul>'
@@ -35,8 +35,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<div><i>a</i><p>First element</p><div><b>test</b></div></div>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'+
-                'aElement.children[0].children[2].appendChild(bElement.children[0].children[1].children[0]);\n'
+                'aElement.childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0]);\naElement.childNodes[0].childNodes[2].appendChild(bElement.childNodes[0].childNodes[1].childNodes[0]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<div><i>a</i><p>First element</p><div><b>test</b></div></div>'
@@ -50,9 +49,7 @@ describe('DomDiff', function() {
                                        '<li><b>guest</b><span>b</span></li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].removeChild(aElement.children[0].children[0].children[2]);\n'+
-                'aElement.children[0].children[1].appendChild(bElement.children[0].children[1].children[2]);\n'+
-                'aElement.children[0].appendChild(bElement.children[0].children[2]);\n'
+                'aElement.childNodes[0].childNodes[0].removeChild(aElement.childNodes[0].childNodes[0].childNodes[2]);\naElement.childNodes[0].childNodes[1].appendChild(bElement.childNodes[0].childNodes[1].childNodes[2]);\naElement.childNodes[0].appendChild(bElement.childNodes[0].childNodes[2]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li><b>guest</b><span></span></li>'+
@@ -65,7 +62,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li class="b">First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));\n'
+                'aElement.childNodes[0].childNodes[0].setAttribute(\"class\", bElement.childNodes[0].childNodes[0].getAttribute(\"class\"));\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li class="b">First element</li></ul>'
@@ -76,7 +73,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li class="b">First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].setAttribute("class", bElement.children[0].children[0].getAttribute("class"));\n'
+                'aElement.childNodes[0].childNodes[0].setAttribute(\"class\", bElement.childNodes[0].childNodes[0].getAttribute(\"class\"));\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li class="b">First element</li></ul>'
@@ -87,7 +84,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].removeAttribute("class");\n'
+                'aElement.childNodes[0].childNodes[0].removeAttribute(\"class\");\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li>First element</li></ul>'
@@ -98,7 +95,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li disabled>First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].setAttribute("disabled", bElement.children[0].children[0].getAttribute("disabled"));\n'
+                'aElement.childNodes[0].childNodes[0].setAttribute("disabled", bElement.childNodes[0].childNodes[0].getAttribute("disabled"));\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li disabled="">First element</li></ul>'
@@ -109,8 +106,8 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li required>First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].removeAttribute("disabled");\n'+
-                'aElement.children[0].children[0].setAttribute("required", bElement.children[0].children[0].getAttribute("required"));\n'
+                'aElement.childNodes[0].childNodes[0].removeAttribute("disabled");\n'+
+                'aElement.childNodes[0].childNodes[0].setAttribute("required", bElement.childNodes[0].childNodes[0].getAttribute("required"));\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li required="">First element</li></ul>'
@@ -121,7 +118,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].children[0].removeAttribute("disabled");\n'
+                'aElement.childNodes[0].childNodes[0].removeAttribute("disabled");\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li>First element</li></ul>'
@@ -132,7 +129,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul class="inactive"><li>First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].setAttribute("class", bElement.children[0].getAttribute("class"));\n'
+                'aElement.childNodes[0].setAttribute("class", bElement.childNodes[0].getAttribute("class"));\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul class="inactive"><li>First element</li></ul>'
@@ -143,7 +140,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].removeChild(aElement.children[0].children[1]);\n'
+                'aElement.childNodes[0].removeChild(aElement.childNodes[0].childNodes[1]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li>First element</li></ul>'
@@ -154,7 +151,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].appendChild(bElement.children[0].children[1]);\n'
+                'aElement.childNodes[0].appendChild(bElement.childNodes[0].childNodes[1]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<ul><li>First element</li><li>Second element</li></ul>'
@@ -165,10 +162,21 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<div><span>First element</span></div>';
             result = domdiff.diff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.children[0].replaceChild(bElement.children[0].children[0], aElement.children[0].children[0]);\n'
+                'aElement.childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
                 '<div><span>First element</span></div>'
+            );
+        });
+        it('should replace elements 3', function() {
+            elementOne.innerHTML = '<table><tr><td colspan="2"><span>A</span>Yes</td></tr></table>';
+            elementTwo.innerHTML = '<table><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></table>';
+            result = domdiff.diff(elementOne, elementTwo);
+            result.should.be.eql(
+                'aElement.childNodes[0].childNodes[0].childNodes[0].removeAttribute(\"colspan\");\naElement.childNodes[0].childNodes[0].childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0]);\naElement.childNodes[0].childNodes[0].childNodes[0].removeChild(aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[1]);\naElement.childNodes[0].childNodes[0].appendChild(bElement.childNodes[0].childNodes[0].childNodes[1]);\n'
+            );
+            execute(elementOne, elementTwo, result).should.be.eql(
+                '<table><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></table>'
             );
         });
     })
@@ -236,10 +244,10 @@ describe('DomDiff', function() {
 
         it('should have valid reference', function() {
             elementOne.should.be.exactly(
-                document.children[0].children[1].children[0]
+                document.childNodes[0].childNodes[1].childNodes[0]
             );
             elementTwo.should.be.exactly(
-                elementTwoContext.children[0]
+                elementTwoContext.childNodes[0]
             );
         })
 
@@ -301,36 +309,36 @@ describe('DomDiff', function() {
                 result.next().parent().toString().should.be.eql(result.toString());
             });
             it('should return next namespace and have valid string representation', function() {
-                result.next().toString().should.be.eql('test.children[0]');
+                result.next().toString().should.be.eql('test.childNodes[0]');
             });
             it('should return next on specific index', function() {
-               result.next(2).toString().should.be.eql('test.children[2]');
+               result.next(2).toString().should.be.eql('test.childNodes[2]');
             });
             it('should return next and after pop have valid string representation', function() {
-                result.next(2).pop().toString().should.be.eql('test.children[1]');
+                result.next(2).pop().toString().should.be.eql('test.childNodes[1]');
             });
             it('should return next and after push have valid string representation', function() {
-                result.next(2).push().toString().should.be.eql('test.children[3]');
+                result.next(2).push().toString().should.be.eql('test.childNodes[3]');
             });
             it('should pop from parent', function() {
                 next = result.next();
                 next.push();
-                next.toString().should.be.eql('test.children[1]');
+                next.toString().should.be.eql('test.childNodes[1]');
 
                 result = next.next(4);
 
-                result.toString().should.be.eql('test.children[1].children[4]');
+                result.toString().should.be.eql('test.childNodes[1].childNodes[4]');
                 result.parent().pop();
-                result.toString().should.be.eql('test.children[0].children[4]')
+                result.toString().should.be.eql('test.childNodes[0].childNodes[4]')
                 result.parent().push();
-                result.toString().should.be.eql('test.children[1].children[4]')
+                result.toString().should.be.eql('test.childNodes[1].childNodes[4]')
             });
             it('pop and push should give same result', function() {
                next = result.next(2);
                next.pop();
-               next.toString().should.be.eql('test.children[1]');
+               next.toString().should.be.eql('test.childNodes[1]');
                next.push();
-               next.toString().should.be.eql('test.children[2]');
+               next.toString().should.be.eql('test.childNodes[2]');
             });
         });
     });
