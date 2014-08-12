@@ -431,8 +431,10 @@
 
         promise.then(function(value) {
             result.push(value);
+            result.destroy();
         }, function(error) {
             result.trigger('error', arguments);
+            result.destroy();
         });
 
         return result;
