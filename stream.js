@@ -33,6 +33,9 @@
         while (typeof (value = drain()) !== 'undefined') {
             this.push(value);
         }
+
+        // Close stream
+        this.destroy();
     }
 
     /**
@@ -49,9 +52,19 @@
         this.buffer = [];
         this.filtered = false;
         this.lastValue = [];
+        this.closed = false;
     }
     Stream.constructor = Stream;
     Stream.prototype = new events();
+
+    /**
+     * Check if stream is closed
+     *
+     * @return {Boolean}
+     */
+    Stream.prototype.isClosed = function() {
+        return this.closed;
+    }
 
     /**
      * Check if stream has readers
@@ -93,6 +106,12 @@
         // Accept only streams
         if (!stream instanceof Stream) {
             throw new Error('You can pipe to another stream, but given ' + stream);
+        }
+        if (this.isClosed()) {
+            throw new Error('Stream is closed, can\'t pipe to another stream');
+        }
+        if (stream.isClosed()) {
+            throw new Error('You can\t pipe to closed streams');
         }
 
         // Connect two streams
@@ -218,8 +237,12 @@
      * @return {Stream}
      */
     Stream.prototype.push = function(data) {
+        if (this.isClosed()) {
+            throw new Error('Stream is closed, can\'t push data');
+        }
+
         if (this.canDrain()) {
-            throw new Error('Stream cant push data because it has drain function');
+            throw new Error('Stream can\'t push data because it has drain function');
         }
 
         // Arguments to array
@@ -323,6 +346,7 @@
      * Destroy stream
      */
     Stream.prototype.destroy = function() {
+        this.trigger('closed');
         // Custom destroy function
         this.options.destroy && this.options.destroy();
         // Destroy childs
@@ -331,6 +355,8 @@
         });
         // Invoking constructor clean properties
         Stream.call(this);
+
+        this.closed = true;
     };
 
     Stream.merge = function () {
