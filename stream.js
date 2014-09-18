@@ -15,7 +15,9 @@
     'use strict';
 
     // Helper functions
-    var slice =  Function.prototype.call.bind(Array.prototype.slice);
+    function slice(args, begin, end) {
+        return Array.prototype.slice.call(args, begin, end);
+    }
 
     /**
      * Drain the stream
