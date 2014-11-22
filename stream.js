@@ -1,21 +1,12 @@
-(function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory(
-            require('./events.js')
-        );
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/events'], factory);
-    } else { // Browser globals
-        root.jef = root.jef || {};
-        root.jef.stream = factory(
-            root.jef.events
-        );
-    }
-})(this, function(events, undefined) {
-    'use strict';
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module)
+}
 
-    // Helper functions
-    var slice =  Function.prototype.call.bind(Array.prototype.slice);
+define([
+    './events',
+    './functional/slice'
+], function(Events, slice, undefined) {
+    'use strict';
 
     /**
      * Drain the stream
@@ -29,7 +20,7 @@
         // You can drain once given stream
         this.options.drain = null;
 
-        // Drain untill will be empty
+        // Drain until will be empty
         while (typeof (value = drain()) !== 'undefined') {
             this.push(value);
         }
@@ -45,7 +36,7 @@
      * @param {Object} options - Options object
      */
     function Stream(options) {
-        events.call(this);
+        Events.call(this);
 
         this.options = options || {};
         this.chain = [];
@@ -55,7 +46,7 @@
         this.closed = false;
     }
     Stream.constructor = Stream;
-    Stream.prototype = new events();
+    Stream.prototype = new Events();
 
     /**
      * Check if stream is closed
@@ -64,7 +55,7 @@
      */
     Stream.prototype.isClosed = function() {
         return this.closed;
-    }
+    };
 
     /**
      * Check if stream has readers
@@ -92,7 +83,7 @@
      * @return {Stream}
      */
     Stream.prototype.on = function(name, func) {
-        var result = events.prototype.on.call(this, name, func);
+        var result = Events.prototype.on.call(this, name, func);
         this.trigger('drain');
         return result;
     };
