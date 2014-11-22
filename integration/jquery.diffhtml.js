@@ -3,13 +3,14 @@ if (typeof define !== 'function') {
 }
 
 define([
-    '../domdiff',
+    '../src/domdiff/diff',
+    '../src/domdiff/applyDiff',
     'jquery'
-], function(domdiff, jQuery) {
+], function(diff, applyDiff, jQuery) {
     'use strict';
 
     jQuery.fn.diffhtml = function(html) {
-        var ref, diff;
+        var ref, diffRef;
 
         return this.map(function() {
             // Create clone
@@ -17,9 +18,9 @@ define([
             // Create in memory DOM nodes
             ref.innerHTML = html;
             // Compare document state with memory state
-            diff = domdiff.diff(this, ref);
+            diffRef = diff(this, ref);
             // Apply difference
-            domdiff.applyDiff(this, ref, diff);
+            applyDiff(this, ref, diffRef);
 
             return this;
         });
