@@ -3,12 +3,12 @@ if (typeof define !== 'function') {
 }
 
 define([
-    './mathematical/equal',
-    './mathematical/addition',
-    './mathematical/subtraction',
-    './mathematical/multiplication',
-    './mathematical/division',
-    './mathematical/summation',
+    './src/mathematical/equal',
+    './src/mathematical/addition',
+    './src/mathematical/subtraction',
+    './src/mathematical/multiplication',
+    './src/mathematical/division',
+    './src/mathematical/summation'
 ], function (
     equal,
     addition,

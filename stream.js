@@ -4,7 +4,7 @@ if (typeof define !== 'function') {
 
 define([
     './events',
-    './functional/slice'
+    './src/functional/slice'
 ], function(Events, slice, undefined) {
     'use strict';
 

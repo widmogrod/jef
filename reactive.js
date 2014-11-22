@@ -3,8 +3,8 @@ if (typeof define !== 'function') {
 }
 
 define([
-    './reactive/value',
-    './reactive/observable'
+    './src/reactive/value',
+    './src/reactive/observable'
 ], function(value, observable) {
     'use strict';
 
