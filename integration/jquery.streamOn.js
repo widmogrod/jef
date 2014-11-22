@@ -1,27 +1,20 @@
-(function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory(
-            require('../stream.js'),
-            require('jquery')
-        );
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/stream','jquery'], factory);
-    } else { // Browser globals
-        factory(
-            root.jef.stream,
-            jQuery
-        );
-    }
-})(this, function(stream, jQuery) {
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module)
+}
+
+define([
+    '../stream',
+    'jquery'
+], function(Stream, jQuery) {
     'use strict';
 
     jQuery.fn.streamOn = function(eventName, selector) {
-        var result = new stream();
+        var result = new Stream();
         this.on(eventName, selector, function (e) {
             result.push(e);
         });
         return result;
-    }
+    };
 
     return jQuery;
 });

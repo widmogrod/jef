@@ -1,22 +1,15 @@
-(function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory(
-            require('../domdiff.js'),
-            require('jquery')
-        );
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/domdiff','jquery'], factory);
-    } else { // Browser globals
-        factory(
-            root.jef.domdiff,
-            jQuery
-        );
-    }
-})(this, function(domdiff, jQuery) {
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module)
+}
+
+define([
+    '../domdiff',
+    'jquery'
+], function(domdiff, jQuery) {
     'use strict';
 
     jQuery.fn.diffhtml = function(html) {
-        var ref, diff, func;
+        var ref, diff;
 
         return this.map(function() {
             // Create clone
@@ -30,7 +23,7 @@
 
             return this;
         });
-    }
+    };
 
     return jQuery;
 });
