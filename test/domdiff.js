@@ -1,3 +1,5 @@
+require('amdefine/intercept');
+
 var domdiff = require('../src/domdiff/diff');
 var applyDiff = require('../src/domdiff/applyDiff');
 var nodeSame = require('../src/domdiff/nodeSame');

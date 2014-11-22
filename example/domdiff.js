@@ -4,7 +4,7 @@
             require('../integration/jquery.domdiff.js')
         );
     } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/integration/jquery.domdiff'], factory);
+        define(['../src/integration/jquery.domdiff'], factory);
     } else {  // Browser globals
         root.jefdemo = root.jefdemo || {};
         root.jefdemo.domdiff = factory(

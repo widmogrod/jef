@@ -5,7 +5,7 @@
             require('../reactive.js')
         );
     } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/functional', 'jef/reactive'], factory);
+        define(['../src/functional.js', '../src/reactive'], factory);
     } else {  // Browser globals
         root.jefdemo = root.jefdemo || {};
         root.jefdemo.reactive_excel = factory(

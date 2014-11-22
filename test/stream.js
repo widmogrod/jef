@@ -1,5 +1,7 @@
-var stream = require('../stream.js');
-var events = require('../events.js');
+require('amdefine/intercept');
+
+var stream = require('../src/stream.js');
+var events = require('../src/events.js');
 var object, context, args, next, called, result, data;
 var callback = function() {};
 var callbackInc = function() { called++ };

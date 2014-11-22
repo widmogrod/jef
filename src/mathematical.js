@@ -1,14 +1,11 @@
-if (typeof define !== 'function') {
-    var define = require('amdefine')(module)
-}
 
 define([
-    './src/mathematical/equal',
-    './src/mathematical/addition',
-    './src/mathematical/subtraction',
-    './src/mathematical/multiplication',
-    './src/mathematical/division',
-    './src/mathematical/summation'
+    './mathematical/equal',
+    './mathematical/addition',
+    './mathematical/subtraction',
+    './mathematical/multiplication',
+    './mathematical/division',
+    './mathematical/summation'
 ], function (
     equal,
     addition,

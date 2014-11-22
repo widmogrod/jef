@@ -1,10 +1,7 @@
-if (typeof define !== 'function') {
-    var define = require('amdefine')(module)
-}
 
 define([
-    '../src/domdiff/diff',
-    '../src/domdiff/applyDiff',
+    '../domdiff/diff',
+    '../domdiff/applyDiff',
     'jquery'
 ], function(diff, applyDiff, jQuery) {
     'use strict';

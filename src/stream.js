@@ -1,10 +1,7 @@
-if (typeof define !== 'function') {
-    var define = require('amdefine')(module)
-}
 
 define([
     './events',
-    './src/functional/slice'
+    './functional/slice'
 ], function(Events, slice, undefined) {
     'use strict';
 
