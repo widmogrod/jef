@@ -1,13 +1,8 @@
-(function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(factory);
-    } else { // Browser globals
-        root.jef = root.jef || {};
-        root.jef.domdiff = factory();
-    }
-})(this, function() {
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module)
+}
+
+define(function() {
     'use strict';
 
     /**
@@ -381,17 +376,15 @@
         return new Function('aElement', 'bElement', diff)(a, b);
     }
 
-    var exports = {};
-
-    exports.diff = diff;
-    exports.applyDiff = applyDiff;
-    exports.attrDifference = attrDifference;
-    exports.attrIntersection = attrIntersection;
-    exports.nodeSame = nodeSame;
-    exports.nodeLeaf = nodeLeaf;
-    exports.nodeExactly = nodeExactly;
-    exports.NamespaceString = NamespaceString;
-    exports.NamespaceNext = NamespaceNext;
-
-    return exports;
+    return {
+        'diff': diff,
+        'applyDiff': applyDiff,
+        'attrDifference': attrDifference,
+        'attrIntersection': attrIntersection,
+        'nodeSame': nodeSame,
+        'nodeLeaf': nodeLeaf,
+        'nodeExactly': nodeExactly,
+        'NamespaceString': NamespaceString,
+        'NamespaceNext': NamespaceNext
+    }
 });
