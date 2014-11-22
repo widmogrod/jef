@@ -6,7 +6,7 @@ define([
     './first',
     './slice',
     './map'
-], function (first, slice, map) {
+], function(first, slice, map) {
     'use strict';
 
     /**
@@ -19,7 +19,7 @@ define([
     return function apply(func, args) {
         func = first(slice(arguments, 0, 1));
         args = slice(arguments, 1);
-        var result = map(args, function (args) {
+        var result = map(args, function(args) {
             switch (args && args.length) {
                 case 0:
                     return func.call(func);

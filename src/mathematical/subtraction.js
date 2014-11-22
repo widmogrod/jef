@@ -12,5 +12,5 @@ define([
         return reduce(slice(arguments, 1), function (i, base) {
             return base - i
         }, a);
-    };
+    }
 });

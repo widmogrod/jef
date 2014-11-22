@@ -5,11 +5,11 @@ if (typeof define !== 'function') {
 define([
     '../functional/reduce',
     '../functional/slice'
-], function (reduce, slice) {
+], function(reduce, slice) {
     'use strict';
 
     return function multiplication(a, b) {
-        return reduce(slice(arguments, 1), function (i, base) {
+        return reduce(slice(arguments, 1), function(i, base) {
             return base * i
         }, a);
     }
