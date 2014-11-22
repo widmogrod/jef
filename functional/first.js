@@ -1,0 +1,16 @@
+if (typeof define !== 'function') {
+    var define = require('amdefine')(module)
+}
+
+define([
+    './get'
+], function (get) {
+    'use strict';
+
+    /**
+     * Return first element from array
+     */
+    return function first(array) {
+        return get(0)(array);
+    }
+});
