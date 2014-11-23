@@ -69,7 +69,7 @@ npm test
 
 Build standalone, vanilla JS
 ```
-grunt build
+grunt run build
 ```
 
 Deploy to GitHub Pages
