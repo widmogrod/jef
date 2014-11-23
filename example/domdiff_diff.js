@@ -1,17 +1,9 @@
 (function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory(
-            require('../integration/jquery.domdiff.js')
-        );
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/integration/jquery.domdiff'], factory);
-    } else {  // Browser globals
-        root.jefdemo = root.jefdemo || {};
-        root.jefdemo.domdiff = factory(
-            jQuery
-        );
-    }
-})(this, function(jQuery){
+    root.jefdemo = root.jefdemo || {};
+    root.jefdemo.domdiff = factory(
+        jQuery
+    );
+})(this, function(jQuery) {
     'use strict';
 
     function update($first, $second, $el) {
@@ -21,8 +13,8 @@
                 .diffhtml($second.val(), {returnDiff: true});
             $el.html(diff[0]).append(
                 $('<div/>')
-                .html($first.val())
-                .diffhtml($second.val())
+                    .html($first.val())
+                    .diffhtml($second.val())
             );
         }
     }

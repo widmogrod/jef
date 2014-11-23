@@ -1,4 +1,6 @@
-var events = require('../events.js');
+require('amdefine/intercept');
+
+var events = require('../src/events.js');
 var object, context, args, called, callback;
 var params = [1, 2, 'test'];
 

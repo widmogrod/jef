@@ -1,16 +1,8 @@
 (function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory(
-            require('../integration/jquery.domdiff.js')
-        );
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/integration/jquery.domdiff'], factory);
-    } else {  // Browser globals
-        root.jefdemo = root.jefdemo || {};
-        root.jefdemo.domdiff = factory(
-            jQuery
-        );
-    }
+    root.jefdemo = root.jefdemo || {};
+    root.jefdemo.domdiff = factory(
+        jQuery
+    );
 })(this, function(jQuery){
     'use strict';
 

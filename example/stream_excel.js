@@ -5,7 +5,7 @@
             require('../stream.js')
         );
     } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/stream', 'jef/reactive'], factory);
+        define(['../src/stream', '../src/reactive'], factory);
     } else {  // Browser globals
         root.jefdemo = root.jefdemo || {};
         root.jefdemo.stream_excel = factory(

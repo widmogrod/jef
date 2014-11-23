@@ -1,11 +1,21 @@
-var domdiff = require('../domdiff.js');
+require('amdefine/intercept');
+
+var domdiff = require('../src/domdiff/diff');
+var applyDiff = require('../src/domdiff/applyDiff');
+var nodeSame = require('../src/domdiff/nodeSame');
+var nodeLeaf = require('../src/domdiff/nodeLeaf');
+var nodeExactly = require('../src/domdiff/nodeExactly');
+var attrDifference = require('../src/domdiff/attrDifference');
+var attrIntersection = require('../src/domdiff/attrIntersection');
+var NamespaceString = require('../src/domdiff/NamespaceString');
+var NamespaceNext = require('../src/domdiff/NamespaceNext');
 var jsdom = require("jsdom").jsdom;
 var document = jsdom("<html><head></head><body>hello world</body></html>");
 var window = document.parentWindow;
 var elementOne, elementTwo, result, next, elementTwoContext;
 
 function execute(a, b, diff) {
-    domdiff.applyDiff(a, b, diff);
+    applyDiff(a, b, diff);
     return a.innerHTML;
 }
 
@@ -17,12 +27,12 @@ describe('DomDiff', function() {
 
     describe('#diff', function(){
         it('should return string', function(){
-            domdiff.diff(elementOne, elementTwo).should.be.string;
+            domdiff(elementOne, elementTwo).should.be.string;
         })
         it('should replace elements', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>Second element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0].childNodes[0]);\n'
             );
@@ -33,7 +43,7 @@ describe('DomDiff', function() {
         it('should replace elements if not same', function() {
             elementOne.innerHTML = '<div><b>a</b><p>First element</p><div></div></div>';
             elementTwo.innerHTML = '<div><i>a</i><p>First element</p><div><b>test</b></div></div>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0]);\naElement.childNodes[0].childNodes[2].appendChild(bElement.childNodes[0].childNodes[1].childNodes[0]);\n'
             );
@@ -47,7 +57,7 @@ describe('DomDiff', function() {
             elementTwo.innerHTML = '<ul><li><b>guest</b><span></span></li>'+
                                        '<li><b>guest</b><span>a</span><p>another node</p></li>'+
                                        '<li><b>guest</b><span>b</span></li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].removeChild(aElement.childNodes[0].childNodes[0].childNodes[2]);\naElement.childNodes[0].childNodes[1].appendChild(bElement.childNodes[0].childNodes[1].childNodes[2]);\naElement.childNodes[0].appendChild(bElement.childNodes[0].childNodes[2]);\n'
             );
@@ -60,7 +70,7 @@ describe('DomDiff', function() {
         it('should replace arguments', function() {
             elementOne.innerHTML = '<ul><li class="a">First element</li></ul>';
             elementTwo.innerHTML = '<ul><li class="b">First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].setAttribute(\"class\", bElement.childNodes[0].childNodes[0].getAttribute(\"class\"));\n'
             );
@@ -71,7 +81,7 @@ describe('DomDiff', function() {
         it('should add arguments', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li class="b">First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].setAttribute(\"class\", bElement.childNodes[0].childNodes[0].getAttribute(\"class\"));\n'
             );
@@ -82,7 +92,7 @@ describe('DomDiff', function() {
         it('should remove arguments', function() {
             elementOne.innerHTML = '<ul><li class="a">First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].removeAttribute(\"class\");\n'
             );
@@ -93,7 +103,7 @@ describe('DomDiff', function() {
         it('should add boolean argument', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li disabled>First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].setAttribute("disabled", bElement.childNodes[0].childNodes[0].getAttribute("disabled"));\n'
             );
@@ -104,7 +114,7 @@ describe('DomDiff', function() {
         it('should replace boolean argument', function() {
             elementOne.innerHTML = '<ul><li disabled>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li required>First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].removeAttribute("disabled");\n'+
                 'aElement.childNodes[0].childNodes[0].setAttribute("required", bElement.childNodes[0].childNodes[0].getAttribute("required"));\n'
@@ -116,7 +126,7 @@ describe('DomDiff', function() {
         it('should remove boolean argument', function() {
             elementOne.innerHTML = '<ul><li disabled>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].removeAttribute("disabled");\n'
             );
@@ -127,7 +137,7 @@ describe('DomDiff', function() {
         it('should remove argument not in child', function() {
             elementOne.innerHTML = '<ul class="active"><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul class="inactive"><li>First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].setAttribute("class", bElement.childNodes[0].getAttribute("class"));\n'
             );
@@ -138,7 +148,7 @@ describe('DomDiff', function() {
         it('should remove unused elements', function() {
             elementOne.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].removeChild(aElement.childNodes[0].childNodes[1]);\n'
             );
@@ -149,7 +159,7 @@ describe('DomDiff', function() {
         it('should add new elements', function() {
             elementOne.innerHTML = '<ul><li>First element</li></ul>';
             elementTwo.innerHTML = '<ul><li>First element</li><li>Second element</li></ul>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].appendChild(bElement.childNodes[0].childNodes[1]);\n'
             );
@@ -160,7 +170,7 @@ describe('DomDiff', function() {
         it('should replace elements', function() {
             elementOne.innerHTML = '<div><b>First element</b></div>';
             elementTwo.innerHTML = '<div><span>First element</span></div>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0]);\n'
             );
@@ -171,7 +181,7 @@ describe('DomDiff', function() {
         it('should replace elements 3', function() {
             elementOne.innerHTML = '<table><tr><td colspan="2"><span>A</span>Yes</td></tr></table>';
             elementTwo.innerHTML = '<table><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></table>';
-            result = domdiff.diff(elementOne, elementTwo);
+            result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
                 'aElement.childNodes[0].childNodes[0].childNodes[0].removeAttribute(\"colspan\");\naElement.childNodes[0].childNodes[0].childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0]);\naElement.childNodes[0].childNodes[0].childNodes[0].removeChild(aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[1]);\naElement.childNodes[0].childNodes[0].appendChild(bElement.childNodes[0].childNodes[0].childNodes[1]);\n'
             );
@@ -183,14 +193,14 @@ describe('DomDiff', function() {
     describe('#attrDifference', function() {
         it('should find diff with mixed', function() {
             elementOne.className = 'test';
-            domdiff.attrDifference(
+            attrDifference(
                 elementOne.attributes,
                 ['test']
             ).should.be.eql(['class']);
         });
         it('should not find diff with mixed', function() {
             elementOne.className = 'test';
-            domdiff.attrDifference(
+            attrDifference(
                 elementOne.attributes,
                 ['class']
             ).should.be.eql([]);
@@ -200,7 +210,7 @@ describe('DomDiff', function() {
         it('should not have intersection', function() {
             elementOne.attributes['class'] = 'test';
             elementTwo.attributes['id'] = 'id';
-            domdiff.attrIntersection(
+            attrIntersection(
                 elementOne.attributes,
                 elementTwo.attributes
             ).should.be.eql([]);
@@ -208,7 +218,7 @@ describe('DomDiff', function() {
         it('should have intersection', function() {
             elementOne.className = 'test';
             elementTwo.className = 'test2';
-            domdiff.attrIntersection(
+            attrIntersection(
                 elementOne.attributes,
                 elementTwo.attributes
             ).should.be.eql(['class']);
@@ -218,7 +228,7 @@ describe('DomDiff', function() {
         it('should be exacly', function() {
             elementOne.textContent = 'asd';
             elementTwo.textContent = 'asd';
-            domdiff.nodeExactly(
+            nodeExactly(
                 elementOne,
                 elementTwo
             ).should.be.true;
@@ -226,7 +236,7 @@ describe('DomDiff', function() {
         it('should not be exacly', function() {
             elementOne.textContent = 'asd2';
             elementTwo.textContent = 'asd';
-            domdiff.nodeExactly(
+            nodeExactly(
                 elementOne,
                 elementTwo
             ).should.be.false;
@@ -253,7 +263,7 @@ describe('DomDiff', function() {
 
         describe('#nodeSame', function() {
            it('node should be the same', function() {
-              domdiff.nodeSame(
+              nodeSame(
                   elementOne,
                   elementTwo
               ).should.be.true;
@@ -261,13 +271,13 @@ describe('DomDiff', function() {
         });
         describe('#nodeExactly', function() {
            it('node should be excatly', function() {
-              domdiff.nodeExactly(
+              nodeExactly(
                   elementOne,
                   elementTwo
               ).should.be.true;
            });
            it('node should not be excatly', function() {
-              domdiff.nodeExactly(
+              nodeExactly(
                   document.createTextNode('ccc'),
                   document.createTextNode('asd')
               ).should.be.false;
@@ -275,13 +285,13 @@ describe('DomDiff', function() {
         });
         describe('#nodeLeaf', function() {
            it('should return true', function() {
-              domdiff.nodeLeaf(
+              nodeLeaf(
                   elementOne,
                   elementTwo
               ).should.be.true;
            });
            it('should return false', function() {
-              domdiff.nodeLeaf(
+              nodeLeaf(
                   elementOne,
                   elementTwoContext
               ).should.be.false;
@@ -290,7 +300,7 @@ describe('DomDiff', function() {
     });
     describe('#NamespaceString', function() {
         beforeEach(function() {
-            result = new domdiff.NamespaceString('test');
+            result = new NamespaceString('test');
         });
         it('should have string representation', function() {
             result.toString().should.be.string
@@ -302,7 +312,7 @@ describe('DomDiff', function() {
         });
         describe('#next', function() {
             it('should return next', function() {
-                result.next().should.be.an.instanceOf(domdiff.NamespaceNext);
+                result.next().should.be.an.instanceOf(NamespaceNext);
             });
             it('should return next with valid parent reference', function() {
                 result.next().parent().should.be.eql(result);

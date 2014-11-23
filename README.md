@@ -47,7 +47,7 @@ stream C streams    ------------------c1-----------------------
 When I pass given stream to `stream.merge()` then new stream will be created,
 and will merge all events into one like so:
 ```
-stream.merge(A,B,C)  -b1--b2a1------a2b3c1------------a3--------
+stream.merge(A,B,C) -b1--b2a1------a2b3c1------------a3--------
 ```
 
 When I pass given stream to `stream.when` then new stream will be created,
@@ -66,6 +66,11 @@ npm test
 ```
 
 ## Other
+
+Build standalone, vanilla JS
+```
+grunt build
+```
 
 Deploy to GitHub Pages
 ```

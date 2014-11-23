@@ -1,5 +1,7 @@
-var stream = require('../stream.js');
-var events = require('../events.js');
+require('amdefine/intercept');
+
+var stream = require('../src/stream.js');
+var events = require('../src/events.js');
 var object, context, args, next, called, result, data;
 var callback = function() {};
 var callbackInc = function() { called++ };
@@ -132,16 +134,40 @@ describe('Stream', function() {
             called.should.be.true;
             args.should.be.eql([1, 2]);
         });
-        it('should remove references when destroyed', function() {
+        it('should remove references when destroyed', function(done) {
             object.on('data', function() {
                 called = true;
             });
             object.destroy();
-            object.push(2);
-            called.should.be.false;
+            try {
+                object.push(2);
+            } catch(e) {
+                e.should.be.an.instanceOf(Error);
+                done();
+            }
         });
     });
-    describe('pipe', function() {
+    describe('#push', function() {
+        beforeEach(function() {
+            object.on('data', function(data) {
+                called = data;
+            });
+        });
+        it('should push and react on data', function() {
+            object.push(10);
+            called.should.be.eql(10);
+        });
+        it('should not be abble to push data if stream is closed', function(done) {
+            try {
+                object.destroy();
+                object.push(10);
+            } catch (e) {
+                e.should.be.an.instanceOf(Error);
+                done();
+            }
+        });
+    });
+    describe('#pipe', function() {
         beforeEach(function() {
             object.push(1);
             object.push(2);
@@ -161,6 +187,24 @@ describe('Stream', function() {
         it('should only accept valid stream objects', function(done) {
             try {
                 object.pipe(function() {});
+            } catch (e) {
+                e.should.be.an.instanceOf(Error);
+                done();
+            }
+        });
+        it('should not pipe to closed stream', function(done) {
+            try {
+                object.destroy();
+                object.pipe(next);
+            } catch (e) {
+                e.should.be.an.instanceOf(Error);
+                done();
+            }
+        });
+        it('should not pipe if is closed', function(done) {
+            try {
+                next.destroy()
+                object.pipe(next);
             } catch (e) {
                 e.should.be.an.instanceOf(Error);
                 done();
@@ -282,16 +326,29 @@ describe('Stream', function() {
         it('should not use buffer', function() {
             object.buffer.should.be.eql([]);
         });
-        it('should drain on pipe', function() {
-            next = new stream();
-            next.on('data', function(value) {
-                result.push(value);
+        describe('should drain on pipe', function() {
+            beforeEach(function() {
+                next = new stream();
+                next.on('data', function(value) {
+                    result.push(value);
+                });
+                object.pipe(next);
+                result.should.be.eql(data);
             });
-            object.pipe(next);
-            result.should.be.eql(data);
 
             it('and buffer must be empty', function() {
-               object.buffer.length.should.be.eql(0);
+                object.buffer.length.should.be.eql(0);
+            });
+            it('after stream pipe everything it should be closed', function() {
+                object.isClosed().should.be.true;
+            });
+            it('should not be able to push value manually after stream is closed', function(done) {
+                try {
+                    object.push(next);
+                } catch (e) {
+                    e.should.be.an.instanceOf(Error);
+                    done();
+                }
             });
         });
     });

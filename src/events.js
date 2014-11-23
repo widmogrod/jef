@@ -1,27 +1,22 @@
-(function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory();
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(factory);
-    } else { // Browser globals
-        root.jef = root.jef || {};
-        root.jef.events = factory();
-    }
-})(this, function() {
+
+define(function() {
     'use strict';
 
-    function events() {
+    /**
+     * @constructor
+     */
+    function Events() {
         this.events = {};
         this.eventsCallbacks = 0;
     }
 
-    events.constructor = events;
-    events.prototype.eachEvent = function(name, func) {
+    Events.constructor = Events;
+    Events.prototype.eachEvent = function(name, func) {
         name.split(/\s+/).forEach(function(name) {
             func(name, (this.events[name] = name in this.events ? this.events[name] : []));
         }.bind(this));
     };
-    events.prototype.on = function(name, func) {
+    Events.prototype.on = function(name, func) {
         this.eachEvent(name, function(name, events) {
             events.push(func);
             ++this.eventsCallbacks;
@@ -29,11 +24,11 @@
 
         return this;
     };
-    events.prototype.once = function(name, func) {
+    Events.prototype.once = function(name, func) {
         func.once = true;
         return this.on(name, func);
-    }
-    events.prototype.off = function(name, func) {
+    };
+    Events.prototype.off = function(name, func) {
         var idx;
         this.eachEvent(name, function(name, events) {
             if (typeof func === 'function') {
@@ -50,7 +45,7 @@
 
         return this;
     };
-    events.prototype.trigger = function(name, args, context) {
+    Events.prototype.trigger = function(name, args, context) {
         var self = this;
         this.eachEvent(name, function(name, events) {
             events.forEach(function(func, idx) {
@@ -66,5 +61,5 @@
         return this;
     };
 
-    return events;
+    return Events;
 });

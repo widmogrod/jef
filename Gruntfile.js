@@ -1,6 +1,6 @@
-module.exports = function(grunt) {
+var packageFor = require('./build/packageFor');
 
-    // Project configuration.
+module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
@@ -8,33 +8,46 @@ module.exports = function(grunt) {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
                 preserveComments: false
             },
-            single: {
+            vanilla: {
                 files: {
-                    'dist/functional.min.js': ['functional.js'],
-                    'dist/mathematical.min.js': ['mathematical.js'],
-                    'dist/domdiff.min.js': ['domdiff.js'],
-                    'dist/events.min.js': ['events.js'],
-                    'dist/stream.min.js': ['stream.js'],
-                    'dist/reactive.min.js': ['reactive.js']
-                }
-            },
-            integration: {
-                 options: {
-                    banner: '/*! jquery.diffhtml <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-                    preserveComments: false
-                },
-                files: {
-                    'dist/integration/jquery.diffhtml.min.js': ['domdiff.js', 'integration/jquery.diffhtml.js'],
-                    'dist/integration/jquery.streamOn.min.js': ['events.js', 'stream.js', 'integration/jquery.streamOn.js'],
+                    'dist/functional.min.js': ['dist/functional.min.js'],
+                    'dist/stream.min.js': ['dist/stream.min.js'],
+                    'dist/mathematical.min.js': ['dist/mathematical.min.js'],
+                    'dist/events.min.js': ['dist/events.min.js'],
+                    'dist/domdiff.min.js': ['dist/domdiff.min.js'],
+                    'dist/integration/jquery.streamOn.min.js': ['dist/integration/jquery.streamOn.min.js'],
+                    'dist/integration/jquery.diffhtml.min.js': ['dist/integration/jquery.diffhtml.min.js']
                 }
             }
+        },
+        requirejs: {
+            functional: packageFor('functional'),
+            stream: packageFor('stream'),
+            mathematical: packageFor('mathematical'),
+            events: packageFor('events'),
+            domdiff: packageFor('domdiff'),
+            reactive: packageFor('reactive'),
+            jqueryStream: packageFor('integration/jquery.streamOn', ['stream'], true),
+            jqueryDiffHtml: packageFor('integration/jquery.diffhtml', ['diffhtml'], true)
         }
     });
 
-    // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
 
     // Default task(s).
-    grunt.registerTask('build', ['uglify:single', 'uglify:integration']);
-
+    grunt.registerTask('build', [
+        // Vanilla - main packages
+        'requirejs:functional',
+        'requirejs:stream',
+        'requirejs:mathematical',
+        'requirejs:events',
+        'requirejs:domdiff',
+        'requirejs:reactive',
+        // Vanilla - integration
+        'requirejs:jqueryStream',
+        'requirejs:jqueryDiffHtml',
+        // Uglify
+        'uglify:vanilla'
+    ]);
 };

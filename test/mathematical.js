@@ -1,4 +1,6 @@
-var m = require('../mathematical.js');
+require('amdefine/intercept');
+
+var m = require('../src/mathematical.js');
 
 describe('Mathematical', function(){
     describe('#addition()', function(){

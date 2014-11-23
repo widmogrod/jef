@@ -1,4 +1,6 @@
-var f = require('../functional.js');
+require('amdefine/intercept');
+
+var f = require('../src/functional.js');
 
 describe('Functional', function(){
     describe('#is()', function(){

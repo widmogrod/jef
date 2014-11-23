@@ -1,21 +1,9 @@
-(function(root, factory) {
-    if (typeof exports === 'object') { // Node.js
-        module.exports = factory(
-            require('./events.js')
-        );
-    } else if (typeof define === 'function' && define.amd) { // Require.JS
-        define(['jef/events'], factory);
-    } else { // Browser globals
-        root.jef = root.jef || {};
-        root.jef.stream = factory(
-            root.jef.events
-        );
-    }
-})(this, function(events, undefined) {
-    'use strict';
 
-    // Helper functions
-    var slice =  Function.prototype.call.bind(Array.prototype.slice);
+define([
+    './events',
+    './functional/slice'
+], function(Events, slice, undefined) {
+    'use strict';
 
     /**
      * Drain the stream
@@ -29,10 +17,13 @@
         // You can drain once given stream
         this.options.drain = null;
 
-        // Drain untill will be empty
+        // Drain until will be empty
         while (typeof (value = drain()) !== 'undefined') {
             this.push(value);
         }
+
+        // Close stream
+        this.destroy();
     }
 
     /**
@@ -42,16 +33,26 @@
      * @param {Object} options - Options object
      */
     function Stream(options) {
-        events.call(this);
+        Events.call(this);
 
         this.options = options || {};
         this.chain = [];
         this.buffer = [];
         this.filtered = false;
         this.lastValue = [];
+        this.closed = false;
     }
     Stream.constructor = Stream;
-    Stream.prototype = new events();
+    Stream.prototype = new Events();
+
+    /**
+     * Check if stream is closed
+     *
+     * @return {Boolean}
+     */
+    Stream.prototype.isClosed = function() {
+        return this.closed;
+    };
 
     /**
      * Check if stream has readers
@@ -79,7 +80,7 @@
      * @return {Stream}
      */
     Stream.prototype.on = function(name, func) {
-        var result = events.prototype.on.call(this, name, func);
+        var result = Events.prototype.on.call(this, name, func);
         this.trigger('drain');
         return result;
     };
@@ -93,6 +94,12 @@
         // Accept only streams
         if (!stream instanceof Stream) {
             throw new Error('You can pipe to another stream, but given ' + stream);
+        }
+        if (this.isClosed()) {
+            throw new Error('Stream is closed, can\'t pipe to another stream');
+        }
+        if (stream.isClosed()) {
+            throw new Error('You can\t pipe to closed streams');
         }
 
         // Connect two streams
@@ -218,8 +225,12 @@
      * @return {Stream}
      */
     Stream.prototype.push = function(data) {
+        if (this.isClosed()) {
+            throw new Error('Stream is closed, can\'t push data');
+        }
+
         if (this.canDrain()) {
-            throw new Error('Stream cant push data because it has drain function');
+            throw new Error('Stream can\'t push data because it has drain function');
         }
 
         // Arguments to array
@@ -323,6 +334,7 @@
      * Destroy stream
      */
     Stream.prototype.destroy = function() {
+        this.trigger('closed');
         // Custom destroy function
         this.options.destroy && this.options.destroy();
         // Destroy childs
@@ -331,6 +343,8 @@
         });
         // Invoking constructor clean properties
         Stream.call(this);
+
+        this.closed = true;
     };
 
     Stream.merge = function () {
@@ -405,8 +419,10 @@
 
         promise.then(function(value) {
             result.push(value);
+            result.destroy();
         }, function(error) {
             result.trigger('error', arguments);
+            result.destroy();
         });
 
         return result;
