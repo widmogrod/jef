@@ -67,6 +67,11 @@ npm test
 
 ## Other
 
+Build standalone, vanilla JS
+```
+grunt build
+```
+
 Deploy to GitHub Pages
 ```
 npm run deploy
