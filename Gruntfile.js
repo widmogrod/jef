@@ -14,6 +14,7 @@ module.exports = function(grunt) {
                     'dist/stream.min.js': ['dist/stream.min.js'],
                     'dist/mathematical.min.js': ['dist/mathematical.min.js'],
                     'dist/events.min.js': ['dist/events.min.js'],
+                    'dist/domdiff.min.js': ['dist/domdiff.min.js'],
                     'dist/integration/jquery.streamOn.min.js': ['dist/integration/jquery.streamOn.min.js'],
                     'dist/integration/jquery.diffhtml.min.js': ['dist/integration/jquery.diffhtml.min.js']
                 }
@@ -41,6 +42,7 @@ module.exports = function(grunt) {
         'requirejs:stream',
         'requirejs:mathematical',
         'requirejs:events',
+        'requirejs:domdiff',
         'requirejs:reactive',
         // Vanilla - integration
         'requirejs:jqueryStream',
