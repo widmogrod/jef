@@ -179,14 +179,14 @@ describe('DomDiff', function() {
             );
         });
         it('should replace elements 3', function() {
-            elementOne.innerHTML = '<table><tr><td colspan="2"><span>A</span>Yes</td></tr></table>';
-            elementTwo.innerHTML = '<table><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></table>';
+            elementOne.innerHTML = '<table><tbody><tr><td colspan="2"><span>A</span>Yes</td></tr></tbody></table>';
+            elementTwo.innerHTML = '<table><tbody><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></tbody></table>';
             result = domdiff(elementOne, elementTwo);
             result.should.be.eql(
-                'aElement.childNodes[0].childNodes[0].childNodes[0].removeAttribute(\"colspan\");\naElement.childNodes[0].childNodes[0].childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0]);\naElement.childNodes[0].childNodes[0].childNodes[0].removeChild(aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[1]);\naElement.childNodes[0].childNodes[0].appendChild(bElement.childNodes[0].childNodes[0].childNodes[1]);\n'
+                'aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0].removeAttribute(\"colspan\");\naElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0].replaceChild(bElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0], aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]);\naElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0].removeChild(aElement.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]);\naElement.childNodes[0].childNodes[0].childNodes[0].appendChild(bElement.childNodes[0].childNodes[0].childNodes[0].childNodes[1]);\n'
             );
             execute(elementOne, elementTwo, result).should.be.eql(
-                '<table><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></table>'
+                '<table><tbody><tr><td><select name="test"><option value="1">value</option></select></td><td><input type="number"></td></tr></tbody></table>'
             );
         });
     })
