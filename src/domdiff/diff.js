@@ -1,5 +1,6 @@
 define([
    './NamespaceString',
+   './NamespaceNext',
    './nodeLeaf',
    './nodeSame',
    './diffAttributes',
@@ -11,6 +12,7 @@ define([
    './nodeExactly'
 ], function(
     NamespaceString,
+    NamespaceNext,
     nodeLeaf,
     nodeSame,
     diffAttributes,

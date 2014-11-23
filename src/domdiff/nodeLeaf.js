@@ -1,4 +1,3 @@
-
 define([
     './nodeLength'
 ], function(nodeLength) {

@@ -1,3 +1,8 @@
+if (typeof define === "function" && define.amd) {
+    define("jquery", [], function() {
+        return jQuery;
+    });
+}
 
 define([
     '../stream',
@@ -7,7 +12,7 @@ define([
 
     jQuery.fn.streamOn = function(eventName, selector) {
         var result = new Stream();
-        this.on(eventName, selector, function (e) {
+        this.on(eventName, selector, function(e) {
             result.push(e);
         });
         return result;

@@ -1,4 +1,3 @@
-
 define([
     './nodeSame'
 ], function(nodeSame) {
