@@ -1,7 +1,7 @@
 {
-  "name": "jef",
+  "name": "jefs",
   "version": "1.0.0",
-  "description": "JavaScript experimental functions ",
+  "description": "JavaScript experimental functions & streams",
   "main": "main.js",
   "dependencies": {
     "amdefine": ">=0.1.0"
