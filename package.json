@@ -2,7 +2,7 @@
   "name": "jef",
   "version": "1.0.0",
   "description": "JavaScript experimental functions ",
-  "main": "functional.js",
+  "main": "main.js",
   "dependencies": {
     "amdefine": ">=0.1.0"
   },
