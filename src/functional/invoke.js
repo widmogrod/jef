@@ -10,7 +10,7 @@ define([
      * For each element form invoke method with arguments
      *
      * Examples:
-     * invoke([{add: add1}, {add:add2}], add, [1]) -> [1, 2]
+     * invoke([{add: add1}, {add:add2}], 'add', 1) -> [2, 3]
      */
     return function invoke(list, method, args) {
         list = first(slice(arguments, 0, 1));

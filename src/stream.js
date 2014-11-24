@@ -337,7 +337,7 @@ define([
         this.trigger('closed');
         // Custom destroy function
         this.options.destroy && this.options.destroy();
-        // Destroy childs
+        // Destroy children
         this.chain.forEach(function(stream) {
             stream.destroy();
         });
