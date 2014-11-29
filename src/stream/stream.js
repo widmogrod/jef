@@ -1,18 +1,18 @@
 define([
     './interface',
+    '../functional/noop',
     '../functional/invoke',
     '../functional/filter',
     '../functional/isDefined'
 ], function(
     StreamInterface,
+    noop,
     invoke,
     filter,
     isDefined,
     undefined
 ) {
     'use strict';
-
-    function noop() {}
 
     /**
      * Generic stream
@@ -60,6 +60,11 @@ define([
                 && event.error !== error
                 && event.complete !== complete;
         });
+
+        // No observers, then there is no reason to exist
+        if (!this._ons.length) {
+            this.push.complete();
+        }
     };
     /**
      * Push value to the stream.
