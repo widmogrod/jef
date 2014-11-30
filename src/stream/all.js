@@ -6,7 +6,8 @@ define([
     './reduce',
     './merge',
     './until',
-    './concat'
+    './concat',
+    './last'
 ], function(
     Stream,
     TakeStream,
@@ -15,7 +16,8 @@ define([
     ReduceStream,
     MergeStream,
     UntilStream,
-    ConcatStream
+    ConcatStream,
+    LastStream
 ) {
     'use strict';
 
@@ -39,6 +41,9 @@ define([
     };
     Stream.prototype.concat = function() {
         return new ConcatStream(this);
+    };
+    Stream.prototype.last = function() {
+        return new LastStream(this);
     };
 
     return Stream;
