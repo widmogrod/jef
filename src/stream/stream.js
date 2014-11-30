@@ -2,14 +2,22 @@ define([
     './interface',
     '../functional/noop',
     '../functional/invoke',
+    '../functional/apply',
+    '../functional/slice',
+    '../functional/immediate',
     '../functional/filter',
-    '../functional/isDefined'
+    '../functional/isDefined',
+    '../functional/isFunction'
 ], function(
     StreamInterface,
     noop,
     invoke,
+    apply,
+    slice,
+    immediate,
     filter,
     isDefined,
+    isFunction,
     undefined
 ) {
     'use strict';
@@ -17,17 +25,24 @@ define([
     /**
      * Generic stream
      *
+     * @param {Function} implementation
      * @constructor
      */
-    function Stream() {
+    function Stream(implementation) {
         this._ons = [];
         this._closed = false;
+
+        // Helper functions, simplifying usage of three methods on, off, push
         this.on.error = this.on.bind(this, undefined);
         this.on.complete = this.on.bind(this, undefined, undefined);
         this.off.error = this.off.bind(this, undefined);
         this.off.complete = this.off.bind(this, undefined, undefined);
         this.push.error = this.push.bind(this, undefined);
         this.push.complete = this.push.bind(this, undefined, undefined, true);
+
+        if (isFunction(implementation)) {
+            immediate(apply.bind(null, implementation.bind(this), slice(arguments, 1)));
+        }
     }
 
     Stream.constructor = Stream;
