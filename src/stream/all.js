@@ -4,14 +4,16 @@ define([
     './map',
     './filter',
     './merge',
-    './until'
+    './until',
+    './concat'
 ], function(
     Stream,
     TakeStream,
     MapStream,
     FilterStream,
     MergeStream,
-    UntilStream
+    UntilStream,
+    ConcatStream
 ) {
     'use strict';
 
@@ -29,6 +31,9 @@ define([
     };
     Stream.prototype.until = function(stream) {
         return new UntilStream(this, stream);
+    };
+    Stream.prototype.concat = function() {
+        return new ConcatStream(this);
     };
 
     return Stream;
