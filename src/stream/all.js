@@ -3,6 +3,7 @@ define([
     './take',
     './map',
     './filter',
+    './reduce',
     './merge',
     './until',
     './concat'
@@ -11,6 +12,7 @@ define([
     TakeStream,
     MapStream,
     FilterStream,
+    ReduceStream,
     MergeStream,
     UntilStream,
     ConcatStream
@@ -25,6 +27,9 @@ define([
     };
     Stream.prototype.filter = function(func) {
         return new FilterStream(this, func);
+    };
+    Stream.prototype.reduce = function(func, base) {
+        return new ReduceStream(this, func, base);
     };
     Stream.prototype.merge = function(stream) {
         return new MergeStream(this, stream);
