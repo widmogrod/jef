@@ -1,4 +1,4 @@
-define(function(first, slice, map) {
+define(function() {
     'use strict';
 
     /**
