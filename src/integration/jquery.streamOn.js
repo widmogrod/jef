@@ -1,6 +1,6 @@
-if (typeof define === "function" && define.amd) {
+if (typeof define === "function" && define.amd && typeof window.jQuery === 'function')  {
     define("jquery", [], function() {
-        return jQuery;
+        return window.jQuery;
     });
 }
 

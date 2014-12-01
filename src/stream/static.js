@@ -1,17 +1,16 @@
 define([
     './stream',
-    '../functional/each'
-], function(Stream, each) {
+    './sequence',
+    './when',
+    '../functional/slice'
+], function(Stream, SequenceStream, WhenStream, slice) {
     'use strict';
 
+    Stream.when = function() {
+        return new WhenStream(slice(arguments));
+    };
     Stream.fromArray = function(array) {
-        var result = new Stream();
-        setTimeout(function() {
-            each(array, result.push.bind(result));
-            result.push.complete();
-        }, 0);
-
-        return result;
+        return new SequenceStream(array);
     };
     Stream.fromPromise = function(promise) {
         var result = new Stream();
