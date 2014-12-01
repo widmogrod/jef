@@ -1,9 +1,14 @@
 define([
     './stream',
-    './sequence'
-], function(Stream, SequenceStream) {
+    './sequence',
+    './when',
+    '../functional/slice'
+], function(Stream, SequenceStream, WhenStream, slice) {
     'use strict';
 
+    Stream.when = function() {
+        return new WhenStream(slice(arguments));
+    };
     Stream.fromArray = function(array) {
         return new SequenceStream(array);
     };
