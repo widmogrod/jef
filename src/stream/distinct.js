@@ -7,10 +7,10 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function distinct(stream, lastValue) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue) {
             stream.on(function(value, next) {
                 if (lastValue !== value) {
-                    sink(
+                    sinkValue(
                         value,
                         Stream.streamable(next)
                             ? distinct(next, value)

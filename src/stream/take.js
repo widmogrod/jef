@@ -7,9 +7,9 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function take(n, stream) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue) {
             stream.on(function(value, next) {
-                sink(
+                sinkValue(
                     value,
                     n > 1
                         ? take(n - 1, next)

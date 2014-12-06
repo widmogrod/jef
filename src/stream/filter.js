@@ -7,10 +7,10 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function filter(fn, stream) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue) {
             stream.on(function(value, next) {
                 if (fn(value)) {
-                    sink(
+                    sinkValue(
                         value,
                         Stream.streamable(next)
                             ? filter(fn, next)

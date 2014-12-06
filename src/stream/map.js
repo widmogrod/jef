@@ -7,14 +7,14 @@ define(['./stream', './both'], function(Stream, both) {
      * @return {Stream}
      */
     return function map(fn, stream) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue) {
             stream.on(function(value, next) {
                 value = fn(value);
                 next = Stream.streamable(next) ? map(fn, next) : Stream.stop;
 
                 if (Stream.streamable(value)) {
                     value.on(function(value, nextinner) {
-                        sink(
+                        sinkValue(
                             value,
                             Stream.streamable(nextinner)
                                 ? both(nextinner, next)
@@ -24,7 +24,7 @@ define(['./stream', './both'], function(Stream, both) {
                         return Stream.stop;
                     });
                 } else {
-                    sink(value, next);
+                    sinkValue(value, next);
                 }
 
                 return Stream.stop;

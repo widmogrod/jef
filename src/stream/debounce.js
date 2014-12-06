@@ -7,7 +7,7 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function debounce(wait, stream) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue) {
             var timeout;
             stream.on(function(value, next) {
                 if (timeout) {
@@ -15,7 +15,7 @@ define(['./stream'], function(Stream) {
                 }
 
                 timeout = setTimeout(function() {
-                    sink(
+                    sinkValue(
                         value,
                         Stream.streamable(next)
                             ? debounce(wait, next)

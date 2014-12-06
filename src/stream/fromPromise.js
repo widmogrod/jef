@@ -6,11 +6,11 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function fromPromise(promise) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue, sinkError) {
             promise.then(function(value) {
-                sink(value, Stream.stop);
+                sinkValue(value, Stream.stop);
             }, function(e) {
-                throw e
+                sinkError(e);
             });
 
             return Stream.stop;

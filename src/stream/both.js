@@ -7,9 +7,9 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function both(streamA, streamB) {
-        return new Stream(function(sink) {
+        return new Stream(function(sinkValue) {
             streamA.on(function(value, next) {
-                sink(
+                sinkValue(
                     value,
                     Stream.streamable(next)
                         ? both(next, streamB)

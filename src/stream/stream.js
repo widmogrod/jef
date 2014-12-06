@@ -11,8 +11,8 @@ define([
      * @param {Function} onComplete
      * @return {Function}
      */
-    function notify(onValue, onError, onComplete) {
-        return once(function sink(value, next) {
+    function notifyValue(onValue, onError, onComplete) {
+        return once(function sinkValue(value, next) {
             var result;
 
             try {
@@ -26,8 +26,24 @@ define([
                 next.on(onValue, onError, onComplete)
             } else {
                 callIfCallable(onComplete);
-                // Clear callbacks, help garbage collector
-                //onValue = onError = onComplete = null;
+            }
+        })
+    }
+
+    /**
+     * @param {Function} onValue
+     * @param {Function} onError
+     * @param {Function} onComplete
+     * @return {Function}
+     */
+    function notifyError(onValue, onError, onComplete) {
+        return once(function sinkError(e, next) {
+            next = callIfOrThrow(onError, e, next);
+
+            if (Stream.streamable(next)) {
+                next.on(onValue, onError, onComplete)
+            } else {
+                callIfCallable(onComplete);
             }
         })
     }
@@ -44,7 +60,10 @@ define([
          * @returns {Stream}
          */
         this.on = function(onValue, onError, onComplete) {
-            implementation.call(this, notify(onValue, onError, onComplete));
+            implementation.call(this,
+                notifyValue(onValue, onError, onComplete),
+                notifyError(onValue, onError, onComplete)
+            );
             return this;
         }
     }
