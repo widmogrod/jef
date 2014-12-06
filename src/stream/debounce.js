@@ -1,4 +1,4 @@
-define(['./stream', './streamable'], function(Stream, streamable) {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
@@ -17,7 +17,7 @@ define(['./stream', './streamable'], function(Stream, streamable) {
                 timeout = setTimeout(function() {
                     sink(
                         value,
-                        streamable(next)
+                        Stream.streamable(next)
                             ? debounce(wait, next)
                             : Stream.stop
                     )

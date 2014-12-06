@@ -1,4 +1,4 @@
-define(['./stream', './streamable'], function(Stream, streamable) {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
@@ -11,7 +11,7 @@ define(['./stream', './streamable'], function(Stream, streamable) {
             streamA.on(function(value, next) {
                 sink(
                     value,
-                    streamable(next)
+                    Stream.streamable(next)
                         ? both(next, streamB)
                         : streamB
                 );

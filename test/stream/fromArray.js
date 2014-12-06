@@ -4,11 +4,14 @@ var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
 var object, withArgs, called;
 
-var args = function() {
+var args = function(value) {
     called++;
-    withArgs = Array.prototype.slice.call(arguments, 0);
-    console.log('a');
-    return true;
+    withArgs = value;
+};
+var argsStop = function(value) {
+    called++;
+    withArgs = value;
+    return Stream.stop;
 };
 
 describe('Stream.fromArray', function() {
@@ -25,9 +28,16 @@ describe('Stream.fromArray', function() {
     });
     describe('#on', function() {
         it('should register onValue', function() {
-            object.on(args).on(function(v) { console.log('called', v) });
+            object.on(args);
+            called.should.be.eql(3);
+            // Last arg should be
+            withArgs.should.be.eql(3);
+        });
+        it('should register onValue', function() {
+            object.on(argsStop);
             called.should.be.eql(1);
-            //withArgs.should.be.eql(1);
+            // Last arg should be
+            withArgs.should.be.eql(1);
         });
     });
 });

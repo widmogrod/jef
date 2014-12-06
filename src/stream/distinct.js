@@ -1,4 +1,4 @@
-define(['./stream', './streamable'], function(Stream, streamable) {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
@@ -12,7 +12,7 @@ define(['./stream', './streamable'], function(Stream, streamable) {
                 if (lastValue !== value) {
                     sink(
                         value,
-                        streamable(next)
+                        Stream.streamable(next)
                             ? distinct(next, value)
                             : Stream.stop
                     );

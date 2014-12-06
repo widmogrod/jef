@@ -1,4 +1,4 @@
-define(['./stream', './both', './streamable'], function(Stream, both, streamable) {
+define(['./stream', './both'], function(Stream, both) {
     'use strict';
 
     /**
@@ -10,13 +10,13 @@ define(['./stream', './both', './streamable'], function(Stream, both, streamable
         return new Stream(function(sink) {
             stream.on(function(value, next) {
                 value = fn(value);
-                next = streamable(next) ? map(fn, next) : Stream.stop;
+                next = Stream.streamable(next) ? map(fn, next) : Stream.stop;
 
-                if (streamable(value)) {
+                if (Stream.streamable(value)) {
                     value.on(function(value, nextinner) {
                         sink(
                             value,
-                            streamable(nextinner)
+                            Stream.streamable(nextinner)
                                 ? both(nextinner, next)
                                 : next
                         );
