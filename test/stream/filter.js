@@ -1,48 +1,47 @@
 require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
-var FilterStream = require('../../src/stream/filter');
-var object, parent, withArgs, called;
-var gretherThanTwo = function(v) {
-    return v > 2;
+var fromArray = require('../../src/stream/fromArray');
+var filter = require('../../src/stream/filter');
+var object, withArgs, called;
+
+var args = function(value) {
+    called++;
+    withArgs = value;
 };
-var args = function() {
-    withArgs = Array.prototype.slice.call(arguments, 0);
+var argsStop = function(value) {
+    called++;
+    withArgs = value;
+    return Stream.stop;
+};
+var graterThanTwo = function(value) {
+    return value > 2;
 };
 
-describe('FilterStream', function() {
+describe('Stream.filter', function() {
     beforeEach(function() {
-        parent = new Stream();
-        object = new FilterStream(parent, gretherThanTwo);
+        object = filter(graterThanTwo, fromArray([1, 2, 3, 4]));
         withArgs = [];
         called = 0;
     });
 
     describe('#construction', function() {
-        it('should construct object instane of FilterStream', function() {
-            object.should.be.an.instanceOf(FilterStream);
+        it('should construct object instance of MapStream', function() {
+            object.should.be.an.instanceOf(Stream);
         })
     });
     describe('#on', function() {
         it('should register onValue', function() {
             object.on(args);
-            called.should.be.eql(0);
-            parent.push(1);
-            withArgs.should.be.eql([]);
-            parent.push(3);
-            withArgs.should.be.eql([3]);
+            called.should.be.eql(2);
+            // Last arg should be
+            withArgs.should.be.eql(4);
         });
-        it('should register onError', function() {
-            object.on.error(args);
-            called.should.be.eql(0);
-            parent.push.error(1);
-            withArgs.should.be.eql([1]);
-        });
-        it('should register onComplete', function() {
-            object.on.complete(args);
-            called.should.be.eql(0);
-            parent.push.complete(1);
-            withArgs.should.be.eql([]);
+        it('should register onValue', function() {
+            object.on(argsStop);
+            called.should.be.eql(1);
+            // Last arg should be
+            withArgs.should.be.eql(3);
         });
     });
 });

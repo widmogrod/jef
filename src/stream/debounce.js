@@ -2,23 +2,26 @@ define(['./stream'], function(Stream) {
     'use strict';
 
     /**
-     * @param {Function} fn
+     * @param {Number} wait
      * @param {Stream} stream
      * @return {Stream}
      */
-    return function filter(fn, stream) {
+    return function debounce(wait, stream) {
         return new Stream(function(sinkValue) {
+            var timeout;
             stream.on(function(value, next) {
-                if (fn(value)) {
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+
+                timeout = setTimeout(function() {
                     sinkValue(
                         value,
                         Stream.streamable(next)
-                            ? filter(fn, next)
+                            ? debounce(wait, next)
                             : Stream.stop
-                    );
-
-                    return Stream.stop;
-                }
+                    )
+                }, wait)
             });
         })
     }

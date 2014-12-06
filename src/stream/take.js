@@ -1,47 +1,23 @@
-define([
-    './stream'
-], function(Stream) {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
-     * Take only part of the stream
-     *
-     * @param {StreamInterface} stream
-     * @param {Number} take
-     * @constructor
+     * @param {Number} n
+     * @param {Stream} stream
+     * @return {Stream}
      */
-    function TakeStream(stream, take) {
-        var self = this;
+    return function take(n, stream) {
+        return new Stream(function(sinkValue) {
+            stream.on(function(value, next) {
+                sinkValue(
+                    value,
+                    n > 1
+                        ? take(n - 1, next)
+                        : Stream.stop
+                );
 
-        Stream.call(self);
-
-        function onValue(value) {
-            if (take) {
-                --take;
-                self.push(value);
-            }
-
-            if (take < 1) {
-                self.push.complete();
-                stream.off(onValue, onError, onComplete);
-            }
-        }
-
-        function onError(error) {
-            self.push.error(error);
-            stream.off(onValue, onError, onComplete);
-        }
-
-        function onComplete() {
-            self.push.complete();
-            stream.off(onValue, onError, onComplete);
-        }
-
-        stream.on(onValue, onError, onComplete);
+                return Stream.stop;
+            });
+        })
     }
-
-    TakeStream.constructor = TakeStream;
-    TakeStream.prototype = Object.create(Stream.prototype);
-
-    return TakeStream;
 });

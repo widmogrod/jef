@@ -1,47 +1,44 @@
 require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
-var TakeStream = require('../../src/stream/take');
-var object, parent, withArgs, called;
-var args = function() {
-    withArgs = Array.prototype.slice.call(arguments, 0);
+var fromArray = require('../../src/stream/fromArray');
+var take = require('../../src/stream/take');
+var object, withArgs, called;
+
+var args = function(value) {
+    called++;
+    withArgs = value;
+};
+var argsStop = function(value) {
+    called++;
+    withArgs = value;
+    return Stream.stop;
 };
 
-describe('TakeStream', function() {
+describe('Stream.take', function() {
     beforeEach(function() {
-        parent = new Stream();
-        object = new TakeStream(parent, 2);
+        object = take(2, fromArray([1, 2, 3]));
         withArgs = [];
         called = 0;
     });
 
     describe('#construction', function() {
-        it('should construct object instane of TakeStream', function() {
-            object.should.be.an.instanceOf(TakeStream);
+        it('should construct object instance of MapStream', function() {
+            object.should.be.an.instanceOf(Stream);
         })
     });
     describe('#on', function() {
         it('should register onValue', function() {
             object.on(args);
-            called.should.be.eql(0);
-            parent.push(1);
-            withArgs.should.be.eql([1]);
-            parent.push(2);
-            withArgs.should.be.eql([2]);
-            parent.push(3);
-            withArgs.should.be.eql([2]);
+            called.should.be.eql(2);
+            // Last arg should be
+            withArgs.should.be.eql(2);
         });
-        it('should register onError', function() {
-            object.on.error(args);
-            called.should.be.eql(0);
-            parent.push.error(1);
-            withArgs.should.be.eql([1]);
-        });
-        it('should register onComplete', function() {
-            object.on.complete(args);
-            called.should.be.eql(0);
-            parent.push.complete(1);
-            withArgs.should.be.eql([]);
+        it('should register onValue', function() {
+            object.on(argsStop);
+            called.should.be.eql(1);
+            // Last arg should be
+            withArgs.should.be.eql(1);
         });
     });
 });

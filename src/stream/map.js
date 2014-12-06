@@ -1,36 +1,34 @@
-define([
-    './stream'
-], function(Stream) {
+define(['./stream', './both'], function(Stream, both) {
     'use strict';
 
     /**
-     * Map stream over a function
-     *
-     * @param {StreamInterface} stream
-     * @param {Function} func
-     * @constructor
+     * @param {Function} fn
+     * @param {Stream} stream
+     * @return {Stream}
      */
-    function MapStream(stream, func) {
-        var self = this;
+    return function map(fn, stream) {
+        return new Stream(function(sinkValue) {
+            stream.on(function(value, next) {
+                value = fn(value);
+                next = Stream.streamable(next) ? map(fn, next) : Stream.stop;
 
-        Stream.call(self);
+                if (Stream.streamable(value)) {
+                    value.on(function(value, nextinner) {
+                        sinkValue(
+                            value,
+                            Stream.streamable(nextinner)
+                                ? both(nextinner, next)
+                                : next
+                        );
 
-        function onValue(value) {
-            self.push(func(value));
-        }
-        function onError(error) {
-            self.push.error(error);
-            stream.off(onValue, onError, onComplete);
-        }
-        function onComplete() {
-            self.push.complete();
-            stream.off(onValue, onError, onComplete);
-        }
+                        return Stream.stop;
+                    });
+                } else {
+                    sinkValue(value, next);
+                }
 
-        stream.on(onValue, onError, onComplete);
+                return Stream.stop;
+            });
+        })
     }
-
-    MapStream.prototype = Object.create(Stream.prototype);
-
-    return MapStream;
 });

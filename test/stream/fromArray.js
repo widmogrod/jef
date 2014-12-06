@@ -2,7 +2,6 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var map = require('../../src/stream/map');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -14,13 +13,10 @@ var argsStop = function(value) {
     withArgs = value;
     return Stream.stop;
 };
-var addOne = function(value) {
-    return value + 1;
-};
 
-describe('Stream.map', function() {
+describe('Stream.fromArray', function() {
     beforeEach(function() {
-        object = map(addOne, fromArray([1, 2, 3]));
+        object = fromArray([1, 2, 3]);
         withArgs = [];
         called = 0;
     });
@@ -35,13 +31,13 @@ describe('Stream.map', function() {
             object.on(args);
             called.should.be.eql(3);
             // Last arg should be
-            withArgs.should.be.eql(4);
+            withArgs.should.be.eql(3);
         });
         it('should register onValue', function() {
             object.on(argsStop);
             called.should.be.eql(1);
             // Last arg should be
-            withArgs.should.be.eql(2);
+            withArgs.should.be.eql(1);
         });
     });
 });

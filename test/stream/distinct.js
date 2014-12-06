@@ -2,7 +2,7 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var map = require('../../src/stream/map');
+var distinct = require('../../src/stream/distinct');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -14,13 +14,10 @@ var argsStop = function(value) {
     withArgs = value;
     return Stream.stop;
 };
-var addOne = function(value) {
-    return value + 1;
-};
 
-describe('Stream.map', function() {
+describe('Stream.distinct', function() {
     beforeEach(function() {
-        object = map(addOne, fromArray([1, 2, 3]));
+        object = distinct(fromArray([2, 2, 2, 4]));
         withArgs = [];
         called = 0;
     });
@@ -33,7 +30,7 @@ describe('Stream.map', function() {
     describe('#on', function() {
         it('should register onValue', function() {
             object.on(args);
-            called.should.be.eql(3);
+            called.should.be.eql(2);
             // Last arg should be
             withArgs.should.be.eql(4);
         });

@@ -2,18 +2,18 @@ define(['./stream'], function(Stream) {
     'use strict';
 
     /**
-     * @param {Function} fn
      * @param {Stream} stream
+     * @param {*} lastValue
      * @return {Stream}
      */
-    return function filter(fn, stream) {
+    return function distinct(stream, lastValue) {
         return new Stream(function(sinkValue) {
             stream.on(function(value, next) {
-                if (fn(value)) {
+                if (lastValue !== value) {
                     sinkValue(
                         value,
                         Stream.streamable(next)
-                            ? filter(fn, next)
+                            ? distinct(next, value)
                             : Stream.stop
                     );
 
