@@ -23,7 +23,7 @@ describe('Stream.take', function() {
     });
 
     describe('#construction', function() {
-        it('should construct object instance of MapStream', function() {
+        it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
         })
     });

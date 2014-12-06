@@ -2,7 +2,7 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var distinct = require('../../src/stream/distinct');
+var when = require('../../src/stream/when');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -15,9 +15,12 @@ var argsStop = function(value) {
     return Stream.stop;
 };
 
-describe('Stream.distinct', function() {
+describe('Stream.when', function() {
     beforeEach(function() {
-        object = distinct(fromArray([2, 2, 2, 4]));
+        object = when([
+            fromArray([1, 2, 3]),
+            fromArray(['a', 'b', 'c'])
+        ]);
         withArgs = [];
         called = 0;
     });
@@ -30,15 +33,19 @@ describe('Stream.distinct', function() {
     describe('#on', function() {
         it('should register onValue', function() {
             object.on(args);
-            called.should.be.eql(2);
-            // Last arg should be
-            withArgs.should.be.eql(4);
+
+            setTimeout(function() {
+                called.should.be.eql(4);
+                withArgs.should.be.eql([3, 'c']);
+            }, 10);
         });
         it('should register onValue', function() {
             object.on(argsStop);
-            called.should.be.eql(1);
-            // Last arg should be
-            withArgs.should.be.eql(2);
+
+            setTimeout(function() {
+                called.should.be.eql(1);
+                withArgs.should.be.eql([1, 'a']);
+            }, 10);
         });
     });
 });

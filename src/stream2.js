@@ -5,6 +5,7 @@ define([
     './stream/take',
     './stream/distinct',
     './stream/debounce',
+    './stream/when',
     './stream/fromArray',
     './stream/fromPromise'
 ], function(
@@ -14,6 +15,7 @@ define([
     take,
     distinct,
     debounce,
+    when,
     fromArray,
     fromPromise
 ) {
@@ -37,6 +39,7 @@ define([
 
     Stream.fromArray = fromArray;
     Stream.fromPromise = fromPromise;
+    Stream.when = when;
 
     return Stream;
 });
