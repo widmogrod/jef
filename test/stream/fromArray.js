@@ -22,7 +22,7 @@ describe('Stream.fromArray', function() {
     });
 
     describe('#construction', function() {
-        it('should construct object instane of MapStream', function() {
+        it('should construct object instance of MapStream', function() {
             object.should.be.an.instanceOf(Stream);
         })
     });

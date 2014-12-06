@@ -15,7 +15,7 @@ var argsStop = function(value) {
     return Stream.stop;
 };
 
-describe('MapStream', function() {
+describe('Stream.take', function() {
     beforeEach(function() {
         object = take(2, fromArray([1, 2, 3]));
         withArgs = [];
@@ -23,7 +23,7 @@ describe('MapStream', function() {
     });
 
     describe('#construction', function() {
-        it('should construct object instane of MapStream', function() {
+        it('should construct object instance of MapStream', function() {
             object.should.be.an.instanceOf(Stream);
         })
     });
