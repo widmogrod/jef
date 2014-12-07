@@ -11,11 +11,14 @@ define(['./stream'], function(Stream) {
             var sinkEvent;
 
             sinkEvent = function(e) {
-                element.removeEventListener(eventName, sinkEvent);
-                sinkValue(e, fromEvent(element, eventName))
+                element.removeEventListener(eventName, sinkEvent, false);
+
+                sinkValue(e, fromEvent(element, eventName));
+
+                element = sinkEvent = sinkValue =  eventName = null;
             };
 
-            element.addEventListener(eventName, sinkEvent);
+            element.addEventListener(eventName, sinkEvent, false);
         });
     }
 });

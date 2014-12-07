@@ -8,11 +8,27 @@ define(['./apply'], function(apply) {
      * @param {Function} fn
      * @return {Function}
      */
-    return function until(condition, fn) {
-        return function until(a, b, c) {
-            if (apply(condition, arguments)) {
+    function until(condition, fn) {
+        var partial = function() {
+            if (condition && apply(condition, arguments)) {
                 return apply(fn, arguments)
+            } else {
+                condition = fn = null;
             }
-        }
+        };
+
+        partial.isUntilPartial = true;
+
+        return partial;
     }
+
+    /**
+     * @param {Function} fn
+     * @returns {Boolean}
+     */
+    until.is = function (fn) {
+        return fn && true === fn.isUntilPartial;
+    };
+
+    return until;
 });
