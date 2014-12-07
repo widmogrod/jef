@@ -33,7 +33,7 @@ describe('Stream.fromArray', function() {
             // Last arg should be
             withArgs.should.be.eql(3);
         });
-        it('should register onValue', function() {
+        it('should register onValue and stop', function() {
             object.on(argsStop);
             called.should.be.eql(1);
             // Last arg should be

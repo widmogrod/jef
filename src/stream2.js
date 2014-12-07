@@ -6,6 +6,7 @@ define([
     './stream/distinct',
     './stream/debounce',
     './stream/when',
+    './stream/noop',
     './stream/fromArray',
     './stream/fromPromise'
 ], function(
@@ -16,6 +17,7 @@ define([
     distinct,
     debounce,
     when,
+    noop,
     fromArray,
     fromPromise
 ) {
@@ -40,6 +42,7 @@ define([
     Stream.fromArray = fromArray;
     Stream.fromPromise = fromPromise;
     Stream.when = when;
+    Stream.noop = noop;
 
     return Stream;
 });
