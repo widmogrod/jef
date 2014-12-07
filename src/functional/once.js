@@ -6,13 +6,15 @@ define(function() {
      * @return {Function}
      */
     return function once(fn) {
-        var called = false;
+        var called = false, result;
         return function(a, b, c) {
             if (!called) {
                 called = true;
-                fn(a, b, c);
+                result = fn(a, b, c);
                 fn = null;
             }
+
+            return result;
         }
     }
 });

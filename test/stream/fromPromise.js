@@ -46,7 +46,7 @@ describe('Stream.fromPromise', function() {
                 }, 0);
             }, 0);
         });
-        it('should register onValue', function() {
+        it('should register onValue and stop', function() {
             object.on(args);
             setTimeout(function() {
                 called.should.be.eql(1);

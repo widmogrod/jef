@@ -12,7 +12,7 @@ define([
      * @return {Function}
      */
     function notifyValue(onValue, onError, onComplete) {
-        return once(function sinkValue(value, next) {
+        return function sinkValue(value, next) {
             var result;
 
             try {
@@ -24,10 +24,10 @@ define([
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
                 next.on(onValue, onError, onComplete)
-            } else {
+            } else if (!Stream.continuable(next)) {
                 callIfCallable(onComplete);
             }
-        })
+        }
     }
 
     /**
@@ -49,6 +49,17 @@ define([
     }
 
     /**
+     * Complete
+     * @param onComplete
+     * @returns {*}
+     */
+    function notifyComplete(onComplete) {
+        return once(function sinkComplete() {
+            callIfCallable(onComplete);
+        })
+    }
+
+    /**
      * @param {Function} implementation
      * @constructor
      */
@@ -62,7 +73,8 @@ define([
         this.on = function(onValue, onError, onComplete) {
             implementation.call(this,
                 notifyValue(onValue, onError, onComplete),
-                notifyError(onValue, onError, onComplete)
+                notifyError(onValue, onError, onComplete),
+                notifyComplete(onComplete)
             );
             return this;
         }

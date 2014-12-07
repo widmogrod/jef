@@ -1,4 +1,10 @@
-define(['./stream', '../functional/each', '../functional/immediate'], function(Stream, each, immediate, undefined) {
+define([
+    './stream',
+    './noop',
+    '../functional/each',
+    '../functional/contains',
+    '../functional/clone'
+], function(Stream, noop, each, contains, clone, undefined) {
     'use strict';
 
     /**
@@ -8,27 +14,28 @@ define(['./stream', '../functional/each', '../functional/immediate'], function(S
      */
     return function when(streams, buffer) {
         buffer = buffer || new Array(streams.length);
+
+        if (contains(streams, Stream.stop)) {
+            return noop();
+        }
+
         return new Stream(function(sinkValue, sinkError) {
             each(streams, function(stream, index) {
-                buffer[index] = undefined;
+                stream.on(function(value, next) {
+                    buffer[index] = value;
+                    streams[index] = next;
 
-                stream.on(function(value) {
-                    immediate(function() {
-                        buffer[index] = value;
-
-                        if (-1 === buffer.indexOf(undefined)) {
-                            sinkValue(buffer, when(streams, buffer));
-                        } else {
-                            when(streams, buffer);
-                        }
-                    });
+                    if (!contains(buffer, undefined)) {
+                        sinkValue(
+                            clone(buffer),
+                            Stream.streamable(next)
+                                ? when(streams, buffer)
+                                : Stream.stop
+                        );
+                    }
 
                     return Stream.stop;
-                }, function(error) {
-                    sinkError(error);
-                }, function() {
-                    sinkValue(undefined, Stream.stop);
-                })
+                }, sinkError)
             });
         })
     }

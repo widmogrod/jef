@@ -9,6 +9,10 @@ var args = function(value) {
     called++;
     withArgs = value;
 };
+var argsCollect = function(value) {
+    called++;
+    withArgs.push(value);
+};
 var argsStop = function(value) {
     called++;
     withArgs = value;
@@ -34,18 +38,25 @@ describe('Stream.when', function() {
         it('should register onValue', function() {
             object.on(args);
 
-            setTimeout(function() {
-                called.should.be.eql(4);
-                withArgs.should.be.eql([3, 'c']);
-            }, 10);
+            called.should.be.eql(5);
+            withArgs.should.be.eql([3, 'c']);
         });
-        it('should register onValue', function() {
+        it('should be called on every combination of events', function() {
+            object.on(argsCollect);
+            called.should.be.eql(5);
+            withArgs.should.be.eql([
+                [1, 'a'],
+                [2, 'a'],
+                [3, 'a'],
+                [3, 'b'],
+                [3, 'c']
+            ]);
+        });
+        it('should register onValue and stop', function() {
             object.on(argsStop);
 
-            setTimeout(function() {
-                called.should.be.eql(1);
-                withArgs.should.be.eql([1, 'a']);
-            }, 10);
+            called.should.be.eql(1);
+            withArgs.should.be.eql([1, 'a']);
         });
     });
 });
