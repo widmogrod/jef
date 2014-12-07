@@ -17,7 +17,7 @@
     "should": "^3.3.1"
   },
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --recursive",
     "build": "grunt build",
     "deploy": "git checkout gh-pages && git merge master -m 'merge from master to gh-pages' && git rm dist -r && git commit -am 'remove old dist' && npm run build && git add dist/* && git commit -am 'update dist files' && git push origin gh-pages && git checkout master"
   },
