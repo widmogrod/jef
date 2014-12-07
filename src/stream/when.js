@@ -25,7 +25,9 @@ define([
                     buffer[index] = value;
                     streams[index] = next;
 
-                    if (!contains(buffer, undefined)) {
+                    if (contains(buffer, undefined) && Stream.streamable(next)) {
+                        when(streams, buffer)
+                    } else {
                         sinkValue(
                             clone(buffer),
                             Stream.streamable(next)
