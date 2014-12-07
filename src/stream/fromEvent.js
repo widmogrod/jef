@@ -8,11 +8,11 @@ define(['./stream'], function(Stream) {
      */
    return function fromEvent(element, eventName) {
         return new Stream(function(sinkValue) {
-            var sinkEvent, self = this;
+            var sinkEvent;
 
             sinkEvent = function(e) {
                 element.removeEventListener(eventName, sinkEvent, false);
-                sinkValue(e, self);
+                sinkValue(e, fromEvent(element, eventName));
             };
 
             element.addEventListener(eventName, sinkEvent, false);
