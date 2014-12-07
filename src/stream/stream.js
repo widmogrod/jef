@@ -1,8 +1,9 @@
 define([
     '../functional/until',
     '../functional/isFunction',
-    '../functional/noop'
-], function(until, isFunction, noop) {
+    '../functional/noop',
+    '../functional/apply'
+], function(until, isFunction, noop, apply) {
     'use strict';
 
     /**
@@ -24,6 +25,8 @@ define([
                 next.on(onValue, onError, onComplete)
             } else if (!Stream.continuable(next)) {
                 onComplete();
+                // Test whenever it, will help GC
+                onValue = onError = onComplete = value = next = null;
             }
         }
     }
@@ -43,6 +46,8 @@ define([
                 next.on(onValue, onError, onComplete)
             } else {
                 onComplete();
+                // Test whenever it, will help GC
+                onValue = onError = onComplete = e = next = null;
             }
         }
     }
@@ -61,10 +66,13 @@ define([
         this.on = function(onValue, onError, onComplete) {
             var stopped = false,
                 stopCall = function(fn) {
-                    return function(a, b, c) {
+                    return function() {
                         if (!stopped) {
                             stopped = true;
-                            return fn(a, b, c);
+                            var result = apply(fn, arguments);
+                            // Test whenever it, will help GC
+                            fn = null;
+                            return result;
                         }
                     }
                 },
@@ -77,15 +85,17 @@ define([
 
                         if (!Stream.continuable(result)) {
                             stopped = true;
+                            // Test whenever it, will help GC
+                            fn = value = next = null;
                         }
 
                         return result;
                     }
                 };
 
-            onValue = until(isNotStopped, stopIfNotContinuable(isFunction(onValue) ? onValue : noop));
-            onError = until(isNotStopped, isFunction(onError) ? onError : noop);
-            onComplete = until(isNotStopped, stopCall(isFunction(onComplete) ? onComplete : noop));
+            onValue = until.is(onValue) ? onValue : until(isNotStopped, stopIfNotContinuable(isFunction(onValue) ? onValue : noop));
+            onError = until.is(onError) ? onError : until(isNotStopped, isFunction(onError) ? onError : noop);
+            onComplete = until.is(onComplete) ? onComplete : until(isNotStopped, stopCall(isFunction(onComplete) ? onComplete : noop));
 
             implementation.call(this,
                 notifyValue(onValue, onError, onComplete),
