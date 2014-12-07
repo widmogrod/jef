@@ -7,7 +7,7 @@ define(['./stream', './both'], function(Stream, both) {
      * @return {Stream}
      */
     return function map(fn, stream) {
-        return new Stream(function(sinkValue) {
+        return new Stream(function(sinkValue, sinkError) {
             stream.on(function(value, next) {
                 value = fn(value);
                 next = Stream.streamable(next) ? map(fn, next) : Stream.stop;
@@ -28,7 +28,7 @@ define(['./stream', './both'], function(Stream, both) {
                 }
 
                 return Stream.stop;
-            });
+            }, sinkError);
         })
     }
 });

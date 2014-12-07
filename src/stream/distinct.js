@@ -7,7 +7,7 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function distinct(stream, lastValue) {
-        return new Stream(function(sinkValue) {
+        return new Stream(function(sinkValue, sinkError) {
             stream.on(function(value, next) {
                 if (lastValue !== value) {
                     sinkValue(
@@ -19,7 +19,7 @@ define(['./stream'], function(Stream) {
 
                     return Stream.stop;
                 }
-            });
+            }, sinkError);
         })
     }
 });

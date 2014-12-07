@@ -7,7 +7,7 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function both(streamA, streamB) {
-        return new Stream(function(sinkValue) {
+        return new Stream(function(sinkValue, sinkError) {
             streamA.on(function(value, next) {
                 sinkValue(
                     value,
@@ -17,9 +17,7 @@ define(['./stream'], function(Stream) {
                 );
 
                 return Stream.stop;
-            }, function(e) {
-                throw e
-            });
+            }, sinkError);
         });
     }
 });
