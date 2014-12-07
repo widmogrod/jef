@@ -36,7 +36,8 @@ define([
     './functional/some',
     './functional/contains',
     './functional/noop',
-    './functional/immediate'
+    './functional/immediate',
+    './functional/until'
 ], function (
     is,
     isFunction,
@@ -74,15 +75,18 @@ define([
     some,
     contains,
     noop,
-    immediate
+    immediate,
+    until
 ) {
     'use strict';
 
     return {
         apply: apply,
         applyc: applyc,
-        compose: compose,
         curry: curry,
+        clone: clone,
+        compose: compose,
+        contains: contains,
         fill: fill,
         filter: filter,
         flip: flip,
@@ -96,7 +100,9 @@ define([
         isFunction: isFunction,
         isObject: isObject,
         isTraversable: isTraversable,
+        immediate: immediate,
         not: not,
+        noop: noop,
         map: map,
         maybe: maybe,
         memoize: memoize,
@@ -107,10 +113,7 @@ define([
         traverse: traverse,
         returnValue: returnValue,
         slice: slice,
-        clone: clone,
         some: some,
-        contains: contains,
-        noop: noop,
-        immediate: immediate
+        until: until
     }
 });

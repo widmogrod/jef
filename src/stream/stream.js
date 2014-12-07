@@ -1,8 +1,8 @@
 define([
-    '../functional/once',
-    './callIfOrThrow',
-    './callIfCallable'
-], function(once, callIfOrThrow, callIfCallable) {
+    '../functional/until',
+    '../functional/isFunction',
+    '../functional/noop'
+], function(until, isFunction, noop) {
     'use strict';
 
     /**
@@ -13,19 +13,17 @@ define([
      */
     function notifyValue(onValue, onError, onComplete) {
         return function sinkValue(value, next) {
-            var result;
-
             try {
-                result = onValue(value, next);
-            } catch(e) {
+                var result = onValue(value, next);
+            } catch (e) {
                 // Here you have possibility of intercept the error
-                next = callIfOrThrow(onError, e, next);
+                next = onError(e, next);
             }
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
                 next.on(onValue, onError, onComplete)
             } else if (!Stream.continuable(next)) {
-                callIfCallable(onComplete);
+                onComplete();
             }
         }
     }
@@ -37,26 +35,16 @@ define([
      * @return {Function}
      */
     function notifyError(onValue, onError, onComplete) {
-        return once(function sinkError(e, next) {
-            next = callIfOrThrow(onError, e, next);
+        return function sinkError(e, next) {
+            // Here you have possibility of intercept the error
+            next = onError(e, next);
 
             if (Stream.streamable(next)) {
                 next.on(onValue, onError, onComplete)
             } else {
-                callIfCallable(onComplete);
+                onComplete();
             }
-        })
-    }
-
-    /**
-     * Complete
-     * @param onComplete
-     * @returns {*}
-     */
-    function notifyComplete(onComplete) {
-        return once(function sinkComplete() {
-            callIfCallable(onComplete);
-        })
+        }
     }
 
     /**
@@ -71,10 +59,38 @@ define([
          * @returns {Stream}
          */
         this.on = function(onValue, onError, onComplete) {
+            var stopped = false,
+                stopCall = function(fn) {
+                    return function(a, b, c) {
+                        if (!stopped) {
+                            stopped = true;
+                            return fn(a, b, c);
+                        }
+                    }
+                },
+                isNotStopped = function() {
+                    return false === stopped
+                },
+                stopIfNotContinuable = function(fn) {
+                    return function(value, next) {
+                        var result = fn(value, next);
+
+                        if (!Stream.continuable(result)) {
+                            stopped = true;
+                        }
+
+                        return result;
+                    }
+                };
+
+            onValue = until(isNotStopped, stopIfNotContinuable(isFunction(onValue) ? onValue : noop));
+            onError = until(isNotStopped, isFunction(onError) ? onError : noop);
+            onComplete = until(isNotStopped, stopCall(isFunction(onComplete) ? onComplete : noop));
+
             implementation.call(this,
                 notifyValue(onValue, onError, onComplete),
                 notifyError(onValue, onError, onComplete),
-                notifyComplete(onComplete)
+                onComplete
             );
             return this;
         }
