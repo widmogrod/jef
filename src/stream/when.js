@@ -12,10 +12,11 @@ define([
      * @param {Array} [buffer]
      * @return {Stream}
      */
-    return function when(streams, buffer) {
+    return function when(streams, buffer, completed) {
         buffer = buffer || new Array(streams.length);
+        completed = completed || new Array(streams.length);
 
-        return new Stream(function(sinkValue, sinkError) {
+        return new Stream(function whenInit(sinkValue, sinkError, sinkComplete) {
             each(streams, function(stream, index) {
                 Stream.streamable(stream) && stream.on(function(value, next) {
                     buffer[index] = value;
@@ -25,14 +26,21 @@ define([
                         sinkValue(
                             clone(buffer),
                             Stream.streamable(next)
-                                ? when(streams, buffer)
+                                ? when(streams, buffer, completed)
                                 : Stream.stop
                         );
 
                         return Stream.stop;
                     }
 
-                }, sinkError)
+                }, sinkError, function() {
+                    completed[index] = true;
+                    if (!contains(completed, undefined)) {
+                        sinkComplete();
+                        // clear reference
+                        completed = buffer = streams = null;
+                    }
+                })
             });
         })
     }

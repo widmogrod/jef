@@ -19,11 +19,11 @@ define([
         var result = map(args, function(args) {
             switch (args && args.length) {
                 case 0:
-                    return func.call(func);
+                    return func();
                 case 1:
-                    return func.call(func, args[0]);
+                    return func(args[0]);
                 case 2:
-                    return func.call(func, args[0], args[1]);
+                    return func(args[0], args[1]);
                 default:
                     return func.apply(func, args);
             }
