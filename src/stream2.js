@@ -11,7 +11,7 @@ define([
     './stream/log',
     './stream/timeout',
     './stream/fromArray',
-    './stream/fromEvent',
+    './stream/fromEmitter',
     './stream/fromCallback',
     './stream/fromPromise'
 ], function(
@@ -27,7 +27,7 @@ define([
     log,
     timeout,
     fromArray,
-    fromEvent,
+    fromEmitter,
     fromCallback,
     fromPromise
 ) {
@@ -56,7 +56,7 @@ define([
     };
 
     Stream.fromArray = fromArray;
-    Stream.fromEvent = fromEvent;
+    Stream.fromEmitter = fromEmitter;
     Stream.fromCallback = fromCallback;
     Stream.fromPromise = fromPromise;
     Stream.both = both;
