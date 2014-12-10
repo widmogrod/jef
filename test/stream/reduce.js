@@ -2,7 +2,7 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var take = require('../../src/stream/take');
+var reduce = require('../../src/stream/reduce');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -14,10 +14,13 @@ var argsStop = function(value) {
     withArgs = value;
     return Stream.stop;
 };
+var sum = function(value, base) {
+    return value + base;
+};
 
-describe('Stream.take', function() {
+describe('Stream.reduce', function() {
     beforeEach(function() {
-        object = take(fromArray([1, 2, 3]), 2);
+        object = reduce(fromArray([1, 2, 3, 4]), sum, 10);
         withArgs = [];
         called = 0;
     });
@@ -30,15 +33,15 @@ describe('Stream.take', function() {
     describe('#on', function() {
         it('should register onValue', function() {
             object.on(args);
-            called.should.be.eql(2);
+            called.should.be.eql(1);
             // Last arg should be
-            withArgs.should.be.eql(2);
+            withArgs.should.be.eql(20);
         });
         it('should register onValue and stop', function() {
             object.on(argsStop);
             called.should.be.eql(1);
             // Last arg should be
-            withArgs.should.be.eql(1);
+            withArgs.should.be.eql(20);
         });
     });
 });

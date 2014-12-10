@@ -14,8 +14,7 @@
         "jsdom": "^1",
         "mocha": "~2",
         "promise": "^6.0.1",
-        "should": "^3.3.1",
-        "memwatch": "^0.2.2"
+        "should": "^3.3.1"
     },
     "scripts": {
         "test": "mocha --recursive",

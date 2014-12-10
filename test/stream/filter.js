@@ -20,7 +20,7 @@ var graterThanTwo = function(value) {
 
 describe('Stream.filter', function() {
     beforeEach(function() {
-        object = filter(graterThanTwo, fromArray([1, 2, 3, 4]));
+        object = filter(fromArray([1, 2, 3, 4]), graterThanTwo);
         withArgs = [];
         called = 0;
     });
