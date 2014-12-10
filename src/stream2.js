@@ -3,6 +3,7 @@ define([
     './stream/map',
     './stream/filter',
     './stream/reduce',
+    './stream/concat',
     './stream/take',
     './stream/both',
     './stream/distinct',
@@ -20,6 +21,7 @@ define([
     map,
     filter,
     reduce,
+    concat,
     take,
     both,
     distinct,
@@ -43,6 +45,9 @@ define([
     };
     Stream.prototype.reduce = function(fn, base) {
         return reduce(this, fn, base);
+    };
+    Stream.prototype.concat = function(fn, base) {
+        return concat(this);
     };
     Stream.prototype.take = function(n) {
         return take(this, n);
