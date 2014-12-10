@@ -2,11 +2,11 @@ define(['./stream'], function(Stream) {
     'use strict';
 
     /**
-     * @param {Number} wait
      * @param {Stream} stream
+     * @param {Number} wait
      * @return {Stream}
      */
-    return function debounce(wait, stream) {
+    return function debounce(stream, wait) {
         return new Stream(function(sinkValue, sinkError) {
             var timeout;
             stream.on(function(value, next) {
@@ -15,12 +15,10 @@ define(['./stream'], function(Stream) {
                 }
 
                 timeout = setTimeout(function() {
-                    timeout = null;
-
                     sinkValue(
                         value,
                         Stream.streamable(next)
-                            ? debounce(wait, next)
+                            ? debounce(next, wait)
                             : Stream.stop
                     )
                 }, wait)
