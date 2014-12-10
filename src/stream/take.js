@@ -2,17 +2,17 @@ define(['./stream'], function(Stream) {
     'use strict';
 
     /**
-     * @param {Number} n
      * @param {Stream} stream
+     * @param {Number} n
      * @return {Stream}
      */
-    return function take(n, stream) {
+    return function take(stream, n) {
         return new Stream(function(sinkValue, sinkError) {
             stream.on(function(value, next) {
                 sinkValue(
                     value,
                     n > 1
-                        ? take(n - 1, next)
+                        ? take(next, n -1)
                         : Stream.stop
                 );
 

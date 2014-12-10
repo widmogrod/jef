@@ -2,6 +2,7 @@ define([
     './stream/stream',
     './stream/map',
     './stream/filter',
+    './stream/reduce',
     './stream/take',
     './stream/both',
     './stream/distinct',
@@ -18,6 +19,7 @@ define([
     Stream,
     map,
     filter,
+    reduce,
     take,
     both,
     distinct,
@@ -34,19 +36,22 @@ define([
     'use strict';
 
     Stream.prototype.map = function(fn) {
-        return map(fn, this);
+        return map(this, fn);
     };
     Stream.prototype.filter = function(fn) {
-        return filter(fn, this);
+        return filter(this, fn);
+    };
+    Stream.prototype.reduce = function(fn, base) {
+        return reduce(this, fn, base);
     };
     Stream.prototype.take = function(n) {
-        return take(n, this);
+        return take(this, n);
     };
     Stream.prototype.distinct = function() {
         return distinct(this);
     };
     Stream.prototype.debounce = function(timeout) {
-        return debounce(timeout, this);
+        return debounce(this, timeout);
     };
     Stream.prototype.timeout = function(wait) {
         return timeout(this, wait | 0);

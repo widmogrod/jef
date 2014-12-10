@@ -20,7 +20,7 @@ var addOne = function(value) {
 
 describe('Stream.map', function() {
     beforeEach(function() {
-        object = map(addOne, fromArray([1, 2, 3]));
+        object = map(fromArray([1, 2, 3]), addOne);
         withArgs = [];
         called = 0;
     });

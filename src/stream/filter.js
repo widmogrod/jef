@@ -2,18 +2,20 @@ define(['./stream'], function(Stream) {
     'use strict';
 
     /**
-     * @param {Function} fn
+     * Filter stream values, and accept only those that pass test function
+     *
      * @param {Stream} stream
+     * @param {Function} fn
      * @return {Stream}
      */
-    return function filter(fn, stream) {
+    return function filter(stream, fn) {
         return new Stream(function(sinkValue, sinkError) {
             stream.on(function(value, next) {
                 if (fn(value)) {
                     sinkValue(
                         value,
                         Stream.streamable(next)
-                            ? filter(fn, next)
+                            ? filter(next, fn)
                             : Stream.stop
                     );
 
