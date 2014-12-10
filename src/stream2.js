@@ -5,6 +5,7 @@ define([
     './stream/reduce',
     './stream/concat',
     './stream/take',
+    './stream/latest',
     './stream/both',
     './stream/distinct',
     './stream/debounce',
@@ -23,6 +24,7 @@ define([
     reduce,
     concat,
     take,
+    latest,
     both,
     distinct,
     debounce,
@@ -51,6 +53,9 @@ define([
     };
     Stream.prototype.take = function(n) {
         return take(this, n);
+    };
+    Stream.prototype.latest = function(n) {
+        return latest(this);
     };
     Stream.prototype.distinct = function() {
         return distinct(this);

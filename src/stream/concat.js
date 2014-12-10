@@ -12,9 +12,11 @@ define(['./stream', './both'], function(Stream, both) {
                     concat(both(value, next)).on(function(value, inner) {
                         sinkValue(
                             value,
-                            concat(inner)
+                            inner
                         );
-                    });
+
+                        return Stream.stop;
+                    }, sinkError);
                 } else {
                     sinkValue(value, concat(next));
                 }

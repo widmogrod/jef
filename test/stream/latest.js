@@ -2,7 +2,7 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var concat = require('../../src/stream/concat');
+var latest = require('../../src/stream/latest');
 var map = require('../../src/stream/map');
 var object, withArgs, called;
 
@@ -15,18 +15,10 @@ var argsStop = function(value) {
     withArgs = value;
     return Stream.stop;
 };
-var expand = function(value) {
-    return fromArray([
-        value, -value,
-        fromArray([
-            value + value
-        ])
-    ]);
-};
 
-describe('Stream.concat', function() {
+describe('Stream.latest', function() {
     beforeEach(function() {
-        object = concat(map(fromArray([1, 2, 3]), expand));
+        object = latest(fromArray([1, 2, 3]));
         withArgs = [];
         called = 0;
     });
@@ -39,13 +31,13 @@ describe('Stream.concat', function() {
     describe('#on', function() {
         it('should register onValue', function() {
             object.on(args);
-            called.should.be.eql(9);
-            withArgs.should.be.eql(6);
+            called.should.be.eql(1);
+            withArgs.should.be.eql(3);
         });
         it('should register onValue and stop', function() {
             object.on(argsStop);
             called.should.be.eql(1);
-            withArgs.should.be.eql(1);
+            withArgs.should.be.eql(3);
         });
     });
 });
