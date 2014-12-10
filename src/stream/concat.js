@@ -18,7 +18,12 @@ define(['./stream', './both'], function(Stream, both) {
                         return Stream.stop;
                     }, sinkError);
                 } else {
-                    sinkValue(value, concat(next));
+                    sinkValue(
+                        value,
+                        Stream.streamable(next)
+                            ? concat(next)
+                            : Stream.stop
+                    );
                 }
 
                 return Stream.stop;
