@@ -13,7 +13,10 @@ define(['./stream'], function(Stream) {
                     skip(
                         next,
                         n - 1
-                    ).on(sinkValue);
+                    ).on(function(value, next) {
+                        sinkValue(value, next);
+                        return Stream.stop;
+                    });
                 } else if (n === 0) {
                     sinkValue(
                         value,
