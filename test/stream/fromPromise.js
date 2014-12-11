@@ -29,30 +29,34 @@ describe('Stream.fromPromise', function() {
         })
     });
     describe('#on', function() {
-        it('should register onError', function(done) {
-            var e = new Error('test');
-            var p = Promise.reject(e);
-            object = fromPromise(p);
-            object.on(noop, args);
-            setTimeout(function() {
-                called.should.be.eql(1);
-                withArgs.should.be.eql(e);
-
+        describe('success', function() {
+            it('should register onValue and stop', function() {
+                object.on(args);
+                setTimeout(function() {
+                    called.should.be.eql(1);
+                    // Last arg should be
+                    withArgs.should.be.eql(2);
+                }, 0);
+            });
+        });
+        describe('failure', function() {
+            it('should register onError', function(done) {
+                var e = new Error('test');
+                var p = Promise.reject(e);
+                object = fromPromise(p);
                 object.on(noop, args);
                 setTimeout(function() {
-                    called.should.be.eql(2);
+                    called.should.be.eql(1);
                     withArgs.should.be.eql(e);
-                    done();
+
+                    object.on(noop, args);
+                    setTimeout(function() {
+                        called.should.be.eql(2);
+                        withArgs.should.be.eql(e);
+                        done();
+                    }, 0);
                 }, 0);
-            }, 0);
-        });
-        it('should register onValue and stop', function() {
-            object.on(args);
-            setTimeout(function() {
-                called.should.be.eql(1);
-                // Last arg should be
-                withArgs.should.be.eql(2);
-            }, 0);
+            });
         });
     });
 });

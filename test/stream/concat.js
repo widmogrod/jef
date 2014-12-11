@@ -37,15 +37,17 @@ describe('Stream.concat', function() {
         })
     });
     describe('#on', function() {
-        it('should register onValue', function() {
-            object.on(args);
-            called.should.be.eql(9);
-            withArgs.should.be.eql(6);
-        });
-        it('should register onValue and stop', function() {
-            object.on(argsStop);
-            called.should.be.eql(1);
-            withArgs.should.be.eql(1);
+        describe('success', function() {
+            it('should register onValue', function() {
+                object.on(args);
+                called.should.be.eql(9);
+                withArgs.should.be.eql(6);
+            });
+            it('should register onValue and stop', function() {
+                object.on(argsStop);
+                called.should.be.eql(1);
+                withArgs.should.be.eql(1);
+            });
         });
     });
 });

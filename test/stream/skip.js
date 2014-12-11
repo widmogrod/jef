@@ -2,7 +2,7 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var filter = require('../../src/stream/filter');
+var skip = require('../../src/stream/skip');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -14,13 +14,10 @@ var argsStop = function(value) {
     withArgs = value;
     return Stream.stop;
 };
-var graterThanTwo = function(value) {
-    return value > 2;
-};
 
-describe('Stream.filter', function() {
+describe('Stream.skip', function() {
     beforeEach(function() {
-        object = filter(fromArray([1, 2, 3, 4]), graterThanTwo);
+        object = skip(fromArray([1, 2, 3, 4]), 2);
         withArgs = [];
         called = 0;
     });
@@ -44,6 +41,6 @@ describe('Stream.filter', function() {
                 // Last arg should be
                 withArgs.should.be.eql(3);
             });
-        });
+        })
     });
 });

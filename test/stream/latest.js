@@ -29,15 +29,17 @@ describe('Stream.latest', function() {
         })
     });
     describe('#on', function() {
-        it('should register onValue', function() {
-            object.on(args);
-            called.should.be.eql(1);
-            withArgs.should.be.eql(3);
-        });
-        it('should register onValue and stop', function() {
-            object.on(argsStop);
-            called.should.be.eql(1);
-            withArgs.should.be.eql(3);
+        describe('success', function() {
+            it('should register onValue', function() {
+                object.on(args);
+                called.should.be.eql(1);
+                withArgs.should.be.eql(3);
+            });
+            it('should register onValue and stop', function() {
+                object.on(argsStop);
+                called.should.be.eql(1);
+                withArgs.should.be.eql(3);
+            });
         });
     });
 });
