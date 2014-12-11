@@ -50,7 +50,7 @@ define([
     Stream.prototype.reduce = function(fn, base) {
         return reduce(this, fn, base);
     };
-    Stream.prototype.concat = function(fn, base) {
+    Stream.prototype.concat = function() {
         return concat(this);
     };
     Stream.prototype.take = function(n) {
@@ -59,7 +59,7 @@ define([
     Stream.prototype.skip = function(n) {
         return skip(this, n);
     };
-    Stream.prototype.latest = function(n) {
+    Stream.prototype.latest = function() {
         return latest(this);
     };
     Stream.prototype.distinct = function() {
