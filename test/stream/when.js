@@ -66,9 +66,6 @@ describe('Stream.when', function() {
                 var t1 = timeout(fromArray([1, 2, 3]));
                 var t2 = timeout(fromArray(['a', 'b', 'c']));
 
-                //log(t1, 't1');
-                //log(t1, 't2');
-
                 object = when([
                     t1,
                     t2
