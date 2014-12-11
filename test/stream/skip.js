@@ -49,20 +49,22 @@ describe('Stream.skip', function() {
                 withArgs = [];
                 called = 0;
             });
-            it('should register onValue', function() {
+            it('should register onValue', function(done) {
                 object.on(args);
                 setTimeout(function() {
                     called.should.be.eql(2);
                     // Last arg should be
                     withArgs.should.be.eql(4);
+                    done();
                 }, 20);
             });
-            it('should register onValue and stop', function() {
+            it('should register onValue and stop', function(done) {
                 object.on(argsStop);
                 setTimeout(function() {
                     called.should.be.eql(1);
                     // Last arg should be
                     withArgs.should.be.eql(3);
+                    done()
                 }, 20);
             });
         });
