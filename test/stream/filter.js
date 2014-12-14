@@ -3,6 +3,7 @@ require('amdefine/intercept');
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
 var filter = require('../../src/stream/filter');
+var noop = require('../../src/functional/noop');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -20,7 +21,7 @@ var graterThanTwo = function(value) {
 
 describe('Stream.filter', function() {
     beforeEach(function() {
-        object = filter(fromArray([1, 2, 3, 4]), graterThanTwo);
+        object = filter(fromArray([1, 2, 3, 4, 2]), graterThanTwo);
         withArgs = [];
         called = 0;
     });
@@ -44,6 +45,10 @@ describe('Stream.filter', function() {
                 // Last arg should be
                 withArgs.should.be.eql(3);
             });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            })
         });
     });
 });

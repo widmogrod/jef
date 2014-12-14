@@ -30,14 +30,22 @@ describe('Stream.fromPromise', function() {
     });
     describe('#on', function() {
         describe('success', function() {
-            it('should register onValue and stop', function() {
+            it('should register onValue and stop', function(done) {
                 object.on(args);
                 setTimeout(function() {
                     called.should.be.eql(1);
                     // Last arg should be
                     withArgs.should.be.eql(2);
+                    done()
                 }, 0);
             });
+            it('should call onComplete', function(done) {
+                object.on(noop, noop, args);
+                setTimeout(function() {
+                    called.should.be.eql(1);
+                    done()
+                }, 0);
+            })
         });
         describe('failure', function() {
             it('should register onError', function(done) {

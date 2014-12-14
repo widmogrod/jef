@@ -45,6 +45,10 @@ describe('Stream.fromCallback', function() {
                 called.should.be.eql(1);
                 withArgs.should.be.eql(2);
             });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            })
         });
         describe('failure', function() {
             beforeEach(function() {

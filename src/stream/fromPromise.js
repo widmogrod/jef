@@ -12,8 +12,6 @@ define(['./stream'], function(Stream) {
             }, function(e) {
                 sinkError(e);
             });
-
-            return Stream.stop;
         })
     }
 });

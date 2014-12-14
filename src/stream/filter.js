@@ -9,7 +9,7 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function filter(stream, fn) {
-        return new Stream(function(sinkValue, sinkError) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value, next) {
                 if (fn(value)) {
                     sinkValue(
@@ -21,7 +21,7 @@ define(['./stream'], function(Stream) {
 
                     return Stream.stop;
                 }
-            }, sinkError);
+            }, sinkError, sinkComplete);
         })
     }
 });

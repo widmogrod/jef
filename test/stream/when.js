@@ -2,9 +2,9 @@ require('amdefine/intercept');
 
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
-var log = require('../../src/stream/log');
 var timeout = require('../../src/stream/timeout');
 var when = require('../../src/stream/when');
+var noop = require('../../src/functional/noop');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -55,19 +55,19 @@ describe('Stream.when', function() {
             });
             it('should register onValue and stop', function() {
                 object.on(argsStop);
-
                 called.should.be.eql(1);
                 withArgs.should.be.eql([3, 'a']);
             });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            })
         });
 
         describe('asynchronously', function() {
             beforeEach(function() {
                 var t1 = timeout(fromArray([1, 2, 3]));
                 var t2 = timeout(fromArray(['a', 'b', 'c']));
-
-                //log(t1, 't1');
-                //log(t1, 't2');
 
                 object = when([
                     t1,
