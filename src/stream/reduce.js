@@ -9,12 +9,11 @@ define(['./stream'], function(Stream) {
      */
     return function reduce(stream, fn, base) {
         return new Stream(function(sinkValue, sinkError) {
-            stream.on(function(value, next) {
+            stream.on(function(value) {
                 base = fn(value, base);
-                if (!Stream.streamable(next)) {
-                    sinkValue(base, next);
-                }
-            }, sinkError);
+            }, sinkError, function() {
+                sinkValue(base, Stream.stop);
+            })
         })
     }
 });
