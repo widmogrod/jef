@@ -13,7 +13,11 @@ define([
      */
     function notifyValue(onValue, onError, onComplete) {
         return function sinkValue(value, next) {
-            var result = onValue(value, next);
+            try {
+                var result = onValue(value, next);
+            } catch(e) {
+                next = onError(e, next);
+            }
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
                 return next.on(onValue, onError, onComplete)
