@@ -1,9 +1,8 @@
 define([
     '../functional/until',
     '../functional/isFunction',
-    '../functional/noop',
-    '../functional/apply'
-], function(until, isFunction, noop, apply) {
+    '../functional/noop'
+], function(until, isFunction, noop) {
     'use strict';
 
     /**
@@ -14,18 +13,13 @@ define([
      */
     function notifyValue(onValue, onError, onComplete) {
         return function sinkValue(value, next) {
-            try {
-                var result = onValue(value, next);
-            } catch (e) {
-                // Here you have possibility of intercept the error
-                next = onError(e, next);
-            }
+            var result = onValue(value, next);
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
-                next.on(onValue, onError, onComplete)
-            } else if (!Stream.continuable(next)) {
-                onComplete();
+                return next.on(onValue, onError, onComplete)
             }
+
+            onComplete();
         }
     }
 
@@ -41,10 +35,10 @@ define([
             next = onError(e, next);
 
             if (Stream.streamable(next)) {
-                next.on(onValue, onError, onComplete)
-            } else {
-                onComplete();
+                return next.on(onValue, onError, onComplete)
             }
+
+            onComplete();
         }
     }
 
@@ -79,7 +73,7 @@ define([
                     return function() {
                         if (!stopped) {
                             stopped = null;
-                            apply(fn, arguments);
+                            fn();
                         }
                     }
                 };

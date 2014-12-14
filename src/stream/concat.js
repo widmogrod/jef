@@ -6,7 +6,7 @@ define(['./stream', './both'], function(Stream, both) {
      * @return {Stream}
      */
     return function concat(stream) {
-        return new Stream(function(sinkValue, sinkError) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value, next) {
                 if (Stream.streamable(value)) {
                     concat(both(value, next)).on(function(value, inner) {
@@ -27,7 +27,7 @@ define(['./stream', './both'], function(Stream, both) {
                 }
 
                 return Stream.stop;
-            }, sinkError);
+            }, sinkError, sinkComplete);
         })
     }
 });
