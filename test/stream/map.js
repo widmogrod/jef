@@ -3,6 +3,7 @@ require('amdefine/intercept');
 var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
 var map = require('../../src/stream/map');
+var noop = require('../../src/functional/noop');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -44,6 +45,10 @@ describe('Stream.map', function() {
                 // Last arg should be
                 withArgs.should.be.eql(2);
             });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            })
         });
     });
 });

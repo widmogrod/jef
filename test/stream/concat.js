@@ -4,6 +4,7 @@ var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
 var concat = require('../../src/stream/concat');
 var map = require('../../src/stream/map');
+var noop = require('../../src/functional/noop');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -48,6 +49,10 @@ describe('Stream.concat', function() {
                 called.should.be.eql(1);
                 withArgs.should.be.eql(1);
             });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            })
         });
     });
 });

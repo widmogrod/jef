@@ -53,6 +53,13 @@ describe('Stream.timeout', function() {
                     done();
                 }, 10);
             });
+            it('should call onComplete', function(done) {
+                object.on(noop, noop, args);
+                setTimeout(function() {
+                called.should.be.eql(1);
+                    done();
+                }, 10);
+            })
         });
         describe('failure', function() {
             beforeEach(function() {

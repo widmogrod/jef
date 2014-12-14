@@ -4,6 +4,7 @@ var Stream = require('../../src/stream/stream');
 var fromArray = require('../../src/stream/fromArray');
 var timeout = require('../../src/stream/timeout');
 var skip = require('../../src/stream/skip');
+var noop = require('../../src/functional/noop');
 var object, withArgs, called;
 
 var args = function(value) {
@@ -42,6 +43,10 @@ describe('Stream.skip', function() {
                 // Last arg should be
                 withArgs.should.be.eql(3);
             });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            })
         });
         describe('asynchronously', function() {
             beforeEach(function() {
