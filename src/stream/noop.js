@@ -1,11 +1,12 @@
 define([
     './stream',
-    '../functional/once',
-    '../functional/noop'
-], function(Stream, once, noop) {
+    '../functional/once'
+], function(Stream, once) {
     'use strict';
 
     return once(function() {
-        return new Stream(noop);
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            sinkComplete();
+        });
     })
 });

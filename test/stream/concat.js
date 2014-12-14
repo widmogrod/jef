@@ -5,6 +5,7 @@ var fromArray = require('../../src/stream/fromArray');
 var timeout = require('../../src/stream/timeout');
 var concat = require('../../src/stream/concat');
 var map = require('../../src/stream/map');
+var filter = require('../../src/stream/filter');
 var noop = require('../../src/functional/noop');
 var object, withArgs, called;
 
@@ -24,6 +25,12 @@ var expand = function(value) {
             value + value
         ])
     ]);
+};
+var graterThanTwo = function(value) {
+    return value > 2;
+};
+var addOne = function(value) {
+    return value + 1;
 };
 
 describe('Stream.concat', function() {
@@ -86,4 +93,46 @@ describe('Stream.concat', function() {
             })
         });
     });
+    describe('.filter', function() {
+        beforeEach(function() {
+            object = filter(object, graterThanTwo);
+        });
+        describe('success', function(){
+            it('should register onValue', function() {
+                map(object, addOne).on(args);
+                called.should.be.eql(3);
+                withArgs.should.be.eql(7);
+            });
+            it('should register onValue and stop', function() {
+                map(object, addOne).on(argsStop);
+                called.should.be.eql(1);
+                withArgs.should.be.eql(5);
+            });
+            it('should call onComplete', function() {
+                object.on(noop, noop, args);
+                called.should.be.eql(1);
+            });
+        });
+        describe('.map', function() {
+            beforeEach(function() {
+                object = map(filter(object, graterThanTwo), addOne);
+            });
+            describe('success', function() {
+                it('should register onValue', function() {
+                    map(object, addOne).on(args);
+                    called.should.be.eql(3);
+                    withArgs.should.be.eql(8);
+                });
+                it('should register onValue and stop', function() {
+                    map(object, addOne).on(argsStop);
+                    called.should.be.eql(1);
+                    withArgs.should.be.eql(6);
+                });
+                it('should call onComplete', function() {
+                    object.on(noop, noop, args);
+                    called.should.be.eql(1);
+                });
+            });
+        })
+    })
 });

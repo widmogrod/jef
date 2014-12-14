@@ -21,9 +21,9 @@ define([
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
                 return next.on(onValue, onError, onComplete)
+            } else if (!Stream.streamable(next)) {
+                onComplete();
             }
-
-            onComplete();
         }
     }
 
