@@ -27,7 +27,7 @@ define(['./stream', './both'], function(Stream, both) {
                 }
 
                 return Stream.stop;
-            }, sinkError, sinkComplete);
+            }, sinkError);
         })
     }
 });

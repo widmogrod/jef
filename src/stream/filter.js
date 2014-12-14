@@ -20,8 +20,10 @@ define(['./stream'], function(Stream) {
                     );
 
                     return Stream.stop;
+                } else if (!Stream.streamable(next)) {
+                    sinkComplete();
                 }
-            }, sinkError, sinkComplete);
+            }, sinkError);
         })
     }
 });
