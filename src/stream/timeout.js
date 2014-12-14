@@ -7,9 +7,10 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function timeout(stream, wait) {
-        return new Stream(function(sinkValue, sinkError) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            var id;
             stream.on(function(value, next) {
-                setTimeout(function() {
+                id = setTimeout(function() {
                     sinkValue(
                         value,
                         Stream.streamable(next)
@@ -19,7 +20,13 @@ define(['./stream'], function(Stream) {
                 }, wait | 0);
 
                 return Stream.stop;
-            }, sinkError);
+            }, function(e, next) {
+                id && clearTimeout(id);
+                sinkError(e, next);
+            }, function() {
+                id && clearTimeout(id);
+                sinkComplete();
+            });
         })
     }
 });

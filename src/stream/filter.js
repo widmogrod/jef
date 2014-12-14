@@ -18,13 +18,21 @@ define(['./stream'], function(Stream) {
                             ? filter(next, fn)
                             : Stream.stop
                     );
-                    return Stream.stop;
-                } else if (!Stream.streamable(next)) {
-                    sinkComplete();
-                    return Stream.stop;
+                } else if (Stream.streamable(next)) {
+                    filter(next, fn).on(function(value, inner) {
+                        sinkValue(
+                            value,
+                            inner
+                        );
+
+                        return Stream.stop;
+
+                    }, sinkError, sinkComplete)
                 }
 
-            }, sinkError);
+                return Stream.stop;
+
+            }, sinkError, sinkComplete);
         })
     }
 });
