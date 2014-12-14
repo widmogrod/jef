@@ -72,6 +72,13 @@ describe('Stream.skip', function() {
                     done()
                 }, 20);
             });
+            it('should call onComplete', function(done) {
+                object.on(noop, noop, args);
+                setTimeout(function() {
+                    called.should.be.eql(1);
+                    done()
+                }, 20);
+            })
         });
     });
 });
