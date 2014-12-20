@@ -1,4 +1,4 @@
-define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
+define(['./stream', '../functional/isDefined', '../functional/invoke'], function (Stream, isDefined, invoke) {
     'use strict';
 
     /**
@@ -6,26 +6,24 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
      * @constructor
      */
     function PushStream(destroy) {
-        var __sinkNext, __sinkError, __sinkComplete, self = this;
+        var callbacks = [], self = this;
 
-        Stream.call(this, function(sinkNext, sinkError, sinkComplete) {
-            __sinkNext = sinkNext;
-            __sinkError = sinkError;
-            __sinkComplete = sinkComplete;
+        Stream.call(this, function (sinkNext, sinkError, sinkComplete) {
+            callbacks.push({
+                value: sinkNext,
+                error: sinkError,
+                complete: sinkComplete
+            });
         });
 
         this.push = function push(value, error) {
-            if (isDefined(error) && __sinkError) {
-                if (!Stream.streamable(__sinkError(error, self))) {
-                    destroy();
-                    __sinkNext = __sinkError = __sinkComplete = null;
-                }
-            } else if (isDefined(value) && __sinkNext) {
-                __sinkNext(value);
-            } else if (__sinkComplete) {
+            if (isDefined(error)) {
+                invoke(callbacks, 'error', error, self);
+            } else if (isDefined(value)) {
+                invoke(callbacks, 'value', value);
+            } else {
+                invoke(callbacks, 'complete');
                 destroy();
-                __sinkComplete();
-                __sinkNext = __sinkError = __sinkComplete = null;
             }
         };
     }

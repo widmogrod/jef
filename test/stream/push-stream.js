@@ -65,7 +65,7 @@ describe('PushStream', function () {
                 object.push(undefined, error);
                 called.should.be.eql(1);
                 withArgs.should.be.eql(error);
-                destroyed.should.be.true;
+                destroyed.should.be.false;
             });
             it('should intercept an error and continue', function () {
                 var error = new Error('test');
