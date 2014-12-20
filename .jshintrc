@@ -1,0 +1,24 @@
+{
+    "boss": true,
+    "curly": true,
+    "eqeqeq": true,
+    "eqnull": true,
+    "expr": true,
+    "immed": true,
+    "noarg": true,
+    "onevar": false,
+    "laxbreak": true,
+    "laxcomma": true,
+    "quotmark": "single",
+    "trailing": true,
+    "undef": true,
+    "unused": true,
+    "browser": true,
+    "jquery": true,
+    "strict": true,
+    "globals": {
+        "define": false,
+        "require": false,
+        "jQuery": false
+    }
+}
