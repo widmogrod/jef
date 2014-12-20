@@ -44,7 +44,7 @@ describe('Stream.both', function() {
             it('should call onComplete', function() {
                 object.on(noop, noop, args);
                 called.should.be.eql(1);
-            })
+            });
         });
         describe('asynchronously', function() {
             beforeEach(function() {
@@ -65,16 +65,16 @@ describe('Stream.both', function() {
                 setTimeout(function() {
                     called.should.be.eql(1);
                     withArgs.should.be.eql(1);
-                    done()
+                    done();
                 }, 20);
             });
             it('should call onComplete', function(done) {
                 object.on(noop, noop, args);
                 setTimeout(function() {
                     called.should.be.eql(1);
-                    done()
+                    done();
                 }, 20);
-            })
+            });
         });
     });
 });

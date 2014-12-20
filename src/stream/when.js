@@ -18,19 +18,13 @@ define([
 
         return new Stream(function whenInit(sinkValue, sinkError, sinkComplete) {
             each(streams, function(stream, index) {
-                Stream.streamable(stream) && stream.on(function(value, next) {
+                stream.on(function(value) {
                     buffer[index] = value;
-                    streams[index] = next;
 
                     if (!contains(buffer, undefined)) {
                         sinkValue(
-                            clone(buffer),
-                            Stream.streamable(next)
-                                ? when(streams, buffer, completed)
-                                : Stream.stop
+                            clone(buffer)
                         );
-
-                        return Stream.stop;
                     }
 
                 }, sinkError, function() {
@@ -40,8 +34,8 @@ define([
                         // clear reference
                         completed = buffer = streams = null;
                     }
-                })
+                });
             });
-        })
-    }
+        });
+    };
 });

@@ -4,6 +4,7 @@ define([
     './stream/filter',
     './stream/reduce',
     './stream/concat',
+    './stream/merge',
     './stream/take',
     './stream/skip',
     './stream/both',
@@ -25,6 +26,7 @@ define([
     filter,
     reduce,
     concat,
+    merge,
     take,
     skip,
     both,
@@ -54,6 +56,9 @@ define([
     };
     Stream.prototype.concat = function() {
         return concat(this);
+    };
+    Stream.prototype.merge = function(stream) {
+        return merge(this, stream);
     };
     Stream.prototype.take = function(n) {
         return take(this, n);
@@ -85,6 +90,7 @@ define([
     Stream.both = both;
     Stream.when = when;
     Stream.noop = noop;
+    Stream.merge = merge;
     Stream.timeout = timeout;
 
     // New classes

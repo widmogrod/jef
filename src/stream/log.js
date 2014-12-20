@@ -20,5 +20,5 @@ define(['./stream', '../functional/noop'], function(Stream, noop) {
         }, function() {
             c.info('[√] ' + namespace);
         });
-    }
+    };
 });

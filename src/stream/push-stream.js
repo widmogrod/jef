@@ -21,7 +21,7 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
                     __sinkNext = __sinkError = __sinkComplete = null;
                 }
             } else if (isDefined(value) && __sinkNext) {
-                __sinkNext(value, self);
+                __sinkNext(value);
             } else if (__sinkComplete) {
                 destroy();
                 __sinkComplete();

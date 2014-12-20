@@ -17,6 +17,6 @@ define(['./stream'], function(Stream) {
                     ? fromArray(array, index + 1, length)
                     : Stream.stop
             );
-        })
-    }
+        });
+    };
 });

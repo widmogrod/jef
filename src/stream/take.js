@@ -1,4 +1,4 @@
-define(['./stream'], function(Stream) {
+define(['./stream'], function (Stream) {
     'use strict';
 
     /**
@@ -7,17 +7,18 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function take(stream, n) {
-        return new Stream(function(sinkValue, sinkError) {
-            stream.on(function(value, next) {
-                sinkValue(
-                    value,
-                    n > 1
-                        ? take(next, n -1)
-                        : Stream.stop
-                );
+        return new Stream(function (sinkValue, sinkError, sinkComplete) {
+            stream.on(function (value) {
+                if (n--) {
+                    sinkValue(value);
+                }
 
-                return Stream.stop;
-            }, sinkError);
-        })
-    }
+                if (n < 1) {
+                    sinkComplete();
+                    return Stream.stop;
+                }
+
+            }, sinkError, sinkComplete);
+        });
+    };
 });

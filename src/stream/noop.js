@@ -8,5 +8,5 @@ define([
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             sinkComplete();
         });
-    })
+    });
 });

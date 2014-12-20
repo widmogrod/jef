@@ -81,8 +81,8 @@ describe('Stream.when', function() {
                 object.on(args);
 
                 setTimeout(function() {
-                    called.should.be.eql(5);
-                    withArgs.should.be.eql([3, 'b']);
+                    called.should.be.eql(3);
+                    withArgs.should.be.eql([3, 'c']);
                     done();
                 }, 30);
             });
@@ -90,28 +90,24 @@ describe('Stream.when', function() {
                 object.on(argsCollect);
 
                 setTimeout(function() {
-                    called.should.be.eql(5);
+                    called.should.be.eql(3);
                     withArgs.should.be.eql([
-                        [1, 'a'],
-                        [2, 'a'],
-                        [2, 'a'],
-                        [2, 'b'],
-                        [3, 'b']
+                        [3, 'a'],
+                        [3, 'b'],
+                        [3, 'c']
                     ]);
                     done();
                 }, 10);
             });
             it('should register onValue and stop', function(done) {
-                object
-                    //.on(function(v) {console.log('v', v); return Stream.stop})
-                    .on(argsStop)
+                object.on(argsStop)
 
                 setTimeout(function() {
                     called.should.be.eql(1);
-                    withArgs.should.be.eql([1, 'a']);
+                    withArgs.should.be.eql([3, 'a']);
                     done();
                 }, 10);
             });
-        })
+        });
     });
 });

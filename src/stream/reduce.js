@@ -8,12 +8,13 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function reduce(stream, fn, base) {
-        return new Stream(function(sinkValue, sinkError) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 base = fn(value, base);
             }, sinkError, function() {
-                sinkValue(base, Stream.stop);
-            })
-        })
-    }
+                sinkValue(base);
+                sinkComplete();
+            });
+        });
+    };
 });

@@ -1,8 +1,9 @@
 define([
     '../functional/until',
     '../functional/isFunction',
+    '../functional/isDefined',
     '../functional/noop'
-], function(until, isFunction, noop) {
+], function(until, isFunction, isDefined, noop) {
     'use strict';
 
     /**
@@ -23,7 +24,7 @@ define([
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
                 return next.on(onValue, onError, onComplete);
-            } else if (!Stream.streamable(next)) {
+            } else if (isDefined(next) && !Stream.streamable(next)) {
                 onComplete();
             }
         };

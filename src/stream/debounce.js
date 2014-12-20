@@ -21,9 +21,9 @@ define(['./stream'], function(Stream) {
                             ? debounce(next, wait)
                             : Stream.stop
                     )
-                }, wait)
+                }, wait);
 
             }, sinkError);
-        })
-    }
+        });
+    };
 });

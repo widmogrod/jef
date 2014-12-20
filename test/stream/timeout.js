@@ -31,7 +31,7 @@ describe('Stream.timeout', function() {
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
-        })
+        });
     });
     describe('#on', function() {
         describe('success', function() {
@@ -59,7 +59,7 @@ describe('Stream.timeout', function() {
                 called.should.be.eql(1);
                     done();
                 }, 10);
-            })
+            });
         });
         describe('failure', function() {
             beforeEach(function() {
@@ -95,6 +95,6 @@ describe('Stream.timeout', function() {
                     done();
                 }, 10);
             });
-        })
+        });
     });
 });

@@ -5,6 +5,7 @@ var fromArray = require('../../src/stream/fromArray');
 var timeout = require('../../src/stream/timeout');
 var concat = require('../../src/stream/concat');
 var map = require('../../src/stream/map');
+var log = require('../../src/stream/log');
 var filter = require('../../src/stream/filter');
 var noop = require('../../src/functional/noop');
 var object, withArgs, called;
@@ -20,10 +21,9 @@ var argsStop = function(value) {
 };
 var expand = function(value) {
     return fromArray([
-        value, -value,
-        fromArray([
-            value + value
-        ])
+        value,
+        -value,
+        value + value
     ]);
 };
 var graterThanTwo = function(value) {
@@ -43,7 +43,7 @@ describe('Stream.concat', function() {
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
-        })
+        });
     });
     describe('#on', function() {
         describe('success', function() {
@@ -60,11 +60,14 @@ describe('Stream.concat', function() {
             it('should call onComplete', function() {
                 object.on(noop, noop, args);
                 called.should.be.eql(1);
-            })
+            });
         });
         describe('asynchronously', function() {
             beforeEach(function() {
-                object = concat(timeout(map(fromArray([1, 2, 3]), expand)));
+                object = fromArray([1, 2, 3]);
+                object = timeout(object);
+                object = map(object, expand);
+                object = concat(object);
                 withArgs = [];
                 called = 0;
             });
@@ -81,16 +84,16 @@ describe('Stream.concat', function() {
                 setTimeout(function() {
                     called.should.be.eql(1);
                     withArgs.should.be.eql(1);
-                    done()
+                    done();
                 }, 20);
             });
             it('should call onComplete', function(done) {
                 object.on(noop, noop, args);
                 setTimeout(function() {
                     called.should.be.eql(1);
-                    done()
+                    done();
                 }, 20);
-            })
+            });
         });
     });
     describe('.filter', function() {
@@ -133,6 +136,6 @@ describe('Stream.concat', function() {
                     called.should.be.eql(1);
                 });
             });
-        })
-    })
+        });
+    });
 });
