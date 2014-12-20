@@ -13,18 +13,20 @@ define([
      */
     function notifyValue(onValue, onError, onComplete) {
         return function sinkValue(value, next) {
+            var result;
+
             try {
-                var result = onValue(value, next);
+                result = onValue(value, next);
             } catch(e) {
                 next = onError(e, next);
             }
 
             if (Stream.continuable(result) && Stream.streamable(next)) {
-                return next.on(onValue, onError, onComplete)
+                return next.on(onValue, onError, onComplete);
             } else if (!Stream.streamable(next)) {
                 onComplete();
             }
-        }
+        };
     }
 
     /**
@@ -39,11 +41,11 @@ define([
             next = onError(e, next);
 
             if (Stream.streamable(next)) {
-                return next.on(onValue, onError, onComplete)
+                return next.on(onValue, onError, onComplete);
             }
 
             onComplete();
-        }
+        };
     }
 
     /**
@@ -57,10 +59,10 @@ define([
          * @param {Function} onComplete
          * @returns {Stream}
          */
-        this.on = function(onValue, onError, onComplete) {
+        this.on = function on(onValue, onError, onComplete) {
             var stopped = false,
                 isNotStopped = function() {
-                    return false === stopped
+                    return false === stopped;
                 },
                 stopIfNotContinuable = function(fn) {
                     return function(value, next) {
@@ -71,7 +73,7 @@ define([
                         }
 
                         return result;
-                    }
+                    };
                 },
                 completeCall = function(fn) {
                     return function() {
@@ -79,7 +81,7 @@ define([
                             stopped = null;
                             fn();
                         }
-                    }
+                    };
                 };
 
             onValue = until.is(onValue) ? onValue : until(isNotStopped, stopIfNotContinuable(isFunction(onValue) ? onValue : noop));
@@ -92,7 +94,7 @@ define([
                 onComplete
             );
             return this;
-        }
+        };
     }
 
     Stream.constructor = Stream;
