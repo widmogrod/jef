@@ -16,7 +16,9 @@ define([
     './stream/fromArray',
     './stream/fromEmitter',
     './stream/fromCallback',
-    './stream/fromPromise'
+    './stream/fromPromise',
+    './stream/toArray',
+    './stream/push-stream'
 ], function(
     Stream,
     map,
@@ -35,7 +37,9 @@ define([
     fromArray,
     fromEmitter,
     fromCallback,
-    fromPromise
+    fromPromise,
+    toArray,
+    PushStream
 ) {
     'use strict';
 
@@ -69,7 +73,11 @@ define([
     Stream.prototype.log = function(namespace) {
         return log(this, namespace || '');
     };
+    Stream.prototype.toArray = function() {
+        return toArray(this);
+    };
 
+    // Factories
     Stream.fromArray = fromArray;
     Stream.fromEmitter = fromEmitter;
     Stream.fromCallback = fromCallback;
@@ -78,6 +86,9 @@ define([
     Stream.when = when;
     Stream.noop = noop;
     Stream.timeout = timeout;
+
+    // New classes
+    Stream.Push = PushStream;
 
     return Stream;
 });
