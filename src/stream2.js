@@ -20,7 +20,8 @@ define([
     './stream/fromCallback',
     './stream/fromPromise',
     './stream/toArray',
-    './stream/push-stream'
+    './stream/push-stream',
+    './stream/push-consume'
 ], function(
     Stream,
     map,
@@ -43,7 +44,8 @@ define([
     fromCallback,
     fromPromise,
     toArray,
-    PushStream
+    PushStream,
+    consume
 ) {
     'use strict';
 
@@ -100,6 +102,9 @@ define([
 
     // New classes
     Stream.Push = PushStream;
+    Stream.Push.prototype.consume = function(stream) {
+        return consume(this, stream);
+    };
 
     return Stream;
 });

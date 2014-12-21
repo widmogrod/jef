@@ -1,8 +1,8 @@
-define(['./stream', '../functional/isDefined', '../functional/invoke'], function (Stream, isDefined, invoke) {
+define(['./stream', '../functional/isDefined', '../functional/invoke'], function (Stream, isDefined, invoke, undefined) {
     'use strict';
 
     /**
-     * @param {Function} destroy
+     * @param {Function} [destroy]
      * @constructor
      */
     function PushStream(destroy) {
@@ -16,16 +16,18 @@ define(['./stream', '../functional/isDefined', '../functional/invoke'], function
             });
         });
 
-        this.push = function push(value, error) {
+        function push(value, error) {
             if (isDefined(error)) {
                 invoke(callbacks, 'error', error, self);
             } else if (isDefined(value)) {
                 invoke(callbacks, 'value', value);
             } else {
                 invoke(callbacks, 'complete');
-                destroy();
+                isDefined(destroy) && destroy();
             }
-        };
+        }
+
+        this.push = push;
     }
 
     PushStream.constructor = PushStream;
