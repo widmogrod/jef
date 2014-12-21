@@ -30,7 +30,7 @@ describe('Stream.map', function() {
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
-        })
+        });
     });
     describe('#on', function() {
         describe('success', function() {
@@ -47,7 +47,7 @@ describe('Stream.map', function() {
             it('should call onComplete', function() {
                 object.on(noop, noop, args);
                 called.should.be.eql(1);
-            })
+            });
         });
         describe('asynchronously', function() {
             beforeEach(function() {
@@ -68,16 +68,16 @@ describe('Stream.map', function() {
                 setTimeout(function() {
                     called.should.be.eql(1);
                     withArgs.should.be.eql(2);
-                    done()
+                    done();
                 }, 20);
             });
             it('should call onComplete', function(done) {
                 object.on(noop, noop, args);
                 setTimeout(function() {
                     called.should.be.eql(1);
-                    done()
+                    done();
                 }, 20);
-            })
+            });
         });
     });
 });
