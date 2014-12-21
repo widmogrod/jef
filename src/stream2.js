@@ -4,6 +4,7 @@ define([
     './stream/filter',
     './stream/reduce',
     './stream/concat',
+    './stream/group',
     './stream/merge',
     './stream/take',
     './stream/skip',
@@ -26,6 +27,7 @@ define([
     filter,
     reduce,
     concat,
+    group,
     merge,
     take,
     skip,
@@ -56,6 +58,9 @@ define([
     };
     Stream.prototype.concat = function() {
         return concat(this);
+    };
+    Stream.prototype.group = function(fn) {
+        return group(this, fn);
     };
     Stream.prototype.merge = function(stream) {
         return merge(this, stream);
