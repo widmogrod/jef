@@ -27,7 +27,7 @@ var throwError = function () {
 
 describe('Stream.last', function () {
     beforeEach(function () {
-        next = new PushStream(function onDestroy() {
+        next = new PushStream(noop, function onDestroy() {
             destroyed = true;
         });
         object = last(next);
