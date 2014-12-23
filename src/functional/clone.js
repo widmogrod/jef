@@ -10,7 +10,7 @@ define([
      * @return {*}
      */
     function clone(value) {
-        var copy = new value.constructor();
+        var copy = value.constructor();
         for (var i in value) {
             if (value.hasOwnProperty(i)) {
                 copy[i] = isObject(value[i])
