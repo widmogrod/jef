@@ -14,10 +14,7 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
         });
 
         return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
-            var received;
-
-            if (!isDefined(received) && isDefined(lastValue)) {
-                received = true;
+            if (isDefined(lastValue)) {
                 sinkValue(lastValue);
             }
 
