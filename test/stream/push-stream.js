@@ -35,6 +35,9 @@ describe('PushStream', function () {
         it('should construct object instance of PushStream', function () {
             object.should.be.an.instanceOf(PushStream);
         });
+        it('should have constructor fo Stream', function() {
+            object.constructor.should.be.eql(PushStream);
+        });
     });
     describe('#on', function () {
         describe('success', function () {

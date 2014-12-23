@@ -27,7 +27,10 @@ describe('Stream.take', function() {
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
-        })
+        });
+        it('should have constructor fo Stream', function() {
+            object.constructor.should.be.eql(Stream);
+        });
     });
     describe('#on', function() {
         describe('success', function() {
