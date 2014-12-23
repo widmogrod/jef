@@ -2,9 +2,8 @@ define([
     './stream',
     './noop',
     '../functional/each',
-    '../functional/contains',
-    '../functional/clone'
-], function(Stream, noop, each, contains, clone, undefined) {
+    '../functional/contains'
+], function(Stream, noop, each, contains, undefined) {
     'use strict';
 
     /**
@@ -23,7 +22,7 @@ define([
 
                     if (!contains(buffer, undefined)) {
                         sinkValue(
-                            clone(buffer)
+                            buffer.slice(0)
                         );
                     }
 
