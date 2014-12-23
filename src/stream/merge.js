@@ -1,4 +1,4 @@
-define(['./stream'], function (Stream) {
+define(function () {
     'use strict';
 
     /**
@@ -8,7 +8,7 @@ define(['./stream'], function (Stream) {
      */
     return function merge(streamA, streamB) {
         var completed = 0;
-        return new Stream(function (sinkValue, sinkError, sinkComplete) {
+        return new streamA.constructor(function (sinkValue, sinkError, sinkComplete) {
             function onComplete() {
                 if (++completed > 1) {
                     sinkComplete();

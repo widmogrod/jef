@@ -1,4 +1,4 @@
-define(['./stream'], function(Stream) {
+define(function() {
     'use strict';
 
     /**
@@ -8,7 +8,7 @@ define(['./stream'], function(Stream) {
      */
     return function timeout(stream, wait) {
         var called = 0;
-        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+        return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 called++;
                 setTimeout(function() {

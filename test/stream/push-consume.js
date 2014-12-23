@@ -26,7 +26,7 @@ var throwError = function () {
 
 describe('consume', function () {
     beforeEach(function () {
-        object = new PushStream(function onDestroy() {
+        object = new PushStream(function() {}, function onDestroy() {
             destroyed = true;
         });
         destroyed = false;

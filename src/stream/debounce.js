@@ -7,7 +7,7 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function debounce(stream, wait) {
-        return new Stream(function(sinkValue, sinkError) {
+        return new stream.constructor(function(sinkValue, sinkError) {
             var timeout;
             stream.on(function(value, next) {
                 if (timeout) {

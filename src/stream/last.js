@@ -13,7 +13,7 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined, und
             return Stream.stop;
         });
 
-        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+        return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
             if (isDefined(lastValue)) {
                 sinkValue(lastValue);
             }

@@ -20,7 +20,7 @@ var argsStop = function (value) {
 
 describe('PushStream', function () {
     beforeEach(function () {
-        object = new PushStream(function onDestroy() {
+        object = new PushStream(noop, function onDestroy() {
             destroyed = true;
         });
         destroyed = false;

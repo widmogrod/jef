@@ -1,14 +1,22 @@
-define(['./stream', '../functional/isDefined', '../functional/invoke'], function (Stream, isDefined, invoke, undefined) {
+define([
+    './stream',
+    '../functional/isFunction',
+    '../functional/isDefined',
+    '../functional/invoke'
+], function (Stream, isFunction, isDefined, invoke) {
     'use strict';
 
     /**
+     * @param {Function} [implementation]
      * @param {Function} [destroy]
      * @constructor
      */
-    function PushStream(destroy) {
+    function PushStream(implementation, destroy) {
         var callbacks = [], self = this;
 
         Stream.call(this, function (sinkNext, sinkError, sinkComplete) {
+            isFunction(implementation) && implementation(sinkNext, sinkError, sinkComplete);
+
             callbacks.push({
                 value: sinkNext,
                 error: sinkError,
@@ -23,7 +31,7 @@ define(['./stream', '../functional/isDefined', '../functional/invoke'], function
                 invoke(callbacks, 'value', value);
             } else {
                 invoke(callbacks, 'complete');
-                isDefined(destroy) && destroy();
+                isFunction(destroy) && destroy();
             }
         }
 

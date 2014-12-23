@@ -6,7 +6,7 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function concat(stream) {
-        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+        return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 if (Stream.streamable(value)) {
                     value.on(function(val) {
