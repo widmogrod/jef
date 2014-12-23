@@ -14,6 +14,7 @@ define([
     './stream/when',
     './stream/noop',
     './stream/log',
+    './stream/last',
     './stream/timeout',
     './stream/fromArray',
     './stream/fromEmitter',
@@ -38,6 +39,7 @@ define([
     when,
     noop,
     log,
+    last,
     timeout,
     fromArray,
     fromEmitter,
@@ -84,6 +86,9 @@ define([
     };
     Stream.prototype.log = function(namespace) {
         return log(this, namespace || '');
+    };
+    Stream.prototype.last = function() {
+        return last(this);
     };
     Stream.prototype.toArray = function() {
         return toArray(this);
