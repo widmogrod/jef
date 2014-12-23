@@ -1,4 +1,4 @@
-define(['./stream', '../functional/isDefined'], function (Stream, isDefined, undefined) {
+define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
     'use strict';
 
     /**
@@ -14,15 +14,17 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined, und
         });
 
         return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
-            if (isDefined(lastValue)) {
+            var received;
+
+            if (!isDefined(received) && isDefined(lastValue)) {
+                received = true;
                 sinkValue(lastValue);
             }
 
             stream.on(function (value) {
-                sinkValue(value);
                 lastValue = value;
+                sinkValue(value);
             }, sinkError, function () {
-                lastValue = undefined;
                 sinkComplete();
             });
         });
