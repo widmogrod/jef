@@ -37,14 +37,22 @@ describe('Stream.last', function () {
     });
 
     describe('successful', function () {
-        it('should pipe onValue', function () {
+        it('should register onValue', function() {
             next.push(1);
             object.on(args);
             called.should.be.eql(1);
             withArgs.should.be.eql(1);
             destroyed.should.be.false;
         });
-        it('should pipe onValue', function () {
+        it('should register onValue and receive next value', function() {
+            next.push(1);
+            object.on(args);
+            next.push(2);
+            called.should.be.eql(2);
+            withArgs.should.be.eql(2);
+            destroyed.should.be.false;
+        });
+        it('should register onValue and stop', function() {
             next.push(1);
             object.on(argsStop);
             next.push(2);

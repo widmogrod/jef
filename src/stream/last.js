@@ -19,10 +19,7 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined, und
             }
 
             stream.on(function (value) {
-                if (!isDefined(lastValue)) {
-                    sinkValue(value);
-                }
-
+                sinkValue(value);
                 lastValue = value;
             }, sinkError, function () {
                 lastValue = undefined;
