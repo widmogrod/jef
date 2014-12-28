@@ -93,6 +93,9 @@ define([
     Stream.prototype.toArray = function() {
         return toArray(this);
     };
+    Stream.prototype.flatMap = function(fn) {
+        return this.map(fn).concat();
+    };
 
     // Factories
     Stream.fromArray = fromArray;
