@@ -6,16 +6,32 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
      * @return {Stream}
      */
     return function last(stream) {
-        var lastValue;
+        var lastValue, lastError, lastComplete, lastNext;
 
-        stream.on(function(value) {
+        // Prefetch last value
+        stream.on(function(value, next) {
             lastValue = value;
+            lastNext = next;
             return Stream.stop;
+        }, function(error, next) {
+            lastError = error;
+            lastNext = next;
+        }, function() {
+            lastComplete = true;
         });
 
         return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
-            if (isDefined(lastValue)) {
-                sinkValue(lastValue);
+            if (isDefined(lastValue)
+                && !Stream.continuable(sinkValue(lastValue, lastNext))
+            ) {
+                // Don't continue when onValue callback stops streaming
+                return;
+            }
+
+            if (isDefined(lastError)) {
+                // Don't continue when prefetched value was an error
+                sinkError(lastError, lastNext);
+                return;
             }
 
             stream.on(function (value) {

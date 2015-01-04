@@ -27,6 +27,8 @@ define([
             } else if (isDefined(next) && !Stream.streamable(next)) {
                 onComplete();
             }
+
+            return result;
         };
     }
 
