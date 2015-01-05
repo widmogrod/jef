@@ -1,6 +1,7 @@
 define(['../stream'], function(Stream) {
     'use strict';
 
+    // I know that this is not a stub, but I don't know right now how to name it properly
     return {
         onValue: function() {},
         onValueAndStop: function() {
