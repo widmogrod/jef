@@ -1,3 +1,4 @@
+/*globals it,describe,beforeEach*/
 require('amdefine/intercept');
 
 // Stream implementations
@@ -13,6 +14,7 @@ var last = require('../../src/stream/last');
 var noop = require('../../src/functional/noop');
 
 describe('Stream.last', function() {
+    'use strict';
     var object, next;
 
     describe('#construction', function() {
