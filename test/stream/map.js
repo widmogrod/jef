@@ -1,80 +1,85 @@
+/*globals it,describe,beforeEach*/
 require('amdefine/intercept');
 
+// Stream implementations
 var Stream = require('../../src/stream/stream');
+var PushStream = require('../../src/stream/push-stream');
+// Test utils
+var Stubs = require('../../src/stream/test/stubs');
+var StreamTestProxy = require('../../src/stream/test/stream-proxy');
+var PushStreamTestProxy = require('../../src/stream/test/push-stream-proxy');
+// Helper streams
 var fromArray = require('../../src/stream/fromArray');
 var timeout = require('../../src/stream/timeout');
 var map = require('../../src/stream/map');
-var noop = require('../../src/functional/noop');
-var object, withArgs, called;
-
-var args = function(value) {
-    called++;
-    withArgs = value;
-};
-var argsStop = function(value) {
-    called++;
-    withArgs = value;
-    return Stream.stop;
-};
-var addOne = function(value) {
-    return value + 1;
-};
 
 describe('Stream.map', function() {
-    beforeEach(function() {
-        object = map(fromArray([1, 2, 3]), addOne);
-        withArgs = [];
-        called = 0;
-    });
+    'use strict';
+    var object, next;
 
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
-            object.should.be.an.instanceOf(Stream);
+            map(fromArray([1])).should.be.an.instanceOf(Stream);
         });
     });
     describe('#on', function() {
+        beforeEach(function() {
+            next = fromArray([1, 2, 3]);
+            next = new StreamTestProxy(next);
+
+            object = map(next, Stubs.addOne);
+            object = new StreamTestProxy(object);
+        });
+
         describe('success', function() {
             it('should register onValue', function() {
-                object.on(args);
-                called.should.be.eql(3);
-                withArgs.should.be.eql(4);
+                object.on(Stubs.onValue);
+
+                object.called.onValue.should.be.eql(3);
+                object.args.onValue.should.be.eql(4);
             });
             it('should register onValue and stop', function() {
-                object.on(argsStop);
-                called.should.be.eql(1);
-                withArgs.should.be.eql(2);
+                object.on(Stubs.onValueAndStop);
+
+                object.called.onValue.should.be.eql(1);
+                object.args.onValue.should.be.eql(2);
             });
             it('should call onComplete', function() {
-                object.on(noop, noop, args);
-                called.should.be.eql(1);
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+
+                object.called.onComplete.should.be.eql(1);
             });
         });
+
         describe('asynchronously', function() {
             beforeEach(function() {
-                object = map(timeout(fromArray([1, 2, 3])), addOne);
-                withArgs = [];
-                called = 0;
+                next = fromArray([1, 2, 3]);
+                next = timeout(next);
+                next = new StreamTestProxy(next);
+
+                object = map(next, Stubs.addOne);
+                object = new StreamTestProxy(object);
             });
             it('should register onValue', function(done) {
-                object.on(args);
+                object.on(Stubs.onValue);
                 setTimeout(function() {
-                    called.should.be.eql(3);
-                    withArgs.should.be.eql(4);
+                    object.called.onValue.should.be.eql(3);
+                    object.args.onValue.should.be.eql(4);
                     done();
                 }, 20);
             });
             it('should register onValue and stop', function(done) {
-                object.on(argsStop);
+                object.on(Stubs.onValueAndStop);
                 setTimeout(function() {
-                    called.should.be.eql(1);
-                    withArgs.should.be.eql(2);
+                    object.called.onValue.should.be.eql(1);
+                    object.args.onValue.should.be.eql(2);
                     done();
                 }, 20);
             });
             it('should call onComplete', function(done) {
-                object.on(noop, noop, args);
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
                 setTimeout(function() {
-                    called.should.be.eql(1);
+                    object.called.onComplete.should.be.eql(1);
                     done();
                 }, 20);
             });
