@@ -57,12 +57,27 @@ describe('Stream.fromArray', function() {
                 });
                 object = new StreamTestProxy(object);
             });
-            it('should call onError', function() {
-                object.on(Stubs.onValue, Stubs.onError);
 
-                object.called.on.should.be.eql(1);
-                object.called.onError.should.be.eql(1);
-                object.args.onError.should.be.eql(Stubs.thrownError);
+            describe('throw exception in implementation', function() {
+                it('should call onError ', function() {
+                    object.on(Stubs.onValue, Stubs.onError);
+
+                    object.called.on.should.be.eql(1);
+                    object.called.onValue.should.be.eql(0);
+                    object.called.onError.should.be.eql(1);
+                    object.args.onError.should.be.eql(Stubs.thrownError);
+                });
+            });
+
+            describe('throw exception in onValue callback', function() {
+                it('should call onError', function() {
+                    object.on(Stubs.throwError, Stubs.onError);
+
+                    object.called.on.should.be.eql(1);
+                    object.called.onValue.should.be.eql(1);
+                    object.called.onError.should.be.eql(1);
+                    object.args.onError.should.be.eql(Stubs.thrownError);
+                });
             });
         });
 
