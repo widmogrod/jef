@@ -2,14 +2,18 @@ define(['../stream'], function(Stream) {
     'use strict';
 
     return {
-        onValue: function() {
-        },
+        onValue: function() {},
         onValueAndStop: function() {
             return Stream.stop;
         },
+        onError: function() {},
+        onComplete: function() {},
         thrownError: new Error('test'),
         throwError: function() {
             throw this.error;
+        },
+        addOne: function(value) {
+            return value + 1;
         }
     };
 });
