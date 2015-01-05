@@ -22,7 +22,7 @@ describe('Stream.last', function() {
             last(fromCallback(noop)).should.be.an.instanceOf(Stream);
         });
     });
-    describe('successful', function() {
+    describe('success', function() {
         beforeEach(function() {
             next = new PushStream(noop);
             next = new PushStreamTestProxy(next);
@@ -96,27 +96,54 @@ describe('Stream.last', function() {
         });
     });
     describe('failure', function() {
-        beforeEach(function() {
-            next = fromCallback(Stubs.throwError);
-            next = new StreamTestProxy(next);
-            object = last(next);
-            object = new StreamTestProxy(object);
+        describe('throw exception in consumed stream', function() {
+            beforeEach(function() {
+                next = fromCallback(Stubs.throwError);
+                next = new StreamTestProxy(next);
+                object = last(next);
+                object = new StreamTestProxy(object);
+            });
+
+            it('should call onError', function() {
+                // prefetch is done, bot we occur an error
+                next.called.on.should.be.eql(1);
+                next.called.onError.should.be.eql(1);
+
+                object.on(Stubs.onValue, Stubs.onError);
+
+                // then we forward last error, and not subscribe to next stream
+                next.called.on.should.be.eql(1);
+                next.called.onError.should.be.eql(1);
+
+                // assert that object was called with last error
+                object.called.on.should.be.eql(1);
+                object.called.onError.should.be.eql(1);
+                object.args.onError.should.be.eql(Stubs.thrownError);
+            });
         });
-        it('should pipe onError', function() {
-            // prefetch is done, bot we occur an error
-            next.called.on.should.be.eql(1);
-            next.called.onError.should.be.eql(1);
 
-            object.on(noop, Stubs.onValue);
+        describe('throw exception in onValue callback', function() {
+            beforeEach(function(){
+                next = new PushStream(noop);
+                next = new PushStreamTestProxy(next);
+                object = last(next);
+                object = new StreamTestProxy(object);
+            });
 
-            // then we forward last error, and not subscribe to next stream
-            next.called.on.should.be.eql(1);
-            next.called.onError.should.be.eql(1);
+            it('should call onError', function() {
+                next.push(1);
+                // Prefetch done, we have value
+                next.called.on.should.be.eql(1);
+                next.called.onValue.should.be.eql(1);
 
-            // assert that object was called with last error
-            object.called.on.should.be.eql(1);
-            object.called.onError.should.be.eql(1);
-            object.args.onError.should.be.eql(Stubs.thrownError);
+                // When handling last value, onValue throws exception
+                object.on(Stubs.throwError, Stubs.onError);
+
+                object.called.on.should.be.eql(1);
+                object.called.onValue.should.be.eql(1);
+                object.called.onError.should.be.eql(1);
+                object.args.onError.should.be.eql(Stubs.thrownError);
+            });
         });
     });
 });
