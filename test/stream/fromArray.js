@@ -48,6 +48,24 @@ describe('Stream.fromArray', function() {
             });
         });
 
+        describe('failure', function() {
+            beforeEach(function() {
+                object = fromArray({
+                    get 0 () {
+                        Stubs.throwError();
+                    }
+                });
+                object = new StreamTestProxy(object);
+            });
+            it('should call onError', function() {
+                object.on(Stubs.onValue, Stubs.onError);
+
+                object.called.on.should.be.eql(1);
+                object.called.onError.should.be.eql(1);
+                object.args.onError.should.be.eql(Stubs.thrownError);
+            });
+        });
+
         describe('asynchronously', function() {
             beforeEach(function() {
                 object = fromArray([1, 2, 3]);
