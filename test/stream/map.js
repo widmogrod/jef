@@ -64,7 +64,7 @@ describe('Stream.map', function() {
             });
 
             describe('throw exception in implementation', function() {
-                it('should call onError ', function() {
+                it('should call onError', function() {
                     object.on(Stubs.onValue, Stubs.onError);
 
                     object.called.on.should.be.eql(1);
