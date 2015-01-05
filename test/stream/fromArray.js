@@ -50,11 +50,7 @@ describe('Stream.fromArray', function() {
 
         describe('failure', function() {
             beforeEach(function() {
-                object = fromArray({
-                    get 0 () {
-                        Stubs.throwError();
-                    }
-                });
+                object = fromArray(Stubs.arrayWithError);
                 object = new StreamTestProxy(object);
             });
 
