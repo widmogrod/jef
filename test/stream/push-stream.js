@@ -34,6 +34,15 @@ describe('PushStream', function() {
                 object.called.onValue.should.be.eql(1);
                 object.args.onValue.should.be.eql(1);
             });
+            it('should register onValue and push more than one value', function() {
+                object.on(Stubs.onValue);
+                object.push(1);
+                object.push(2);
+
+                object.called.on.should.be.eql(1);
+                object.called.onValue.should.be.eql(2);
+                object.args.onValue.should.be.eql(2);
+            });
             it('should register onValue and stop', function() {
                 object.on(Stubs.onValueAndStop);
                 object.push(1);
