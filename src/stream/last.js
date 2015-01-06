@@ -1,4 +1,4 @@
-define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
+define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
     'use strict';
 
     /**
@@ -20,12 +20,13 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
             lastComplete = true;
         });
 
-        return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
-            if (isDefined(lastValue)
-                && !Stream.continuable(sinkValue(lastValue, lastNext))
-            ) {
-                // Don't continue when onValue callback stops streaming
-                return;
+        //return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            if (isDefined(lastValue)) {
+                if (!Stream.continuable(sinkValue(lastValue))) {
+                    // Don't continue when onValue callback stops streaming
+                    return;
+                }
             }
 
             if (isDefined(lastError)) {
@@ -34,12 +35,10 @@ define(['./stream', '../functional/isDefined'], function (Stream, isDefined) {
                 return;
             }
 
-            stream.on(function (value) {
+            stream.on(function(value) {
                 lastValue = value;
                 sinkValue(value);
-            }, sinkError, function () {
-                sinkComplete();
-            });
+            }, sinkError, sinkComplete);
         });
     };
 });

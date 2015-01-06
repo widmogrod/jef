@@ -12,5 +12,5 @@ define(['./some'], function(some) {
         return some(array, function(value) {
             return value === test;
         });
-    }
+    };
 });

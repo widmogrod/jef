@@ -9,7 +9,7 @@ define(['./stream'], function(Stream) {
      */
     return function fromArray(array, index, length) {
         index = index || 0;
-        length = length || array.length -1;
+        length = length || (array.length ? array.length -1 : 0);
         return new Stream(function(sinkValue) {
             sinkValue(
                 array[index],

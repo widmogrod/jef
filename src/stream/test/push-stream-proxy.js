@@ -17,9 +17,9 @@ define([
         var self = this;
         self.called.push = 0;
 
-        this.push = function(value) {
+        this.push = function(value, error) {
             ++self.called.push;
-            stream.push(value);
+            stream.push(value, error);
         };
     };
 });

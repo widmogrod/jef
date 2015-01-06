@@ -24,7 +24,7 @@ describe('Stream.last', function() {
     });
     describe('success', function() {
         beforeEach(function() {
-            next = new PushStream(noop);
+            next = new PushStream();
             next = new PushStreamTestProxy(next);
             object = last(next);
             object = new StreamTestProxy(object);
@@ -51,11 +51,15 @@ describe('Stream.last', function() {
         it('should register onValue and receive next value', function() {
             next.push(1);
 
+            // Is called because of prefetch
             next.called.on.should.be.eql(1);
             next.called.onValue.should.be.eql(1);
 
+            object.called.onValue.should.be.eql(0);
             object.on(Stubs.onValue);
+            object.called.onValue.should.be.eql(1);
 
+            // Now is called second time
             next.called.on.should.be.eql(2);
             next.called.onValue.should.be.eql(1);
 
@@ -123,8 +127,8 @@ describe('Stream.last', function() {
         });
 
         describe('throw exception in onValue callback', function() {
-            beforeEach(function(){
-                next = new PushStream(noop);
+            beforeEach(function() {
+                next = new PushStream();
                 next = new PushStreamTestProxy(next);
                 object = last(next);
                 object = new StreamTestProxy(object);

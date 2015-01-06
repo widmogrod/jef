@@ -1,4 +1,4 @@
-define(function () {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
@@ -8,7 +8,7 @@ define(function () {
      */
     return function distinct(stream) {
         var lastValue;
-        return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 if (lastValue !== value) {
                     sinkValue(value);

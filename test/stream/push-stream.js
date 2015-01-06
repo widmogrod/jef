@@ -1,84 +1,94 @@
+/*globals it,describe,beforeEach*/
 require('amdefine/intercept');
 
+// Stream implementations
 var Stream = require('../../src/stream/stream');
 var PushStream = require('../../src/stream/push-stream');
-var fromArray = require('../../src/stream/fromArray');
-var timeout = require('../../src/stream/timeout');
-var reduce = require('../../src/stream/reduce');
-var noop = require('../../src/functional/noop');
-var object, withArgs, called, destroyed;
+// Test utils
+var Stubs = require('../../src/stream/test/stubs');
+var StreamTestProxy = require('../../src/stream/test/stream-proxy');
+var PushStreamTestProxy = require('../../src/stream/test/push-stream-proxy');
+// Helper streams
 
-var args = function (value) {
-    called++;
-    withArgs = value;
-};
-var argsStop = function (value) {
-    called++;
-    withArgs = value;
-    return Stream.stop;
-};
+describe('PushStream', function() {
+    var object, destroyed;
 
-describe('PushStream', function () {
-    beforeEach(function () {
-        object = new PushStream(noop, function onDestroy() {
-            destroyed = true;
-        });
-        destroyed = false;
-        withArgs = [];
-        called = 0;
-    });
-
-    describe('#construction', function () {
-        it('should construct object instance of Stream', function () {
-            object.should.be.an.instanceOf(Stream);
-        });
-        it('should construct object instance of PushStream', function () {
-            object.should.be.an.instanceOf(PushStream);
-        });
-        it('should have constructor fo Stream', function() {
-            object.constructor.should.be.eql(PushStream);
-        });
-    });
-    describe('#on', function () {
-        describe('success', function () {
-            it('should register onValue', function () {
-                object.on(args);
-                object.push(20);
-                called.should.be.eql(1);
-                withArgs.should.be.eql(20);
-                destroyed.should.be.false;
+    describe('#on', function() {
+        beforeEach(function() {
+            destroyed = false;
+            object = new PushStream(function() {
+                destroyed = true;
             });
-            it('should register onValue and stop', function () {
-                object.on(argsStop);
-                object.push(20);
-                object.push(21);
-                called.should.be.eql(1);
-                withArgs.should.be.eql(20);
-                destroyed.should.be.false;
+            object = new PushStreamTestProxy(object);
+        });
+
+        describe('success', function() {
+            it('should be lazy with initializing stream', function() {
+                object.called.on.should.be.eql(0);
             });
-            it('should call onComplete', function () {
-                object.on(noop, noop, args);
+            it('should register onValue', function() {
+                object.on(Stubs.onValue);
+                object.push(1);
+
+                object.called.on.should.be.eql(1);
+                object.called.onValue.should.be.eql(1);
+                object.args.onValue.should.be.eql(1);
+            });
+            it('should register onValue and stop', function() {
+                object.on(Stubs.onValueAndStop);
+                object.push(1);
+                object.push(2);
+
+                object.called.on.should.be.eql(1);
+                object.called.onValue.should.be.eql(1);
+                object.args.onValue.should.be.eql(1);
+            });
+            it('should call onComplete', function() {
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
                 object.push();
-                called.should.be.eql(1);
-                destroyed.should.be.true;
+
+                object.called.onComplete.should.be.eql(1);
             });
-            it('should call onError', function () {
-                var error = new Error('test');
-                object.on(noop, args);
-                object.push(undefined, error);
-                called.should.be.eql(1);
-                withArgs.should.be.eql(error);
-                destroyed.should.be.false;
-            });
-            it('should intercept an error and continue', function () {
-                var error = new Error('test');
-                object.on(args, function (e, next) {
-                    return next.push(e), next;
+        });
+
+        describe('failure', function() {
+
+            describe('throw exception in implementation', function() {
+                it('should call onError', function() {
+                    object.on(Stubs.onValue, Stubs.onError);
+                    object.push(undefined, Stubs.error);
+
+                    object.called.on.should.be.eql(1);
+                    object.called.onValue.should.be.eql(0);
+                    object.called.onError.should.be.eql(1);
+                    object.args.onError.should.be.eql(Stubs.thrownError);
+                    destroyed.should.be.eql(true);
                 });
-                object.push(undefined, error);
-                called.should.be.eql(1);
-                withArgs.should.be.eql(error);
-                destroyed.should.be.false;
+
+                it('should intercept an error and continue', function() {
+                    object.on(Stubs.onValue, Stubs.onErrorAndContinue);
+                    object.push(undefined, Stubs.error);
+
+                    object.called.on.should.be.eql(1);
+                    object.called.onValue.should.be.eql(1);
+                    object.called.onError.should.be.eql(1);
+                    object.args.onValue.should.be.eql(Stubs.continueValue);
+                    object.args.onError.should.be.eql(Stubs.error);
+                    destroyed.should.be.eql(false);
+                });
+            });
+
+            describe('throw exception in onValue callback', function() {
+                it('should call onError', function() {
+                    object.on(Stubs.throwError, Stubs.onError);
+                    object.push(1);
+
+                    object.called.on.should.be.eql(1);
+                    object.called.onValue.should.be.eql(1);
+                    object.called.onError.should.be.eql(1);
+                    object.args.onError.should.be.eql(Stubs.thrownError);
+                    destroyed.should.be.eql(false);
+                });
             });
         });
     });

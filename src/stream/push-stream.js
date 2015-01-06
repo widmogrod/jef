@@ -1,9 +1,10 @@
 define([
     './stream',
+    '../functional/reduce',
     '../functional/isFunction',
     '../functional/isDefined',
     '../functional/invoke'
-], function (Stream, isFunction, isDefined, invoke) {
+], function(Stream, reduce, isFunction, isDefined, invoke) {
     'use strict';
 
     /**
@@ -11,28 +12,59 @@ define([
      * @param {Function} [destroy]
      * @constructor
      */
-    function PushStream(implementation, destroy) {
-        var callbacks = [], self = this;
+    function PushStream(destroy) {
+        var callbacks = [],
+            closed = false,
+            self = this;
 
-        Stream.call(this, function (sinkNext, sinkError, sinkComplete) {
-            isFunction(implementation) && implementation(sinkNext, sinkError, sinkComplete);
+        Stream.call(this, function(sinkValue, sinkError, sinkComplete) {
+            if (closed) {
+                return;
+            }
 
             callbacks.push({
-                value: sinkNext,
-                error: sinkError,
-                complete: sinkComplete
+                onValue: sinkValue,
+                onError: sinkError,
+                onComplete: sinkComplete
             });
         });
 
         function push(value, error) {
+            if (closed) {
+                return self;
+            }
+
             if (isDefined(error)) {
-                invoke(callbacks, 'error', error, self);
+                callbacks = reduce(callbacks, function(callback, base) {
+                    if (Stream.streamable(callback.onError(error, self))) {
+                        base.push(callback);
+                    }
+
+                    return base;
+                }, []);
+
+                // If there are callbacks then stream is not closed,
+                // Error was handled, so we continue
+                closed = !callbacks.length;
             } else if (isDefined(value)) {
-                invoke(callbacks, 'value', value);
+                callbacks = reduce(callbacks, function(callback, base) {
+                    if (Stream.continuable(callback.onValue(value, self))) {
+                        base.push(callback);
+                    }
+
+                    return base;
+                }, []);
             } else {
-                invoke(callbacks, 'complete');
+                closed = true;
+                invoke(callbacks, 'onComplete');
+            }
+
+            if (closed) {
+                callbacks = [];
                 isFunction(destroy) && destroy();
             }
+
+            return self;
         }
 
         this.push = push;
@@ -40,7 +72,6 @@ define([
 
     PushStream.constructor = PushStream;
     PushStream.prototype = Object.create(Stream.prototype);
-    PushStream.prototype.constructor = PushStream;
 
     return PushStream;
 });

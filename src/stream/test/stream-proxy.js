@@ -47,7 +47,7 @@ define([
             return this;
         };
 
-        this.constructor = stream.constructor;
+        //this.constructor = stream.constructor;
 
         this.called = called;
         this.args = args;

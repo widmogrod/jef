@@ -1,4 +1,4 @@
-define(function() {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
@@ -8,7 +8,7 @@ define(function() {
      * @return {Stream}
      */
     return function reduce(stream, fn, base) {
-        return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 base = fn(value, base);
             }, sinkError, function() {

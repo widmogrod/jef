@@ -13,8 +13,6 @@ define(['./push-stream'], function(PushStream) {
         var stream;
 
         stream = new PushStream(function() {
-            // Nothing happens during construction
-        }, function() {
             eventEmitter.off(event, selector, onEmitted);
         });
 
