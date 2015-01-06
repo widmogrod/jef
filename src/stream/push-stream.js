@@ -8,7 +8,6 @@ define([
     'use strict';
 
     /**
-     * @param {Function} [implementation]
      * @param {Function} [destroy]
      * @constructor
      */
@@ -48,7 +47,7 @@ define([
                 closed = !callbacks.length;
             } else if (isDefined(value)) {
                 callbacks = reduce(callbacks, function(callback, base) {
-                    if (Stream.continuable(callback.onValue(value, self))) {
+                    if (Stream.continuable(callback.onValue(value))) {
                         base.push(callback);
                     }
 
