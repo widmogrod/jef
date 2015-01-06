@@ -12,7 +12,7 @@ define(['./stream'], function(Stream) {
         return new Stream(function (sinkValue, sinkError, sinkComplete) {
             stream.on(function (value) {
                 if (fn(value)) {
-                    sinkValue(
+                    return sinkValue(
                         value
                     );
                 }

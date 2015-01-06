@@ -11,6 +11,7 @@ var PushStreamTestProxy = require('../../src/stream/test/push-stream-proxy');
 // Helper streams
 var fromCallback = require('../../src/stream/fromCallback');
 var last = require('../../src/stream/last');
+var map = require('../../src/stream/map');
 var noop = require('../../src/functional/noop');
 
 describe('Stream.last', function() {
@@ -98,7 +99,62 @@ describe('Stream.last', function() {
             object.called.onComplete.should.be.eql(0);
             object.args.onValue.should.be.eql(1);
         });
+
+        describe('.map()', function() {
+            var nextPush, nextMap;
+
+            beforeEach(function() {
+                nextPush = new PushStream();
+                nextPush = new PushStreamTestProxy(nextPush);
+
+                nextMap = map(nextPush, Stubs.addOne);
+                nextMap = new StreamTestProxy(nextMap);
+
+                object = last(nextMap);
+                object = new StreamTestProxy(object);
+            });
+
+            it('should prefetch last value', function() {
+                nextPush.called.on.should.be.eql(1);
+                nextPush.called.onValue.should.be.eql(0);
+                nextMap.called.on.should.be.eql(1);
+                nextMap.called.onValue.should.be.eql(0);
+
+                object.called.on.should.be.eql(0);
+            });
+            it('should register onValue', function() {
+                nextPush.push(1);
+
+                nextPush.called.on.should.be.eql(1);
+                nextPush.called.onValue.should.be.eql(1);
+                nextMap.called.on.should.be.eql(1);
+                nextMap.called.onValue.should.be.eql(1);
+
+                object.on(Stubs.onValue);
+
+                object.called.on.should.be.eql(1);
+                object.called.onValue.should.be.eql(1);
+                object.args.onValue.should.be.eql(2);
+
+                nextPush.called.on.should.be.eql(2);
+                nextPush.called.onValue.should.be.eql(1);
+                nextMap.called.on.should.be.eql(2);
+                nextMap.called.onValue.should.be.eql(1);
+
+                nextPush.push(2);
+
+                object.called.on.should.be.eql(1);
+                object.called.onValue.should.be.eql(2);
+                object.args.onValue.should.be.eql(3);
+
+                nextPush.called.on.should.be.eql(2);
+                nextPush.called.onValue.should.be.eql(2);
+                nextMap.called.on.should.be.eql(2);
+                nextMap.called.onValue.should.be.eql(2);
+            });
+        });
     });
+
     describe('failure', function() {
         describe('throw exception in consumed stream', function() {
             beforeEach(function() {

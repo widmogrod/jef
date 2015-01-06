@@ -11,7 +11,7 @@ define(['./stream'], function(Stream) {
         index = index || 0;
         length = length || (array.length ? array.length -1 : 0);
         return new Stream(function(sinkValue) {
-            sinkValue(
+            return sinkValue(
                 array[index],
                 length > index
                     ? fromArray(array, index + 1, length)

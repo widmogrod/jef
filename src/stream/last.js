@@ -23,21 +23,21 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
         //return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             if (isDefined(lastValue)) {
-                if (!Stream.continuable(sinkValue(lastValue))) {
+                var result = sinkValue(lastValue);
+                if (!Stream.continuable(result)) {
                     // Don't continue when onValue callback stops streaming
-                    return;
+                    return result;
                 }
             }
 
             if (isDefined(lastError)) {
                 // Don't continue when prefetched value was an error
-                sinkError(lastError, lastNext);
-                return;
+                return sinkError(lastError, lastNext);
             }
 
             stream.on(function(value) {
                 lastValue = value;
-                sinkValue(value);
+                return sinkValue(value);
             }, sinkError, sinkComplete);
         });
     };

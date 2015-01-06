@@ -11,8 +11,8 @@ define(['./stream'], function(Stream) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 if (lastValue !== value) {
-                    sinkValue(value);
                     lastValue = value;
+                    return sinkValue(value);
                 }
             }, sinkError, sinkComplete);
         });

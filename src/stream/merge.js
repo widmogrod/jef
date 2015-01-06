@@ -16,11 +16,11 @@ define(['./stream'], function(Stream) {
             }
 
             streamA.on(function (value) {
-                sinkValue(value);
+                return sinkValue(value);
             }, sinkError, onComplete);
 
             streamB.on(function (value) {
-                sinkValue(value);
+                return sinkValue(value);
             }, sinkError, onComplete);
         });
     };

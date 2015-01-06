@@ -21,7 +21,7 @@ define([
                     buffer[index] = value;
 
                     if (!contains(buffer, undefined)) {
-                        sinkValue(
+                        return sinkValue(
                             buffer.slice(0)
                         );
                     }

@@ -9,7 +9,7 @@ define(['./stream'], function(Stream) {
     return function map(stream, fn) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
-                sinkValue(
+                return sinkValue(
                     fn(value)
                 );
             }, sinkError, sinkComplete);
