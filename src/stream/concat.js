@@ -10,7 +10,7 @@ define(['./stream'], function(Stream) {
             stream.on(function(value) {
                 if (Stream.streamable(value)) {
                     value.on(function(val) {
-                        return sinkValue(val);
+                        sinkValue(val);
                     }, sinkError);
                 } else {
                     return sinkValue(value);

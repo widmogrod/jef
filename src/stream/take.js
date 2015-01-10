@@ -10,12 +10,7 @@ define(['./stream'], function(Stream) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 if (n--) {
-                    return sinkValue(
-                        value,
-                        n < 1
-                            ? Stream.stop
-                            : null
-                    );
+                    sinkValue(value);
                 }
 
                 if (n < 1) {

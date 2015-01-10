@@ -21,9 +21,7 @@ define([
                     buffer[index] = value;
 
                     if (!contains(buffer, undefined)) {
-                        return sinkValue(
-                            buffer.slice(0)
-                        );
+                        sinkValue(buffer.slice(0));
                     }
 
                 }, sinkError, function() {
