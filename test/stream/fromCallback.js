@@ -22,7 +22,7 @@ var throwError = function() {
 describe('Stream.fromCallback', function() {
     beforeEach(function() {
         object = fromCallback(function() {
-            return 2
+            return 2;
         });
         withArgs = [];
         called = 0;
@@ -31,7 +31,7 @@ describe('Stream.fromCallback', function() {
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
-        })
+        });
     });
     describe('#on', function() {
         describe('success', function() {
@@ -48,7 +48,7 @@ describe('Stream.fromCallback', function() {
             it('should call onComplete', function() {
                 object.on(noop, noop, args);
                 called.should.be.eql(1);
-            })
+            });
         });
         describe('failure', function() {
             beforeEach(function() {
@@ -74,6 +74,6 @@ describe('Stream.fromCallback', function() {
                 object.on(noop, noop, args);
                 called.should.be.eql(1);
             });
-        })
+        });
     });
 });
