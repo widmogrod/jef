@@ -34,7 +34,11 @@ define([
     function continueValue(callback, value, next) {
         var result = callback.onValue(value);
 
-        if (!Stream.continuable(result) || !Stream.continuable(next)) {
+        if (!Stream.continuable(result)) {
+            return false;
+        }
+
+        if (!Stream.continuable(next)) {
             callback.onComplete();
             return false;
         }
