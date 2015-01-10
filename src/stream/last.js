@@ -43,7 +43,7 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
             }, sinkError, sinkComplete);
         }, function onAttacheOnValue(onValue, onError, onComplete) {
             if (isDefined(lastError)) {
-                onError(lastError);
+                onError(lastError, lastNext);
                 return;
             }
 
@@ -56,7 +56,7 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
                 try {
                     return onValue(lastValue);
                 } catch(e) {
-                    return onError(e);
+                    return onError(e, lastNext);
                 }
             }
         });
