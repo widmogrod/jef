@@ -1,6 +1,22 @@
 define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
     'use strict';
 
+    function LastStream(implementation, onAttacheOnValue) {
+        Stream.call(this, implementation);
+
+        var on = this.on;
+
+        this.on = function onLast(onValue, onError, onComplete) {
+            if (Stream.continuable(onAttacheOnValue(onValue, onError))) {
+                on(onValue, onError, onComplete);
+            }
+            return this;
+        };
+    }
+
+    LastStream.constructor = LastStream;
+    LastStream.prototype = Object.create(Stream.prototype);
+
     /**
      * @param {Stream} stream
      * @return {Stream}
@@ -20,25 +36,24 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
             lastComplete = true;
         });
 
-        //return new stream.constructor(function(sinkValue, sinkError, sinkComplete) {
-        return new Stream(function(sinkValue, sinkError, sinkComplete) {
-            if (isDefined(lastValue)) {
-                var result = sinkValue(lastValue);
-                if (!Stream.continuable(result)) {
-                    // Don't continue when onValue callback stops streaming
-                    return result;
-                }
-            }
-
-            if (isDefined(lastError)) {
-                // Don't continue when prefetched value was an error
-                return sinkError(lastError, lastNext);
-            }
-
+        return new LastStream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 lastValue = value;
                 return sinkValue(value);
             }, sinkError, sinkComplete);
+        }, function onAttacheOnValue(onValue, onError) {
+            if (isDefined(lastError)) {
+                onError(lastError);
+                return;
+            }
+
+            if (isDefined(lastValue)) {
+                try {
+                    return onValue(lastValue);
+                } catch(e) {
+                    return onError(e);
+                }
+            }
         });
     };
 });

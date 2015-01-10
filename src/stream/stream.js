@@ -34,18 +34,18 @@ define([
     function continueValue(callback, value, next) {
         var result = callback.onValue(value);
 
-        if (!Stream.continuable(result)) {
+        if (!Stream.continuable(result) || !Stream.continuable(next)) {
+            callback.onComplete();
             return false;
         }
 
         if (Stream.streamable(next)) {
             // Pass control to next stream
             next.on(callback.onValue, callback.onError, callback.onComplete);
-        } else if (!Stream.continuable(next)) {
-            callback.onComplete();
-        } else {
-            return true;
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -64,15 +64,18 @@ define([
          * @returns {Stream}
          */
         this.on = function on(onValue, onError, onComplete) {
-            if (closed) {
-                return this;
-            }
-
-            callbacks.push({
+            var callback = {
                 onValue: isFunction(onValue) ? onValue : noop,
                 onError: isFunction(onError) ? onError : noop,
                 onComplete: isFunction(onComplete) ? onComplete : noop
-            });
+            };
+
+            if (closed) {
+                callback.onComplete();
+                return this;
+            }
+
+            callbacks.push(callback);
 
             // Lazy initialization
             if (!init) {

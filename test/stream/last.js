@@ -49,6 +49,17 @@ describe('Stream.last', function() {
             object.called.onValue.should.be.eql(1);
             object.args.onValue.should.be.eql(1);
         });
+        it('should register last value several times', function() {
+            next.push(1);
+
+            object.on(Stubs.onValue);
+            object.called.onValue.should.be.eql(1);
+            object.args.onValue.should.be.eql(1);
+
+            object.on(Stubs.onValue);
+            object.called.onValue.should.be.eql(2);
+            object.args.onValue.should.be.eql(1);
+        });
         it('should register onValue and receive next value', function() {
             next.push(1);
 
@@ -81,21 +92,20 @@ describe('Stream.last', function() {
 
             object.on(Stubs.onValueAndStop);
 
-            next.called.on.should.be.eql(2);
+            next.called.on.should.be.eql(1);
             next.called.onValue.should.be.eql(1);
 
             next.push(2);
 
-            next.called.on.should.be.eql(2);
-            next.called.onValue.should.be.eql(2);
+            next.called.on.should.be.eql(1);
+            next.called.onValue.should.be.eql(1);
 
             next.push(3);
 
-            next.called.on.should.be.eql(2);
-            next.called.onValue.should.be.eql(3);
+            next.called.on.should.be.eql(1);
+            next.called.onValue.should.be.eql(1);
 
             object.called.on.should.be.eql(1);
-            object.called.onValue.should.be.eql(1);
             object.called.onComplete.should.be.eql(0);
             object.args.onValue.should.be.eql(1);
         });
@@ -171,8 +181,8 @@ describe('Stream.last', function() {
 
                 object.on(Stubs.onValue, Stubs.onError);
 
-                // then we forward last error, and not subscribe to next stream
-                next.called.on.should.be.eql(1);
+                // then we forward last error
+                next.called.on.should.be.eql(2);
                 next.called.onError.should.be.eql(1);
 
                 // assert that object was called with last error
