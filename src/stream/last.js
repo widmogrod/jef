@@ -1,21 +1,8 @@
-define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
+define([
+    './decorator/on-attach-decorator',
+    '../functional/isDefined'
+], function(StreamOnAttachDecorator, isDefined) {
     'use strict';
-
-    function LastStream(implementation, onAttacheOnValue) {
-        Stream.call(this, implementation);
-
-        var on = this.on;
-
-        this.on = function onLast(onValue, onError, onComplete) {
-            if (Stream.continuable(onAttacheOnValue(onValue, onError, onComplete))) {
-                on(onValue, onError, onComplete);
-            }
-            return this;
-        };
-    }
-
-    LastStream.constructor = LastStream;
-    LastStream.prototype = Object.create(Stream.prototype);
 
     /**
      * @param {Stream} stream
@@ -35,7 +22,7 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
             lastComplete = true;
         });
 
-        return new LastStream(function(sinkValue, sinkError, sinkComplete) {
+        return new StreamOnAttachDecorator(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 sinkValue(value);
             }, sinkError, sinkComplete);
@@ -53,7 +40,7 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
             if (isDefined(lastValue)) {
                 try {
                     return onValue(lastValue);
-                } catch(e) {
+                } catch (e) {
                     return onError(e, lastNext);
                 }
             }
