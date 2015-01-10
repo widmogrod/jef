@@ -11,14 +11,11 @@ var PushStreamTestProxy = require('../../src/stream/test/push-stream-proxy');
 // Helper streams
 
 describe('PushStream', function() {
-    var object, destroyed;
+    var object;
 
     describe('#on', function() {
         beforeEach(function() {
-            destroyed = false;
-            object = new PushStream(function() {
-                destroyed = true;
-            });
+            object = new PushStream();
             object = new PushStreamTestProxy(object);
         });
 
@@ -71,7 +68,6 @@ describe('PushStream', function() {
                     object.called.onValue.should.be.eql(0);
                     object.called.onError.should.be.eql(1);
                     object.args.onError.should.be.eql(Stubs.thrownError);
-                    destroyed.should.be.eql(true);
                 });
 
                 it('should intercept an error and continue', function() {
@@ -79,11 +75,9 @@ describe('PushStream', function() {
                     object.push(undefined, Stubs.error);
 
                     object.called.on.should.be.eql(1);
-                    object.called.onValue.should.be.eql(1);
+                    object.called.onValue.should.be.eql(0);
                     object.called.onError.should.be.eql(1);
-                    object.args.onValue.should.be.eql(Stubs.continueValue);
                     object.args.onError.should.be.eql(Stubs.error);
-                    destroyed.should.be.eql(false);
                 });
             });
 
@@ -96,7 +90,6 @@ describe('PushStream', function() {
                     object.called.onValue.should.be.eql(1);
                     object.called.onError.should.be.eql(1);
                     object.args.onError.should.be.eql(Stubs.thrownError);
-                    destroyed.should.be.eql(false);
                 });
             });
         });

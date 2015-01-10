@@ -1,54 +1,51 @@
 define([
-    '../functional/until',
+    '../functional/invoke',
+    '../functional/reduce',
     '../functional/isFunction',
-    '../functional/isDefined',
     '../functional/noop'
-], function(until, isFunction, isDefined, noop) {
+], function(invoke, reduce, isFunction, noop) {
     'use strict';
 
     /**
-     * @param {Function} onValue
-     * @param {Function} onError
-     * @param {Function} onComplete
-     * @return {Function}
+     * @param callback
+     * @param error
+     * @param next
+     * @returns {boolean}
+     * @private
      */
-    function notifyValue(onValue, onError, onComplete) {
-        return function sinkValue(value, next) {
-            var result;
+    function continueError(callback, error, next) {
+        var result = callback.onError(error, next);
 
-            try {
-                result = onValue(value, next);
-            } catch(e) {
-                next = onError(e, next);
-            }
 
-            if (Stream.continuable(result) && Stream.streamable(next)) {
-                return next.on(onValue, onError, onComplete);
-            } else if (isDefined(next) && !Stream.streamable(next)) {
-                onComplete();
-            }
-
-            return result;
-        };
+        if (Stream.streamable(result)) {
+            return true;
+        } else {
+            callback.onComplete();
+        }
     }
 
     /**
-     * @param {Function} onValue
-     * @param {Function} onError
-     * @param {Function} onComplete
-     * @return {Function}
+     * @param callback
+     * @param value
+     * @param next
+     * @returns {boolean}
+     * @private
      */
-    function notifyError(onValue, onError, onComplete) {
-        return function sinkError(e, next) {
-            // Here you have possibility of intercept the error
-            next = onError(e, next);
+    function continueValue(callback, value, next) {
+        var result = callback.onValue(value);
 
-            if (Stream.streamable(next)) {
-                return next.on(onValue, onError, onComplete);
-            }
+        if (!Stream.continuable(result)) {
+            return false;
+        }
 
-            onComplete();
-        };
+        if (Stream.streamable(next)) {
+            // Pass control to next stream
+            next.on(callback.onValue, callback.onError, callback.onComplete);
+        } else if (!Stream.continuable(next)) {
+            callback.onComplete();
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -56,6 +53,10 @@ define([
      * @constructor
      */
     function Stream(implementation) {
+        var callbacks = []
+          , init = false
+          , closed = false;
+
         /**
          * @param {Function} onValue
          * @param {Function} onError
@@ -63,41 +64,68 @@ define([
          * @returns {Stream}
          */
         this.on = function on(onValue, onError, onComplete) {
-            var stopped = false,
-                isNotStopped = function() {
-                    return false === stopped;
-                },
-                stopIfNotContinuable = function(fn) {
-                    return function(value, next) {
-                        var result = fn(value, next);
+            if (closed) {
+                return this;
+            }
 
-                        if (!Stream.continuable(result)) {
-                            stopped = null;
-                        }
+            callbacks.push({
+                onValue: isFunction(onValue) ? onValue : noop,
+                onError: isFunction(onError) ? onError : noop,
+                onComplete: isFunction(onComplete) ? onComplete : noop
+            });
 
-                        return result;
-                    };
-                },
-                completeCall = function(fn) {
-                    return function() {
-                        if (!stopped) {
-                            stopped = null;
-                            fn();
-                        }
-                    };
-                };
+            // Lazy initialization
+            if (!init) {
+                init = true;
+                implementation(sinkValue, sinkError, sinkComplete);
+            }
 
-            onValue = until.is(onValue) ? onValue : until(isNotStopped, stopIfNotContinuable(isFunction(onValue) ? onValue : noop));
-            onError = until.is(onError) ? onError : until(isNotStopped, isFunction(onError) ? onError : noop);
-            onComplete = until.is(onComplete) ? onComplete : until(isNotStopped, completeCall(isFunction(onComplete) ? onComplete : noop));
-
-            implementation.call(this,
-                notifyValue(onValue, onError, onComplete),
-                notifyError(onValue, onError, onComplete),
-                onComplete
-            );
             return this;
         };
+
+        function sinkValue(value, next) {
+            if (closed) {
+                return;
+            }
+
+            callbacks = reduce(callbacks, function(callback, base) {
+                try {
+                    if (continueValue(callback, value, next)) {
+                        base.push(callback);
+                    }
+                } catch (e) {
+                    if (continueError(callback, e, next)) {
+                        base.push(callback);
+                    }
+                }
+
+                return base;
+            }, []);
+        }
+
+        function sinkError(error, next) {
+            if (closed) {
+                return;
+            }
+
+            callbacks = reduce(callbacks, function(callback, base) {
+                if (continueError(callback, error, next)) {
+                    base.push(callback);
+                }
+
+                return base;
+            }, []);
+
+            // If any callback exists then stream is not closed.
+            // An error was handled, so we continue
+            closed = !callbacks.length;
+        }
+
+        function sinkComplete() {
+            closed = true;
+            invoke(callbacks, 'onComplete');
+            callbacks = [];
+        }
     }
 
     Stream.constructor = Stream;

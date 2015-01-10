@@ -81,18 +81,18 @@ describe('Stream.last', function() {
 
             object.on(Stubs.onValueAndStop);
 
-            next.called.on.should.be.eql(1);
+            next.called.on.should.be.eql(2);
             next.called.onValue.should.be.eql(1);
 
             next.push(2);
 
-            next.called.on.should.be.eql(1);
-            next.called.onValue.should.be.eql(1);
+            next.called.on.should.be.eql(2);
+            next.called.onValue.should.be.eql(2);
 
             next.push(3);
 
-            next.called.on.should.be.eql(1);
-            next.called.onValue.should.be.eql(1);
+            next.called.on.should.be.eql(2);
+            next.called.onValue.should.be.eql(3);
 
             object.called.on.should.be.eql(1);
             object.called.onValue.should.be.eql(1);
@@ -136,7 +136,7 @@ describe('Stream.last', function() {
                 object.called.onValue.should.be.eql(1);
                 object.args.onValue.should.be.eql(2);
 
-                nextPush.called.on.should.be.eql(2);
+                nextPush.called.on.should.be.eql(1);
                 nextPush.called.onValue.should.be.eql(1);
                 nextMap.called.on.should.be.eql(2);
                 nextMap.called.onValue.should.be.eql(1);
@@ -147,7 +147,7 @@ describe('Stream.last', function() {
                 object.called.onValue.should.be.eql(2);
                 object.args.onValue.should.be.eql(3);
 
-                nextPush.called.on.should.be.eql(2);
+                nextPush.called.on.should.be.eql(1);
                 nextPush.called.onValue.should.be.eql(2);
                 nextMap.called.on.should.be.eql(2);
                 nextMap.called.onValue.should.be.eql(2);

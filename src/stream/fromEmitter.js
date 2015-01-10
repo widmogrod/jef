@@ -1,4 +1,4 @@
-define(['./push-stream'], function(PushStream) {
+define(['./push-stream', '../functional/noop'], function(PushStream, noop) {
     'use strict';
 
     /**
@@ -12,15 +12,17 @@ define(['./push-stream'], function(PushStream) {
     return function fromEmitter(eventEmitter, selector, event) {
         var stream;
 
-        stream = new PushStream(function() {
-            eventEmitter.off(event, selector, onEmitted);
-        });
+        stream = new PushStream();
 
         function onEmitted(e) {
             stream.push(e);
         }
 
         eventEmitter.on(event, selector, onEmitted);
+
+        stream.on(noop, noop, function() {
+            eventEmitter.off(event, selector, onEmitted);
+        });
 
         return stream;
     };
