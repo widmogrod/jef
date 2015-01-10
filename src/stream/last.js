@@ -7,7 +7,7 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
         var on = this.on;
 
         this.on = function onLast(onValue, onError, onComplete) {
-            if (Stream.continuable(onAttacheOnValue(onValue, onError))) {
+            if (Stream.continuable(onAttacheOnValue(onValue, onError, onComplete))) {
                 on(onValue, onError, onComplete);
             }
             return this;
@@ -41,9 +41,14 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
                 lastValue = value;
                 return sinkValue(value);
             }, sinkError, sinkComplete);
-        }, function onAttacheOnValue(onValue, onError) {
+        }, function onAttacheOnValue(onValue, onError, onComplete) {
             if (isDefined(lastError)) {
                 onError(lastError);
+                return;
+            }
+
+            if (isDefined(lastComplete)) {
+                onComplete();
                 return;
             }
 
