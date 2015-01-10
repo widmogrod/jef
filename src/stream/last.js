@@ -39,7 +39,7 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
         return new LastStream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
                 lastValue = value;
-                return sinkValue(value);
+                sinkValue(value);
             }, sinkError, sinkComplete);
         }, function onAttacheOnValue(onValue, onError, onComplete) {
             if (isDefined(lastError)) {
