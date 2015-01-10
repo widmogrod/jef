@@ -28,7 +28,6 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
         stream.on(function(value, next) {
             lastValue = value;
             lastNext = next;
-            return Stream.stop;
         }, function(error, next) {
             lastError = error;
             lastNext = next;
@@ -38,7 +37,6 @@ define(['./stream', '../functional/isDefined'], function(Stream, isDefined) {
 
         return new LastStream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
-                lastValue = value;
                 sinkValue(value);
             }, sinkError, sinkComplete);
         }, function onAttacheOnValue(onValue, onError, onComplete) {

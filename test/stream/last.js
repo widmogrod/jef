@@ -78,7 +78,7 @@ describe('Stream.last', function() {
             next.push(2);
 
             next.called.on.should.be.eql(2);
-            next.called.onValue.should.be.eql(2);
+            next.called.onValue.should.be.eql(3);
 
             object.called.on.should.be.eql(1);
             object.called.onValue.should.be.eql(2);
@@ -98,12 +98,12 @@ describe('Stream.last', function() {
             next.push(2);
 
             next.called.on.should.be.eql(1);
-            next.called.onValue.should.be.eql(1);
+            next.called.onValue.should.be.eql(2);
 
             next.push(3);
 
             next.called.on.should.be.eql(1);
-            next.called.onValue.should.be.eql(1);
+            next.called.onValue.should.be.eql(3);
 
             object.called.on.should.be.eql(1);
             object.called.onComplete.should.be.eql(0);
@@ -160,7 +160,7 @@ describe('Stream.last', function() {
                 nextPush.called.on.should.be.eql(1);
                 nextPush.called.onValue.should.be.eql(2);
                 nextMap.called.on.should.be.eql(2);
-                nextMap.called.onValue.should.be.eql(2);
+                nextMap.called.onValue.should.be.eql(3);
             });
         });
     });
