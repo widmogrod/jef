@@ -83,13 +83,11 @@ describe('PushStream', function() {
 
             describe('throw exception in onValue callback', function() {
                 it('should call onError', function() {
-                    object.on(Stubs.throwError, Stubs.onError);
-                    object.push(1);
-
-                    object.called.on.should.be.eql(1);
-                    object.called.onValue.should.be.eql(1);
-                    object.called.onError.should.be.eql(1);
-                    object.args.onError.should.be.eql(Stubs.thrownError);
+                    try {
+                        object.on(Stubs.throwError, Stubs.onError);
+                    } catch (e) {
+                        e.should.be.eql(Stubs.thrownError);
+                    }
                 });
             });
         });

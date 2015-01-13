@@ -200,19 +200,12 @@ describe('Stream.last', function() {
                 object = new StreamTestProxy(object);
             });
 
-            it('should call onError', function() {
-                next.push(1);
-                // Prefetch done, we have value
-                next.called.on.should.be.eql(1);
-                next.called.onValue.should.be.eql(1);
-
-                // When handling last value, onValue throws exception
-                object.on(Stubs.throwError, Stubs.onError);
-
-                object.called.on.should.be.eql(1);
-                object.called.onValue.should.be.eql(1);
-                object.called.onError.should.be.eql(1);
-                object.args.onError.should.be.eql(Stubs.thrownError);
+            it('shouldnt be cached', function() {
+                try {
+                    next.push(1);
+                } catch (e) {
+                    e.should.be.eql(Stubs.thrownError);
+                }
             });
         });
     });

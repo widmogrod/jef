@@ -1,19 +1,17 @@
 define([
     './stream',
-    './noop',
     '../functional/each',
     '../functional/contains'
-], function(Stream, noop, each, contains, undefined) {
+], function(Stream, each, contains, undefined) {
     'use strict';
 
     /**
      * @param {Stream[]} streams
-     * @param {Array} [buffer]
      * @return {Stream}
      */
-    return function when(streams, buffer, completed) {
-        buffer = buffer || new Array(streams.length);
-        completed = completed || new Array(streams.length);
+    return function when(streams) {
+        var buffer =  new Array(streams.length),
+            completed = new Array(streams.length);
 
         return new Stream(function whenInit(sinkValue, sinkError, sinkComplete) {
             each(streams, function(stream, index) {

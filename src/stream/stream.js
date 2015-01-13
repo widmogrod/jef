@@ -96,14 +96,8 @@ define([
             }
 
             callbacks = reduce(callbacks, function(callback, base) {
-                try {
-                    if (continueValue(callback, value, next)) {
-                        base.push(callback);
-                    }
-                } catch (e) {
-                    if (continueError(callback, e, next)) {
-                        base.push(callback);
-                    }
+                if (continueValue(callback, value, next)) {
+                    base.push(callback);
                 }
 
                 return base;

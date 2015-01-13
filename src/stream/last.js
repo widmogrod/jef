@@ -1,7 +1,8 @@
 define([
     './decorator/on-attach-decorator',
-    '../functional/isDefined'
-], function(StreamOnAttachDecorator, isDefined) {
+    '../functional/isDefined',
+    '../functional/isFunction'
+], function(StreamOnAttachDecorator, isDefined, isFunction) {
     'use strict';
 
     /**
@@ -27,22 +28,22 @@ define([
                 sinkValue(value);
             }, sinkError, sinkComplete);
         }, function onAttacheOnValue(onValue, onError, onComplete) {
-            if (isDefined(lastError)) {
+            if (isDefined(lastError) && isFunction(onError)) {
                 onError(lastError, lastNext);
                 return;
             }
 
-            if (isDefined(lastComplete)) {
+            if (isDefined(lastComplete) && isFunction(onComplete)) {
                 onComplete();
                 return;
             }
 
-            if (isDefined(lastValue)) {
-                try {
+            if (isDefined(lastValue) && isFunction(onValue)) {
+                //try {
                     return onValue(lastValue);
-                } catch (e) {
-                    return onError(e, lastNext);
-                }
+                //} catch (e) {
+                //    return onError(e, lastNext);
+                //}
             }
         });
     };
