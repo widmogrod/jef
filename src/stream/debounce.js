@@ -7,8 +7,8 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function debounce(stream, wait) {
-        return new Stream(function(sinkValue, sinkError) {
-            var timeout;
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            var timeout, completeInterval;
             stream.on(function(value, next) {
                 if (timeout) {
                     clearTimeout(timeout);
@@ -23,7 +23,19 @@ define(['./stream'], function(Stream) {
                     );
                 }, wait);
 
-            }, sinkError);
+            }, sinkError, function() {
+                if (!timeout) {
+                    return sinkComplete();
+                }
+
+                completeInterval = setInterval(function() {
+                    if (!timeout) {
+                        clearInterval(completeInterval);
+                        sinkComplete();
+                    }
+                }, wait);
+
+            });
         });
     };
 });

@@ -23,8 +23,8 @@ define(['./stream'], function (Stream) {
                 // Wait for complete
                 completeInterval = setInterval(function() {
                     if (!called) {
-                        sinkComplete();
                         clearInterval(completeInterval);
+                        sinkComplete();
                     }
                 }, wait);
             });
