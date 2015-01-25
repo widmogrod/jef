@@ -9,18 +9,13 @@ define(['./stream'], function(Stream) {
     return function debounce(stream, wait) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             var timeout, completeInterval;
-            stream.on(function(value, next) {
+            stream.on(function(value) {
                 if (timeout) {
                     clearTimeout(timeout);
                 }
 
                 timeout = setTimeout(function() {
-                    sinkValue(
-                        value,
-                        Stream.streamable(next)
-                            ? debounce(next, wait)
-                            : Stream.stop
-                    );
+                    sinkValue(value);
                 }, wait);
 
             }, sinkError, function() {
