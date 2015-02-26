@@ -20,9 +20,13 @@ define([
     './stream/fromEmitter',
     './stream/fromCallback',
     './stream/fromPromise',
+    './stream/fromElement',
+    './stream/fromValue',
     './stream/toArray',
     './stream/push-stream',
-    './stream/push-consume'
+    './stream/push-consume',
+    './stream/dom/toElementProp',
+    './stream/domdiff/domDiffWith',
 ], function(
     Stream,
     map,
@@ -45,9 +49,13 @@ define([
     fromEmitter,
     fromCallback,
     fromPromise,
+    fromElement,
+    fromValue,
     toArray,
     PushStream,
-    consume
+    consume,
+    toElementProp,
+    domDiffWith
 ) {
     'use strict';
 
@@ -97,11 +105,21 @@ define([
         return this.map(fn).concat();
     };
 
+    // Integrated with other components
+    Stream.prototype.domDiffWith = function(elementSelector) {
+        return domDiffWith(this, elementSelector);
+    };
+    Stream.prototype.toElementProp = function(elementSelector, prop) {
+        return toElementProp(this, elementSelector, prop);
+    };
+
     // Factories
     Stream.fromArray = fromArray;
     Stream.fromEmitter = fromEmitter;
     Stream.fromCallback = fromCallback;
     Stream.fromPromise = fromPromise;
+    Stream.fromElement = fromElement;
+    Stream.fromValue = fromValue;
     Stream.both = both;
     Stream.when = when;
     Stream.noop = noop;
