@@ -16,4 +16,3 @@ define([
 
     return jQuery;
 });
-
