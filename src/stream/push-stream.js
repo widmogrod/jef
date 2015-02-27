@@ -8,7 +8,7 @@ define([
      * @constructor
      */
     function PushStream() {
-        var callback = {};
+        var callback;
 
         Stream.call(this, function(sinkValue, sinkError, sinkComplete) {
             callback = {
