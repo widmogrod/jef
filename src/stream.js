@@ -15,6 +15,7 @@ define([
     './stream/noop',
     './stream/log',
     './stream/last',
+    './stream/pluck',
     './stream/timeout',
     './stream/fromArray',
     './stream/fromEmitter',
@@ -44,6 +45,7 @@ define([
     noop,
     log,
     last,
+    pluck,
     timeout,
     fromArray,
     fromEmitter,
@@ -103,6 +105,27 @@ define([
     };
     Stream.prototype.flatMap = function(fn) {
         return this.map(fn).concat();
+    };
+    Stream.prototype.pluck = function(pattern) {
+        return pluck(this, pattern);
+    };
+    Stream.prototype.mapApply = function(fn, thisArg) {
+        return this.map(function(value) {
+            return fn.apply(thisArg, value);
+        });
+    };
+    Stream.prototype.onApply = function(fndomDiffWith, thisArg) {
+        return this.on(function(value) {
+            return fn.apply(thisArg, value);
+        });
+    };
+    Stream.prototype.onWith = function(stream, fn, thisArg) {
+        return this.on(function(valueA) {
+            stream.on(function(valueB) {
+                fn.call(thisArg, valueA, valueB);
+                return Stream.stop;
+            });
+        });
     };
 
     // Integrated with other components
