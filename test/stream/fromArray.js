@@ -108,5 +108,20 @@ describe('Stream.fromArray', function() {
                 }, 10);
             });
         });
+
+        describe('empty array', function() {
+            beforeEach(function() {
+                object = fromArray([]);
+                object = new StreamTestProxy(object);
+            });
+
+            it('should be completed', function() {
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+
+                object.called.onComplete.should.be.eql(1);
+                object.called.onValue.should.be.eql(0);
+                object.called.onError.should.be.eql(0);
+            })
+        });
     });
 });
