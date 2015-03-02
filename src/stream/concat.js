@@ -10,7 +10,7 @@ define(['./stream'], function(Stream) {
 
         function complete(callback) {
             return function tryComplete() {
-                if (--started) {
+                if (--started < 0) {
                     callback.apply(null, arguments)
                 }
             }
@@ -20,14 +20,13 @@ define(['./stream'], function(Stream) {
             var tryComplete = complete(sinkComplete);
 
             stream.on(function(value) {
-                ++started;
                 if (Stream.streamable(value)) {
+                    ++started;
                     value.on(function(val) {
                         sinkValue(val);
                     }, sinkError, tryComplete);
                 } else {
                     sinkValue(value);
-                    tryComplete();
                 }
             }, sinkError, tryComplete);
         });
