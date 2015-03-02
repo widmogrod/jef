@@ -6,16 +6,30 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function concat(stream) {
+        var started = 0;
+
+        function complete(callback) {
+            return function tryComplete() {
+                if (--started) {
+                    callback.apply(null, arguments)
+                }
+            }
+        }
+
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            var tryComplete = complete(sinkComplete);
+
             stream.on(function(value) {
+                ++started;
                 if (Stream.streamable(value)) {
                     value.on(function(val) {
                         sinkValue(val);
-                    }, sinkError);
+                    }, sinkError, tryComplete);
                 } else {
-                    return sinkValue(value);
+                    sinkValue(value);
+                    tryComplete();
                 }
-            }, sinkError, sinkComplete);
+            }, sinkError, tryComplete);
         });
     };
 });
