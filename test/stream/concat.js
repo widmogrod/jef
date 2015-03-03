@@ -36,130 +36,125 @@ var addOne = function(value) {
 };
 
 describe('Stream.concat', function() {
-    //beforeEach(function() {
-    //    object = concat(map(fromArray([1, 2, 3]), expand));
-    //    object = new StreamTestProxy(object);
-    //});
-    //
-    //describe('#construction', function() {
-    //    it('should construct object instance of Stream', function() {
-    //        concat(fromArray([])).should.be.an.instanceOf(Stream);
-    //    });
-    //});
-    //describe('#on', function() {
-    //    describe('success', function() {
-    //        it('should register onValue', function() {
-    //            object.on(Stubs.onValue);
-    //
-    //            object.called.onValue.should.be.eql(9);
-    //            object.args.onValue.should.be.eql(6);
-    //        });
-    //        it('should register onValue and stop', function() {
-    //            object.on(Stubs.onValueAndStop);
-    //
-    //            object.called.onValue.should.be.eql(1);
-    //            object.args.onValue.should.be.eql(1);
-    //        });
-    //        it('should call onComplete', function() {
-    //            object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
-    //
-    //            object.called.onComplete.should.be.eql(1);
-    //        });
-    //    });
-    //    describe('asynchronously', function() {
-    //        beforeEach(function() {
-    //            object = fromArray([1, 2, 3]);
-    //            object = timeout(object);
-    //            object = map(object, expand);
-    //            object = concat(object);
-    //            object = new StreamTestProxy(object);
-    //        });
-    //        it('should register onValue', function(done) {
-    //            object.on(Stubs.onValue);
-    //            setTimeout(function() {
-    //                object.called.onValue.should.be.eql(9);
-    //                object.args.onValue.should.be.eql(6);
-    //                done();
-    //            }, 20);
-    //        });
-    //        it('should register onValue and stop', function(done) {
-    //            object.on(Stubs.onValueAndStop);
-    //            setTimeout(function() {
-    //                object.called.onValue.should.be.eql(1);
-    //                object.args.onValue.should.be.eql(1);
-    //                done();
-    //            }, 20);
-    //        });
-    //        it('should call onComplete', function(done) {
-    //            object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
-    //            setTimeout(function() {
-    //                object.called.onComplete.should.be.eql(1);
-    //                done();
-    //            }, 20);
-    //        });
-    //    });
-    //});
-    //describe('.filter', function() {
-    //    beforeEach(function() {
-    //        object = concat(map(fromArray([1, 2, 3]), expand));
-    //        object = filter(object, graterThanTwo);
-    //        object = new StreamTestProxy(object);
-    //    });
-    //    describe('success', function() {
-    //        it('should register onValue', function() {
-    //            object.on(Stubs.onValue);
-    //
-    //            object.called.onValue.should.be.eql(3);
-    //            object.args.onValue.should.be.eql(6);
-    //        });
-    //        it('should register onValue and stop', function() {
-    //            object.on(Stubs.onValueAndStop);
-    //
-    //            object.called.onValue.should.be.eql(1);
-    //            object.args.onValue.should.be.eql(4);
-    //        });
-    //        it('should call onComplete', function() {
-    //            object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
-    //
-    //            object.called.onComplete.should.be.eql(1);
-    //        });
-    //    });
-    //    describe('.map', function() {
-    //        beforeEach(function() {
-    //            object = concat(map(fromArray([1, 2, 3]), expand));
-    //            object = map(filter(object, graterThanTwo), addOne);
-    //            object = new StreamTestProxy(object);
-    //        });
-    //        describe('success', function() {
-    //            it('should register onValue', function() {
-    //                object.on(Stubs.onValue);
-    //
-    //                object.called.onValue.should.be.eql(3);
-    //                object.args.onValue.should.be.eql(7);
-    //            });
-    //            it('should register onValue and stop', function() {
-    //                object.on(Stubs.onValueAndStop);
-    //
-    //                object.called.onValue.should.be.eql(1);
-    //                object.args.onValue.should.be.eql(5);
-    //            });
-    //            it('should call onComplete', function() {
-    //                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
-    //
-    //                object.called.onComplete.should.be.eql(1);
-    //            });
-    //        });
-    //    });
-    //});
+    beforeEach(function() {
+        object = concat(map(fromArray([1, 2, 3]), expand));
+        object = new StreamTestProxy(object);
+    });
+
+    describe('#construction', function() {
+        it('should construct object instance of Stream', function() {
+            concat(fromArray([])).should.be.an.instanceOf(Stream);
+        });
+    });
+    describe('#on', function() {
+        describe('success', function() {
+            it('should register onValue', function() {
+                object.on(Stubs.onValue);
+
+                object.called.onValue.should.be.eql(9);
+                object.args.onValue.should.be.eql(6);
+            });
+            it('should register onValue and stop', function() {
+                object.on(Stubs.onValueAndStop);
+
+                object.called.onValue.should.be.eql(1);
+                object.args.onValue.should.be.eql(1);
+            });
+            it('should call onComplete', function() {
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+
+                object.called.onComplete.should.be.eql(1);
+            });
+        });
+        describe('asynchronously', function() {
+            beforeEach(function() {
+                object = fromArray([1, 2, 3]);
+                object = timeout(object);
+                object = map(object, expand);
+                object = concat(object);
+                object = new StreamTestProxy(object);
+            });
+            it('should register onValue', function(done) {
+                object.on(Stubs.onValue);
+                setTimeout(function() {
+                    object.called.onValue.should.be.eql(9);
+                    object.args.onValue.should.be.eql(6);
+                    done();
+                }, 20);
+            });
+            it('should register onValue and stop', function(done) {
+                object.on(Stubs.onValueAndStop);
+                setTimeout(function() {
+                    object.called.onValue.should.be.eql(1);
+                    object.args.onValue.should.be.eql(1);
+                    done();
+                }, 20);
+            });
+            it('should call onComplete', function(done) {
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+                setTimeout(function() {
+                    object.called.onComplete.should.be.eql(1);
+                    done();
+                }, 20);
+            });
+        });
+    });
+    describe('.filter', function() {
+        beforeEach(function() {
+            object = concat(map(fromArray([1, 2, 3]), expand));
+            object = filter(object, graterThanTwo);
+            object = new StreamTestProxy(object);
+        });
+        describe('success', function() {
+            it('should register onValue', function() {
+                object.on(Stubs.onValue);
+
+                object.called.onValue.should.be.eql(3);
+                object.args.onValue.should.be.eql(6);
+            });
+            it('should register onValue and stop', function() {
+                object.on(Stubs.onValueAndStop);
+
+                object.called.onValue.should.be.eql(1);
+                object.args.onValue.should.be.eql(4);
+            });
+            it('should call onComplete', function() {
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+
+                object.called.onComplete.should.be.eql(1);
+            });
+        });
+        describe('.map', function() {
+            beforeEach(function() {
+                object = concat(map(fromArray([1, 2, 3]), expand));
+                object = map(filter(object, graterThanTwo), addOne);
+                object = new StreamTestProxy(object);
+            });
+            describe('success', function() {
+                it('should register onValue', function() {
+                    object.on(Stubs.onValue);
+
+                    object.called.onValue.should.be.eql(3);
+                    object.args.onValue.should.be.eql(7);
+                });
+                it('should register onValue and stop', function() {
+                    object.on(Stubs.onValueAndStop);
+
+                    object.called.onValue.should.be.eql(1);
+                    object.args.onValue.should.be.eql(5);
+                });
+                it('should call onComplete', function() {
+                    object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+
+                    object.called.onComplete.should.be.eql(1);
+                });
+            });
+        });
+    });
 
     describe('bugs', function() {
         describe('completes sooner that it should be', function() {
             beforeEach(function() {
-                //object = fromArray([
-                //    timeout(concat(fromArray(['a', 'A']))),
-                //    timeout(concat(fromArray(['b', 'B']))),
-                //    timeout(concat(fromArray(['c', 'C'])))
-                //]);
                 object = fromArray([
                     concat(timeout(fromArray([1, 2, 3]))),
                     concat(timeout(fromArray([
