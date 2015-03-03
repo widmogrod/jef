@@ -10,7 +10,7 @@ define(['./stream'], function(Stream) {
     return function reduce(stream, fn, base) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             stream.on(function(value) {
-                base = fn(value, base);
+                base = fn(base, value);
             }, sinkError, function() {
                 sinkValue(base);
                 sinkComplete();

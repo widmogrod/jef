@@ -8,7 +8,7 @@ define([
      */
     return function reduce(data, func, base) {
         each(data, function(item, index, data) {
-            base = func(item, base, index, data);
+            base = func(base, item, index, data);
         });
         return base;
     };

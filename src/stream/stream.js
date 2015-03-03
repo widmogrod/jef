@@ -95,7 +95,7 @@ define([
                 return;
             }
 
-            callbacks = reduce(callbacks, function(callback, base) {
+            callbacks = reduce(callbacks, function(base, callback) {
                 if (continueValue(callback, value, next)) {
                     base.push(callback);
                 }
@@ -109,7 +109,7 @@ define([
                 return;
             }
 
-            callbacks = reduce(callbacks, function(callback, base) {
+            callbacks = reduce(callbacks, function(base, callback) {
                 if (continueError(callback, error, next)) {
                     base.push(callback);
                 }

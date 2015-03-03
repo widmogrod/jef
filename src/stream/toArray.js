@@ -6,7 +6,7 @@ define(['./reduce'], function (reduce) {
      * @return {Stream}
      */
     return function toArray(stream) {
-        return reduce(stream, function (value, base) {
+        return reduce(stream, function (base, value) {
             base.push(value);
             return base;
         }, []);

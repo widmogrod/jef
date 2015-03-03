@@ -7,7 +7,7 @@ define(['./reduce', './map', './fromArray', './concat'], function (reduce, map, 
      * @return {Stream}
      */
     return function group(stream, fn) {
-        return concat(map(reduce(stream, function (value, base) {
+        return concat(map(reduce(stream, function (base, value) {
             base.key = fn(value);
             base.index = base.indices.indexOf(base.key);
 

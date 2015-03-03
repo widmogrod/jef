@@ -6,7 +6,7 @@ define([
     'use strict';
 
     return function addition(a, b) {
-        return reduce(slice(arguments, 1), function (i, base) {
+        return reduce(slice(arguments, 1), function (base, i) {
             return base + i
         }, a);
     }
