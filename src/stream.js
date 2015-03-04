@@ -114,7 +114,7 @@ define([
             return fn.apply(thisArg, value);
         });
     };
-    Stream.prototype.onApply = function(fndomDiffWith, thisArg) {
+    Stream.prototype.onApply = function(fn, thisArg) {
         return this.on(function(value) {
             return fn.apply(thisArg, value);
         });
