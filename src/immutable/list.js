@@ -4,6 +4,7 @@ define([
     './trie/setIn',
     './utils/hashToPath',
     './utils/naiveHashFactory',
+    './utils/hash',
     '../functional/isArray',
     '../functional/reduce'
 ], function(
@@ -12,22 +13,26 @@ define([
     setIn,
     hashToPath,
     naiveHashFactory,
+    hash,
     isArray,
     reduce
 ) {
     'use strict';
 
-    function List(data, trie, hash) {
+    function pathFromKey(key) {
+        return hashToPath(hash(String(key)).toString(2));
+    }
+
+    function List(data, trie) {
         if (!(this instanceof List)) {
-            return new List(data, trie, hash);
+            return new List(data, trie);
         }
 
         trie = trie || [];
-        hash = hash || naiveHashFactory([]);
 
         this.get = function get(key) {
             return getIn(
-                hashToPath(hash(key)),
+                pathFromKey(key),
                 trie
             );
         };
@@ -36,7 +41,7 @@ define([
             return List(
                 null,
                 setIn(
-                    hashToPath(hash(key)),
+                    pathFromKey(key),
                     trie,
                     value
                 ),
@@ -47,7 +52,7 @@ define([
         if (isArray(data)) {
             trie = reduce(data, function(trie, value, key) {
                 return setIn(
-                    hashToPath(hash(key)),
+                    pathFromKey(key),
                     trie,
                     value
                 );
