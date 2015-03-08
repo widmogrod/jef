@@ -30,24 +30,6 @@ define([
 
         trie = trie || [];
 
-        this.get = function get(key) {
-            return getIn(
-                pathFromKey(key),
-                trie
-            );
-        };
-
-        this.set = function set(key, value) {
-            return List(
-                null,
-                setIn(
-                    pathFromKey(key),
-                    trie,
-                    value
-                ),
-                hash
-            );
-        };
 
         if (isArray(data)) {
             trie = reduce(data, function(trie, value, key) {
@@ -58,6 +40,24 @@ define([
                 );
             }, trie);
         }
+
+        this.get = function get(key) {
+            return getIn(
+                pathFromKey(key),
+                trie
+            );
+        };
+
+        this.set = function set(key, value) {
+            return new List(
+                null,
+                setIn(
+                    pathFromKey(key),
+                    trie,
+                    value
+                )
+            );
+        };
     }
 
     List.constructor = List;

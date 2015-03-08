@@ -28,13 +28,18 @@ describe('Immutable#Lisst', function() {
         l2.should.be.an.instanceOf(List);
         l2.should.not.be.exactly(l1);
     });
-    it('copy should have exactly the same values except new one', function() {
-        var l2 = l1.set(1, f);
+    it('should have exactly the same new value in new copy and old in original', function() {
+        var l2 = l1.set(0, f);
 
-        l2.get(0).should.be.exactly(l1.get(0));
-        l2.get(1).should.not.be.exactly(l1.get(1));
+        l1.get(0).should.be.exactly(a);
+        l2.get(0).should.not.be.exactly(l1.get(0));
+
+    });
+    it('should have unmodified values in copy for unaffected values', function() {
+        var l2 = l1.set(0, f);
+        l2.get(1).should.be.exactly(l1.get(1));
         l2.get(2).should.be.exactly(l1.get(2));
         l2.get(3).should.be.exactly(l1.get(3));
         l2.get(4).should.be.exactly(l1.get(4));
-    });
+    })
 });
