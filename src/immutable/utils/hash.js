@@ -6,13 +6,13 @@ define(function() {
      * https://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
      * http://jsperf.com/hashing-strings
      *
-     * @param String string
-     * @return integer
+     * @param {String} string
+     * @return {Number}
      */
     return function hash(string) {
         var hash = 0, i = 0, length = string.length;
 
-        if (length) {
+        if (!length) {
             return hash;
         }
 
