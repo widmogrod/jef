@@ -6,7 +6,8 @@ define([
     './utils/naiveHashFactory',
     './utils/hash',
     '../functional/isArray',
-    '../functional/reduce'
+    '../functional/reduce',
+    '../functional/slice'
 ], function(
     getIn,
     hasIn,
@@ -15,7 +16,8 @@ define([
     naiveHashFactory,
     hash,
     isArray,
-    reduce
+    reduce,
+    slice
 ) {
     'use strict';
 
@@ -23,13 +25,16 @@ define([
         return hashToPath(hash(String(key)).toString(2));
     }
 
+    /**
+     * Ensure everything on start.
+     *
+     * @param {Array} data      List of elements to initialize
+     * @param {Array} [trie]    Trie data structure
+     * @returns {List}
+     * @constructor
+     */
     function List(data, trie) {
-        if (!(this instanceof List)) {
-            return new List(data, trie);
-        }
-
         trie = trie || [];
-
 
         if (isArray(data)) {
             trie = reduce(data, function(trie, value, key) {
@@ -61,6 +66,14 @@ define([
     }
 
     List.constructor = List;
+
+    /**
+     * Transform values to new form.
+     * @returns {List}
+     */
+    List.of = function() {
+        return new List(slice(arguments));
+    };
 
     return List;
 });

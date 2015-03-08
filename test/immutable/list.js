@@ -13,7 +13,7 @@ describe('Immutable#Lisst', function() {
         e = {e: 'e'};
         f = {f: 'f'};
 
-        l1 = List([a, b, c, d, e]);
+        l1 = List.of(a, b, c, d, e);
     });
 
     it('should retrieve values by its key', function() {
@@ -33,7 +33,6 @@ describe('Immutable#Lisst', function() {
 
         l1.get(0).should.be.exactly(a);
         l2.get(0).should.not.be.exactly(l1.get(0));
-
     });
     it('should have unmodified values in copy for unaffected values', function() {
         var l2 = l1.set(0, f);
