@@ -12,6 +12,7 @@ define([
     './stream/distinct',
     './stream/debounce',
     './stream/when',
+    './stream/until',
     './stream/noop',
     './stream/log',
     './stream/last',
@@ -42,6 +43,7 @@ define([
     distinct,
     debounce,
     when,
+    until,
     noop,
     log,
     last,
@@ -102,6 +104,9 @@ define([
     };
     Stream.prototype.toArray = function() {
         return toArray(this);
+    };
+    Stream.prototype.until = function(stream) {
+        return until(this, stream);
     };
     Stream.prototype.flatMap = function(fn) {
         return this.map(fn).concat();
