@@ -53,7 +53,6 @@ define([
         }
 
         return function elInjectChildren(el) {
-
             each(children, function(child) {
                 el.appendChild(child);
             });
@@ -69,7 +68,7 @@ define([
      * @returns {Function}
      */
     function elTextContent(text) {
-        if (!is('String', text)) {
+        if (!is('String', text) && !is('Number', text)) {
             return unit;
         }
 
