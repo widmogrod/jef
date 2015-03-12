@@ -236,13 +236,6 @@ describe('Functional', function(){
             result(2).should.be.eql(3);
         })
     })
-    describe('#reduce()', function(){
-        it('should return number when function with numeric base value is passed', function(){
-            f.reduce([1, 2, 3], function(item, base) {
-                return base + item;
-            }, 0).should.be.eql(6);
-        })
-    })
     describe('#flip()', function(){
         it('should return function that accept arguments in reversed order', function(){
             var funcReturnSecond = function(a,b) {return b};
