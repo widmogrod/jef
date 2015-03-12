@@ -3,6 +3,8 @@ define(function () {
 
     /**
      * Check if is possible to call reduce function on value.
+     *
+     * @param {{reduce:function}} value
      * @return {Boolean}
      */
     return function isReduceable(value) {

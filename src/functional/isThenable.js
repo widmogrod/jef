@@ -4,7 +4,7 @@ define(function() {
     /**
      * Check whenever value is a thenable or not.
      *
-     * @param {*} value
+     * @param {{then:function}} value
      * @return {Boolean}
      */
     return function isThenable(value) {
