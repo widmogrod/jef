@@ -243,16 +243,6 @@ describe('Functional', function(){
             }, 0).should.be.eql(6);
         })
     })
-    describe('#filter()', function(){
-        it('should return filtered array when data and function are passed', function(){
-            var result = f.filter([1, 2, 3], function(item) {
-                return item <= 2;
-            }, 0);
-
-            result.should.be.Array;
-            result.should.be.eql([1, 2]);
-        })
-    })
     describe('#flip()', function(){
         it('should return function that accept arguments in reversed order', function(){
             var funcReturnSecond = function(a,b) {return b};
