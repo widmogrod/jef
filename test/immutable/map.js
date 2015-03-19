@@ -46,21 +46,33 @@ describe('Immutable#Map', function() {
         var l1 = Map.fromObject({
             a: Map.fromObject({
                 b: Map.fromObject({
-                    c: c
+                    c: c,
+                    d: d
                 })
             })
         });
 
-        var l2 = l1.setIn(['a', 'b', 'c'], d);
+        var l2 = l1.setIn(['a', 'b', 'c'], e);
 
         l1.getIn(['a', 'b', 'c']).should.be.exactly(c);
-        l2.getIn(['a', 'b', 'c']).should.be.exactly(d);
+        l2.getIn(['a', 'b', 'c']).should.be.exactly(e);
+
+        // siblings should be the same
+        l1.getIn(['a', 'b', 'd']).should.be.exactly(
+           l2.getIn(['a', 'b', 'd'])
+        );
+        // but parents should change
+        l1.getIn(['a', 'b']).should.not.be.exactly(
+            l2.getIn(['a', 'b'])
+        );
+
     });
     it('should set deep changes Map -> Map', function() {
         var l1 = Map.fromObject({
             a: {
                 b: {
-                    c: 1
+                    c: 1,
+                    d: 3
                 }
             }
         }, true);
@@ -71,5 +83,14 @@ describe('Immutable#Map', function() {
 
         l1.getIn(['a', 'b', 'c']).should.be.exactly(1);
         l2.getIn(['a', 'b', 'c']).should.be.exactly(2);
+
+        // siblings should be the same
+        l1.getIn(['a', 'b', 'd']).should.be.exactly(
+            l2.getIn(['a', 'b', 'd'])
+        );
+        // but parents should change
+        l1.getIn(['a', 'b']).should.not.be.exactly(
+            l2.getIn(['a', 'b'])
+        );
     });
 });

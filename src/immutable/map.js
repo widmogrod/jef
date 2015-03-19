@@ -6,8 +6,6 @@ define([
     './utils/naiveHashFactory',
     './utils/hash',
     '../functional/isTraversable',
-    '../functional/isObject',
-    '../functional/isArray',
     '../functional/reduce',
     '../functional/slice'
 ], function(
@@ -18,8 +16,6 @@ define([
     naiveHashFactory,
     hash,
     isTraversable,
-    isObject,
-    isArray,
     reduce,
     slice
 ) {
