@@ -40,12 +40,12 @@ describe('Immutable#Map', function() {
         l2.get(2).should.be.exactly(l1.get(2));
         l2.get(3).should.be.exactly(l1.get(3));
         l2.get(4).should.be.exactly(l1.get(4));
-    })
+    });
 
-    it('should set deep changes Map -> Map', function() {
-        var l1 = Map.of({
-            a: Map.of({
-                b: Map.of({
+    it('should set changes Map -> Map', function() {
+        var l1 = Map.fromObject({
+            a: Map.fromObject({
+                b: Map.fromObject({
                     c: c
                 })
             })
@@ -55,5 +55,21 @@ describe('Immutable#Map', function() {
 
         l1.getIn(['a', 'b', 'c']).should.be.exactly(c);
         l2.getIn(['a', 'b', 'c']).should.be.exactly(d);
-    })
+    });
+    it('should set deep changes Map -> Map', function() {
+        var l1 = Map.fromObject({
+            a: {
+                b: {
+                    c: 1
+                }
+            }
+        }, true);
+
+        l1.should.be.an.instanceOf(Map);
+
+        var l2 = l1.setIn(['a', 'b', 'c'], 2);
+
+        l1.getIn(['a', 'b', 'c']).should.be.exactly(1);
+        l2.getIn(['a', 'b', 'c']).should.be.exactly(2);
+    });
 });

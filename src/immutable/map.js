@@ -6,6 +6,7 @@ define([
     './utils/naiveHashFactory',
     './utils/hash',
     '../functional/isTraversable',
+    '../functional/isObject',
     '../functional/isArray',
     '../functional/reduce',
     '../functional/slice'
@@ -17,6 +18,7 @@ define([
     naiveHashFactory,
     hash,
     isTraversable,
+    isObject,
     isArray,
     reduce,
     slice
@@ -38,24 +40,11 @@ define([
     /**
      * Ensure everything on start.
      *
-     * @param {Array} data      List of elements to initialize
      * @param {Array} [trie]    Trie data structure
      * @returns {Map}
      * @constructor
      */
-    function Map(data, trie) {
-        trie = trie || [];
-
-        if (isTraversable(data)) {
-            trie = reduce(data, function(trie, value, key) {
-                return setIn(
-                    pathFromKey(key),
-                    trie,
-                    value
-                );
-            }, trie);
-        }
-
+    function Map(trie) {
         this.get = function get(key) {
             return getIn(
                 pathFromKey(key),
@@ -65,7 +54,6 @@ define([
 
         this.set = function set(key, value) {
             return new Map(
-                null,
                 setIn(
                     pathFromKey(key),
                     trie,
@@ -100,17 +88,30 @@ define([
      *
      * Map.of(1, 2, 3) ~ [1, 2, 3]
      * Map.of({a: 1}, {b: 2}) ~ [{a: 1}, {b:2}]
-     * Map.of({a: 1}) ~ {a: 1}
-     * Map.of([{a: 1}]) ~ [{a: 1}]
      *
      * @returns {Map}
      */
-    Map.of = function(data) {
-        return new Map(
-            arguments.length === 1 && isTraversable(data)
-                ? data
-                : slice(arguments)
-        );
+    Map.of = function mapOf() {
+        return Map.fromObject(slice(arguments));
+    };
+
+    /**
+     * Transform object to immutable map
+     *
+     * @param {Object} data
+     * @param {Boolean} [deep]
+     * @returns {Map}
+     */
+    Map.fromObject = function fromObject(data, deep) {
+        return new Map(reduce(data, function(trie, value, key) {
+            return setIn(
+                pathFromKey(key),
+                trie,
+                deep && isTraversable(value) && !(value instanceof Map)
+                    ? fromObject(value, deep)
+                    : value
+            );
+        }, []));
     };
 
     return Map;
