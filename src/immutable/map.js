@@ -97,6 +97,12 @@ define([
 
     /**
      * Transform values to new form.
+     *
+     * Map.of(1, 2, 3) ~ [1, 2, 3]
+     * Map.of({a: 1}, {b: 2}) ~ [{a: 1}, {b:2}]
+     * Map.of({a: 1}) ~ {a: 1}
+     * Map.of([{a: 1}]) ~ [{a: 1}]
+     *
      * @returns {Map}
      */
     Map.of = function(data) {
