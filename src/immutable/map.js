@@ -30,10 +30,10 @@ define([
      *
      * @param {Array} data      List of elements to initialize
      * @param {Array} [trie]    Trie data structure
-     * @returns {List}
+     * @returns {Map}
      * @constructor
      */
-    function List(data, trie) {
+    function Map(data, trie) {
         trie = trie || [];
 
         if (isArray(data)) {
@@ -54,7 +54,7 @@ define([
         };
 
         this.set = function set(key, value) {
-            return new List(
+            return new Map(
                 null,
                 setIn(
                     pathFromKey(key),
@@ -65,15 +65,15 @@ define([
         };
     }
 
-    List.constructor = List;
+    Map.constructor = Map;
 
     /**
      * Transform values to new form.
-     * @returns {List}
+     * @returns {Map}
      */
-    List.of = function() {
-        return new List(slice(arguments));
+    Map.of = function() {
+        return new Map(slice(arguments));
     };
 
-    return List;
+    return Map;
 });

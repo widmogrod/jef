@@ -1,8 +1,8 @@
 require('amdefine/intercept');
 
-var List = require('../../src/immutable/list');
+var Map = require('../../src/immutable/Map');
 
-describe('Immutable#Lisst', function() {
+describe('Immutable#Map', function() {
     var l1, a, b, c, d, e, f;
 
     beforeEach(function() {
@@ -13,7 +13,7 @@ describe('Immutable#Lisst', function() {
         e = {e: 'e'};
         f = {f: 'f'};
 
-        l1 = List.of(a, b, c, d, e);
+        l1 = Map.of(a, b, c, d, e);
     });
 
     it('should retrieve values by its key', function() {
@@ -23,9 +23,9 @@ describe('Immutable#Lisst', function() {
         l1.get(3).should.be.exactly(d);
         l1.get(4).should.be.exactly(e);
     });
-    it('should create copy of a list when setting new value', function() {
+    it('should create copy of a Map when setting new value', function() {
         var l2 = l1.set(1, f);
-        l2.should.be.an.instanceOf(List);
+        l2.should.be.an.instanceOf(Map);
         l2.should.not.be.exactly(l1);
     });
     it('should have exactly the same new value in new copy and old in original', function() {
