@@ -5,6 +5,7 @@ define([
     './utils/hashToPath',
     './utils/naiveHashFactory',
     './utils/hash',
+    '../functional/isTraversable',
     '../functional/isArray',
     '../functional/reduce',
     '../functional/slice'
@@ -15,11 +16,20 @@ define([
     hashToPath,
     naiveHashFactory,
     hash,
+    isTraversable,
     isArray,
     reduce,
     slice
 ) {
     'use strict';
+
+    function head(array) {
+        return array[0];
+    }
+
+    function tail(array) {
+        return array.slice(1);
+    }
 
     function pathFromKey(key) {
         return hashToPath(hash(String(key)).toString(2));
@@ -36,7 +46,7 @@ define([
     function Map(data, trie) {
         trie = trie || [];
 
-        if (isArray(data)) {
+        if (isTraversable(data)) {
             trie = reduce(data, function(trie, value, key) {
                 return setIn(
                     pathFromKey(key),
@@ -67,12 +77,34 @@ define([
 
     Map.constructor = Map;
 
+    Map.prototype.setIn = function(path, value) {
+        var first = head(path),
+            next = tail(path),
+            item = this.get(first);
+
+        return this.set(
+            first,
+            path.length > 1
+                ? item.setIn(next, value)
+                : value
+        );
+    };
+    Map.prototype.getIn = function(path) {
+        return reduce(path, function(map, key) {
+            return map.get(key);
+        }, this);
+    };
+
     /**
      * Transform values to new form.
      * @returns {Map}
      */
-    Map.of = function() {
-        return new Map(slice(arguments));
+    Map.of = function(data) {
+        return new Map(
+            arguments.length === 1 && isTraversable(data)
+                ? data
+                : slice(arguments)
+        );
     };
 
     return Map;

@@ -41,4 +41,19 @@ describe('Immutable#Map', function() {
         l2.get(3).should.be.exactly(l1.get(3));
         l2.get(4).should.be.exactly(l1.get(4));
     })
+
+    it('should set deep changes Map -> Map', function() {
+        var l1 = Map.of({
+            a: Map.of({
+                b: Map.of({
+                    c: c
+                })
+            })
+        });
+
+        var l2 = l1.setIn(['a', 'b', 'c'], d);
+
+        l1.getIn(['a', 'b', 'c']).should.be.exactly(c);
+        l2.getIn(['a', 'b', 'c']).should.be.exactly(d);
+    })
 });
