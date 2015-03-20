@@ -11,7 +11,7 @@ define(['./stream'], function(Stream) {
         function complete(callback) {
             return function tryComplete() {
                 if (--started < 0) {
-                    callback.apply(null, arguments)
+                    callback();
                 }
             }
         }
