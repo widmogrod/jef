@@ -9,6 +9,6 @@ define(function() {
      * @return {Array}
      */
     return function concat(array1, array2) {
-        return array1.concat(array2);
+        return Array.prototype.concat.apply([], arguments);
     };
 });
