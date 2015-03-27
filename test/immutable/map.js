@@ -1,6 +1,6 @@
 require('amdefine/intercept');
 
-var Map = require('../../src/immutable/Map');
+var Map = require('../../src/immutable/map');
 
 describe('Immutable#Map', function() {
     var l1, a, b, c, d, e, f;
