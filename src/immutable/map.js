@@ -2,9 +2,10 @@ define([
     './trie/getIn',
     './trie/hasIn',
     './trie/setIn',
-    './utils/hashToPath',
-    './utils/hash',
+    './utils/pathFromKey',
     '../functional/isTraversable',
+    '../functional/tail',
+    '../functional/head',
     '../functional/reduce',
     '../functional/slice',
     '../functional/each',
@@ -13,27 +14,16 @@ define([
     getIn,
     hasIn,
     setIn,
-    hashToPath,
-    hash,
+    pathFromKey,
     isTraversable,
+    tail,
+    head,
     reduce,
     slice,
     each,
-    keys)
-{
+    keys
+) {
     'use strict';
-
-    function head(array) {
-        return array[0];
-    }
-
-    function tail(array) {
-        return array.slice(1);
-    }
-
-    function pathFromKey(key) {
-        return hashToPath(hash(String(key)).toString(2));
-    }
 
     /**
      * Ensure everything on start.
