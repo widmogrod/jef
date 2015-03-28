@@ -6,7 +6,9 @@ define([
     './utils/hash',
     '../functional/isTraversable',
     '../functional/reduce',
-    '../functional/slice'
+    '../functional/slice',
+    '../functional/each',
+    '../functional/keys'
 ], function(
     getIn,
     hasIn,
@@ -15,8 +17,10 @@ define([
     hash,
     isTraversable,
     reduce,
-    slice
-) {
+    slice,
+    each,
+    keys)
+{
     'use strict';
 
     function head(array) {
@@ -35,10 +39,11 @@ define([
      * Ensure everything on start.
      *
      * @param {Array} [trie]    Trie data structure
+     * @param {Array} [keys]    Keys stored in the trie
      * @returns {Map}
      * @constructor
      */
-    function Map(trie) {
+    function Map(trie, keys) {
         this.get = function get(key) {
             return getIn(
                 pathFromKey(key),
@@ -54,6 +59,10 @@ define([
                     value
                 )
             );
+        };
+
+        this.keys = function() {
+            return keys;
         };
     }
 
@@ -76,6 +85,35 @@ define([
             return map.get(key);
         }, this);
     };
+
+    Map.prototype.forEach = function(fn, thisArg) {
+        each(this.keys(), function(key) {
+            fn.call(thisArg, this.get(key), key);
+        }, this);
+
+        return this;
+    };
+    Map.prototype.filter = function(fn, thisArg) {
+        var value, result = {};
+        each(this.keys(), function(key) {
+            value = this.get(key);
+            if (fn.call(thisArg, value, key)) {
+                result[key] = value;
+            }
+        }, this);
+
+        return Map.fromObject(result);
+    };
+    Map.prototype.map = function(fn, thisArg) {
+        var value, result = {};
+        each(this.keys(), function(key) {
+            value = this.get(key);
+            result[key] = fn.call(thisArg, value, key);
+        }, this);
+
+        return Map.fromObject(result);
+    };
+
 
     /**
      * Transform values to new form.
@@ -105,7 +143,7 @@ define([
                     ? fromObject(value, deep)
                     : value
             );
-        }, []));
+        }, []), keys(data));
     };
 
     return Map;

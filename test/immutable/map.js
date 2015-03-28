@@ -59,7 +59,7 @@ describe('Immutable#Map', function() {
 
         // siblings should be the same
         l1.getIn(['a', 'b', 'd']).should.be.exactly(
-           l2.getIn(['a', 'b', 'd'])
+            l2.getIn(['a', 'b', 'd'])
         );
         // but parents should change
         l1.getIn(['a', 'b']).should.not.be.exactly(
@@ -92,5 +92,62 @@ describe('Immutable#Map', function() {
         l1.getIn(['a', 'b']).should.not.be.exactly(
             l2.getIn(['a', 'b'])
         );
+    });
+
+    describe('.forEach', function() {
+        it('should return instance of Map', function() {
+            var l2 = l1.forEach(function() {
+            });
+            l2.should.be.an.instanceOf(Map);
+        });
+        it('should be able to iterate', function() {
+            var called = 0;
+            l1.forEach(function() {
+                ++called;
+            });
+            called.should.be.exactly(5)
+        });
+    });
+
+    describe('.filter', function() {
+        it('should return instance of Map', function() {
+            var l2 = l1.filter(function(value) {
+                return value !== a;
+            });
+            l2.should.be.an.instanceOf(Map);
+        });
+        it('should be able to filter', function() {
+            var l2 = l1.filter(function(value) {
+                return value === a;
+            });
+
+            var values = [];
+            l2.forEach(function(value) {
+                values.push(value);
+            });
+
+            values.should.be.eql([a])
+        });
+    });
+
+    describe('.map', function() {
+        it('should return instance of Map', function() {
+            var l2 = l1.map(function() {
+                return a;
+            });
+            l2.should.be.an.instanceOf(Map);
+        });
+        it('should be able to map', function() {
+            var l2 = l1.map(function() {
+                return a;
+            });
+
+            var values = [];
+            l2.forEach(function(value) {
+                values.push(value);
+            });
+
+            values.should.be.eql([a, a, a, a, a])
+        });
     });
 });
