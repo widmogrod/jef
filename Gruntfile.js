@@ -26,7 +26,6 @@ module.exports = function(grunt) {
             mathematical: packageFor('mathematical'),
             events: packageFor('events'),
             domdiff: packageFor('domdiff'),
-            reactive: packageFor('reactive'),
             jqueryStream: packageFor('integration/jquery.streamOn', ['stream'], true),
             jqueryDiffHtml: packageFor('integration/jquery.diffhtml', ['diffhtml'], true)
         }
@@ -43,7 +42,6 @@ module.exports = function(grunt) {
         'requirejs:mathematical',
         'requirejs:events',
         'requirejs:domdiff',
-        'requirejs:reactive',
         // Vanilla - integration
         'requirejs:jqueryStream',
         'requirejs:jqueryDiffHtml',
