@@ -1,24 +1,26 @@
 define([
+    './isForEachable',
     './isNumber',
     './keys'
-], function(isNumber, keysF) {
+], function(isForEachable, isNumber, keysF) {
     'use strict';
 
     /**
      * Apply function on each data element
      */
-    return function each(data, func, start, end) {
-        var i,
-            keys = keysF(data),
-            length = keys.length,
-            key;
+    return function each(data, func, thisArg) {
+        var i, keys, length, key;
 
-        isNumber(start) && (i = (start < 0) ? length + start : start);
-        isNumber(end) && (length = (end < 0) ? length + end : end);
+        if (isForEachable(data)) {
+            return data.forEach(func, thisArg);
+        }
+
+        keys = keysF(data);
+        length = keys.length;
 
         for (i = 0; i < length; i++) {
             key = keys[i];
-            func(data[key], key, data);
+            func.call(thisArg, data[key], key, data);
         }
     };
 });
