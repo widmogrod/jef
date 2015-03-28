@@ -9,14 +9,18 @@ define(['./stream'], function(Stream) {
      */
     return function fromArray(array, index, length) {
         index = index || 0;
-        length = length || array.length -1;
-        return new Stream(function(sinkValue) {
-            sinkValue(
+        length = length || array.length - 1;
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            if (length < 0) {
+                return sinkComplete();
+            }
+
+            return sinkValue(
                 array[index],
                 length > index
                     ? fromArray(array, index + 1, length)
                     : Stream.stop
             );
-        })
-    }
+        });
+    };
 });

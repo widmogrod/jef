@@ -8,10 +8,10 @@ define(['./stream'], function(Stream) {
     return function fromCallback(callback) {
         return new Stream(function(sinkValue, sinkError) {
             try {
-                sinkValue(callback(), Stream.stop);
+                return sinkValue(callback(), Stream.stop);
             } catch(e) {
                 sinkError(e);
             }
-        })
-    }
+        });
+    };
 });

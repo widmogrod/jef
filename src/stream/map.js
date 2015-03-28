@@ -8,17 +8,11 @@ define(['./stream'], function(Stream) {
      */
     return function map(stream, fn) {
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
-            stream.on(function(value, next) {
-                sinkValue(
-                    fn(value),
-                    Stream.streamable(next)
-                        ? map(next, fn)
-                        : Stream.stop
+            stream.on(function(value) {
+                return sinkValue(
+                    fn(value)
                 );
-
-                return Stream.stop;
-
             }, sinkError, sinkComplete);
-        })
-    }
+        });
+    };
 });

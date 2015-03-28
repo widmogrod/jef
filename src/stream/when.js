@@ -1,36 +1,25 @@
 define([
     './stream',
-    './noop',
     '../functional/each',
-    '../functional/contains',
-    '../functional/clone'
-], function(Stream, noop, each, contains, clone, undefined) {
+    '../functional/contains'
+], function(Stream, each, contains, undefined) {
     'use strict';
 
     /**
      * @param {Stream[]} streams
-     * @param {Array} [buffer]
      * @return {Stream}
      */
-    return function when(streams, buffer, completed) {
-        buffer = buffer || new Array(streams.length);
-        completed = completed || new Array(streams.length);
+    return function when(streams) {
+        var buffer =  new Array(streams.length),
+            completed = new Array(streams.length);
 
         return new Stream(function whenInit(sinkValue, sinkError, sinkComplete) {
             each(streams, function(stream, index) {
-                Stream.streamable(stream) && stream.on(function(value, next) {
+                stream.on(function(value) {
                     buffer[index] = value;
-                    streams[index] = next;
 
                     if (!contains(buffer, undefined)) {
-                        sinkValue(
-                            clone(buffer),
-                            Stream.streamable(next)
-                                ? when(streams, buffer, completed)
-                                : Stream.stop
-                        );
-
-                        return Stream.stop;
+                        sinkValue(buffer.slice(0));
                     }
 
                 }, sinkError, function() {
@@ -40,8 +29,8 @@ define([
                         // clear reference
                         completed = buffer = streams = null;
                     }
-                })
+                });
             });
-        })
-    }
+        });
+    };
 });

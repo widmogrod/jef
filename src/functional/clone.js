@@ -1,16 +1,7 @@
 define([
-    './each',
     './isObject'
-], function (each, isObject) {
+], function (isObject) {
     'use strict';
-
-    function assign(result) {
-        return function(value, key) {
-            result[key] = isObject(value)
-                ? clone(value)
-                : value;
-        }
-    }
 
     /**
      * Merge two object into one
@@ -20,9 +11,13 @@ define([
      */
     function clone(value) {
         var copy = value.constructor();
-
-        each(value, assign(copy));
-
+        for (var i in value) {
+            if (value.hasOwnProperty(i)) {
+                copy[i] = isObject(value[i])
+                    ? clone(value[i])
+                    : value[i];
+            }
+        }
         return copy;
     }
 

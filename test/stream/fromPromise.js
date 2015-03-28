@@ -26,7 +26,7 @@ describe('Stream.fromPromise', function() {
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
             object.should.be.an.instanceOf(Stream);
-        })
+        });
     });
     describe('#on', function() {
         describe('success', function() {
@@ -36,16 +36,16 @@ describe('Stream.fromPromise', function() {
                     called.should.be.eql(1);
                     // Last arg should be
                     withArgs.should.be.eql(2);
-                    done()
+                    done();
                 }, 0);
             });
             it('should call onComplete', function(done) {
                 object.on(noop, noop, args);
                 setTimeout(function() {
                     called.should.be.eql(1);
-                    done()
+                    done();
                 }, 0);
-            })
+            });
         });
         describe('failure', function() {
             it('should register onError', function(done) {
@@ -56,13 +56,7 @@ describe('Stream.fromPromise', function() {
                 setTimeout(function() {
                     called.should.be.eql(1);
                     withArgs.should.be.eql(e);
-
-                    object.on(noop, args);
-                    setTimeout(function() {
-                        called.should.be.eql(2);
-                        withArgs.should.be.eql(e);
-                        done();
-                    }, 0);
+                    done();
                 }, 0);
             });
         });

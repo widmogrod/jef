@@ -6,22 +6,15 @@ define(['./stream'], function(Stream) {
      * @param {*} lastValue
      * @return {Stream}
      */
-    return function distinct(stream, lastValue) {
+    return function distinct(stream) {
+        var lastValue;
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
-            stream.on(function(value, next) {
+            stream.on(function(value) {
                 if (lastValue !== value) {
-                    sinkValue(
-                        value,
-                        Stream.streamable(next)
-                            ? distinct(next, value)
-                            : Stream.stop
-                    );
-
-                    return Stream.stop;
-                } else if (!Stream.streamable(next)) {
-                    sinkComplete();
+                    lastValue = value;
+                    sinkValue(value);
                 }
-            }, sinkError);
-        })
-    }
+            }, sinkError, sinkComplete);
+        });
+    };
 });

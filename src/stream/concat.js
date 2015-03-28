@@ -1,4 +1,4 @@
-define(['./stream', './both'], function(Stream, both) {
+define(['./stream'], function(Stream) {
     'use strict';
 
     /**
@@ -6,28 +6,29 @@ define(['./stream', './both'], function(Stream, both) {
      * @return {Stream}
      */
     return function concat(stream) {
-        return new Stream(function(sinkValue, sinkError) {
-            stream.on(function(value, next) {
-                if (Stream.streamable(value)) {
-                    concat(both(value, next)).on(function(value, inner) {
-                        sinkValue(
-                            value,
-                            inner
-                        );
+        var started = 0;
 
-                        return Stream.stop;
-                    }, sinkError);
-                } else {
-                    sinkValue(
-                        value,
-                        Stream.streamable(next)
-                            ? concat(next)
-                            : Stream.stop
-                    );
+        function complete(callback) {
+            return function tryComplete() {
+                if (--started < 0) {
+                    callback();
                 }
+            }
+        }
 
-                return Stream.stop;
-            }, sinkError);
-        })
-    }
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            var tryComplete = complete(sinkComplete);
+
+            stream.on(function(value) {
+                if (Stream.streamable(value)) {
+                    ++started;
+                    value.on(function(val) {
+                        sinkValue(val);
+                    }, sinkError, tryComplete);
+                } else {
+                    sinkValue(value);
+                }
+            }, sinkError, tryComplete);
+        });
+    };
 });

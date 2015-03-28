@@ -12,7 +12,6 @@ module.exports = function(grunt) {
                 files: {
                     'dist/functional.min.js': ['dist/functional.min.js'],
                     'dist/stream.min.js': ['dist/stream.min.js'],
-                    'dist/stream2.min.js': ['dist/stream2.min.js'],
                     'dist/mathematical.min.js': ['dist/mathematical.min.js'],
                     'dist/events.min.js': ['dist/events.min.js'],
                     'dist/domdiff.min.js': ['dist/domdiff.min.js'],
@@ -24,7 +23,6 @@ module.exports = function(grunt) {
         requirejs: {
             functional: packageFor('functional'),
             stream: packageFor('stream'),
-            stream2: packageFor('stream2'),
             mathematical: packageFor('mathematical'),
             events: packageFor('events'),
             domdiff: packageFor('domdiff'),
@@ -42,7 +40,6 @@ module.exports = function(grunt) {
         // Vanilla - main packages
         'requirejs:functional',
         'requirejs:stream',
-        'requirejs:stream2',
         'requirejs:mathematical',
         'requirejs:events',
         'requirejs:domdiff',

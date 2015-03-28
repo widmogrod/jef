@@ -1,7 +1,6 @@
-
 define([
     './isNumber'
-], function (isNumber) {
+], function(isNumber) {
     'use strict';
 
     /**
@@ -18,7 +17,7 @@ define([
 
         for (; i < length; i++) {
             key = keys[i];
-            func(data[key], key);
+            func(data[key], key, data);
         }
-    }
+    };
 });

@@ -1,76 +1,43 @@
+/*globals it,describe,beforeEach*/
 require('amdefine/intercept');
 
+// Stream implementations
 var Stream = require('../../src/stream/stream');
-var fromArray = require('../../src/stream/fromArray');
+var PushStream = require('../../src/stream/push-stream');
+// Test utils
+var Stubs = require('../../src/stream/test/stubs');
+var StreamTestProxy = require('../../src/stream/test/stream-proxy');
+var PushStreamTestProxy = require('../../src/stream/test/push-stream-proxy');
+// Helper streams
 var noop = require('../../src/stream/noop');
-var timeout = require('../../src/stream/timeout');
-var noopf = require('../../src/functional/noop');
-var object, withArgs, called;
-
-var args = function(value) {
-    called++;
-    withArgs = value;
-};
-var argsStop = function(value) {
-    called++;
-    withArgs = value;
-    return Stream.stop;
-};
 
 describe('Stream.noop', function() {
-    beforeEach(function() {
-        object = noop();
-        withArgs = [];
-        called = 0;
-    });
+    var object;
 
     describe('#construction', function() {
         it('should construct object instance of Stream', function() {
-            object.should.be.an.instanceOf(Stream);
-        })
+            noop().should.be.an.instanceOf(Stream);
+        });
     });
     describe('#on', function() {
+        beforeEach(function() {
+            object = noop();
+            object = new StreamTestProxy(object);
+        });
+
         describe('success', function() {
+            it('should call onComplete', function() {
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+                object.called.onComplete.should.be.eql(1);
+            });
             it('should register onValue', function() {
-                object.on(args);
-                called.should.be.eql(0);
+                object.on(Stubs.onValue, Stubs.onError, Stubs.onComplete);
+                object.called.onValue.should.be.eql(0);
             });
             it('should register onValue and stop', function() {
-                object.on(argsStop);
-                called.should.be.eql(0);
+                object.on(Stubs.onValueAndStop, Stubs.onError, Stubs.onComplete);
+                object.called.onValue.should.be.eql(0);
             });
-            it('should call onComplete', function() {
-                object.on(noopf, noopf, args);
-                called.should.be.eql(1);
-            })
-        });
-        describe('asynchronously', function() {
-            beforeEach(function() {
-                object = noop();
-                withArgs = [];
-                called = 0;
-            });
-            it('should register onValue', function(done) {
-                object.on(args);
-                setTimeout(function() {
-                    called.should.be.eql(0);
-                    done();
-                }, 20);
-            });
-            it('should register onValue and stop', function(done) {
-                object.on(argsStop);
-                setTimeout(function() {
-                    called.should.be.eql(0);
-                    done()
-                }, 20);
-            });
-            it('should call onComplete', function(done) {
-                object.on(noopf, noopf, args);
-                setTimeout(function() {
-                    called.should.be.eql(1);
-                    done()
-                }, 20);
-            })
         });
     });
 });

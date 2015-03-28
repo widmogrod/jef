@@ -7,23 +7,30 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function debounce(stream, wait) {
-        return new Stream(function(sinkValue, sinkError) {
-            var timeout;
-            stream.on(function(value, next) {
+        return new Stream(function(sinkValue, sinkError, sinkComplete) {
+            var timeout, completeInterval;
+            stream.on(function(value) {
                 if (timeout) {
                     clearTimeout(timeout);
                 }
 
                 timeout = setTimeout(function() {
-                    sinkValue(
-                        value,
-                        Stream.streamable(next)
-                            ? debounce(next, wait)
-                            : Stream.stop
-                    )
-                }, wait)
+                    sinkValue(value);
+                }, wait);
 
-            }, sinkError);
-        })
-    }
+            }, sinkError, function() {
+                if (!timeout) {
+                    return sinkComplete();
+                }
+
+                completeInterval = setInterval(function() {
+                    if (!timeout) {
+                        clearInterval(completeInterval);
+                        sinkComplete();
+                    }
+                }, wait);
+
+            });
+        });
+    };
 });

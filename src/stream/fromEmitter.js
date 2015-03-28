@@ -1,4 +1,4 @@
-define(['./stream'], function(Stream) {
+define(['./push-stream', '../functional/noop'], function(PushStream, noop) {
     'use strict';
 
     /**
@@ -10,18 +10,20 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function fromEmitter(eventEmitter, selector, event) {
-        var __sinkValue, stream;
+        var stream;
+
+        stream = new PushStream();
 
         function onEmitted(e) {
-            __sinkValue && __sinkValue(e, stream)
+            stream.push(e);
         }
-
-        stream = new Stream(function(sinkValue) {
-            __sinkValue = sinkValue;
-        });
 
         eventEmitter.on(event, selector, onEmitted);
 
+        stream.on(noop, noop, function() {
+            eventEmitter.off(event, selector, onEmitted);
+        });
+
         return stream;
-    }
+    };
 });

@@ -1,4 +1,4 @@
-define(['./stream'], function(Stream) {
+define(['./stream'], function (Stream) {
     'use strict';
 
     /**
@@ -7,26 +7,27 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function timeout(stream, wait) {
+        var called = 0, completeInterval;
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
-            var id;
-            stream.on(function(value, next) {
-                id = setTimeout(function() {
-                    sinkValue(
-                        value,
-                        Stream.streamable(next)
-                            ? timeout(next, wait)
-                            : Stream.stop
-                    );
-                }, wait | 0);
+            stream.on(function(value) {
+                called++;
+                setTimeout(function() {
+                    sinkValue(value);
+                    --called;
+                }, wait);
+            }, sinkError, function() {
+                if (!called) {
+                    return sinkComplete();
+                }
 
-                return Stream.stop;
-            }, function(e, next) {
-                id && clearTimeout(id);
-                sinkError(e, next);
-            }, function() {
-                id && clearTimeout(id);
-                sinkComplete();
+                // Wait for complete
+                completeInterval = setInterval(function() {
+                    if (!called) {
+                        clearInterval(completeInterval);
+                        sinkComplete();
+                    }
+                }, wait);
             });
-        })
-    }
+        });
+    };
 });

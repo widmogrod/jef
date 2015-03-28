@@ -9,30 +9,15 @@ define(['./stream'], function(Stream) {
      * @return {Stream}
      */
     return function filter(stream, fn) {
-        return new Stream(function(sinkValue, sinkError, sinkComplete) {
-            stream.on(function(value, next) {
+        return new Stream(function (sinkValue, sinkError, sinkComplete) {
+            stream.on(function (value) {
                 if (fn(value)) {
-                    sinkValue(
-                        value,
-                        Stream.streamable(next)
-                            ? filter(next, fn)
-                            : Stream.stop
+                    return sinkValue(
+                        value
                     );
-                } else if (Stream.streamable(next)) {
-                    filter(next, fn).on(function(value, inner) {
-                        sinkValue(
-                            value,
-                            inner
-                        );
-
-                        return Stream.stop;
-
-                    }, sinkError, sinkComplete)
                 }
 
-                return Stream.stop;
-
             }, sinkError, sinkComplete);
-        })
-    }
+        });
+    };
 });
