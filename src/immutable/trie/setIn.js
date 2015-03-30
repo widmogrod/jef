@@ -1,18 +1,10 @@
 define([
     '../../functional/reduce',
-    '../../functional/isDefined'
-], function(reduce, isDefined, undefined) {
+    '../../functional/isDefined',
+    './createTrieNodes',
+    './createTrieNode'
+], function(reduce, isDefined, createTrieNodes, createTrieNode, undefined) {
     'use strict';
-
-    var VECTOR_LENGTH = 4;
-
-    function createTrieNodes() {
-        return new Array(VECTOR_LENGTH);
-    }
-
-    function createTrieNode(value) {
-        return {v: value, nodes: createTrieNodes()};
-    }
 
     return function setIn(path, inTrie, value) {
         return reduce(path, function(base, node, level) {
@@ -37,7 +29,7 @@ define([
             // Copy by reference values from original trie level to new one,
             // except node that is updated/created right now
             if (hasNodes) {
-                for (i = 0; i < VECTOR_LENGTH; i++) {
+                for (i = 0; i < 4; i++) {
                     if ((!isLast || i !== node)
                         && isDefined(nodes[i]) // isDefines allows to keep sparse arrays sparse
                     ) {
@@ -51,7 +43,7 @@ define([
             if (hasNode) {
                 // When trie has more levels deep
                 // Then point to them by reference
-                for (i = 0; i < VECTOR_LENGTH; i++) {
+                for (i = 0; i < 4; i++) {
                     if (isDefined(nodes[node].nodes[i]) ) {
                         g[node].nodes[i] = nodes[node].nodes[i];
                     }
