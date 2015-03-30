@@ -93,6 +93,14 @@ describe('Immutable#Map', function() {
             l2.getIn(['a', 'b'])
         );
     });
+    it('should work with bigger keys', function() {
+        var l1 = Map.fromObject({
+            abdef: a
+        });
+
+        l1.should.be.an.instanceOf(Map);
+        l1.get('abdef').should.be.exactly(a);
+    });
 
     describe('.forEach', function() {
         it('should return instance of Map', function() {
