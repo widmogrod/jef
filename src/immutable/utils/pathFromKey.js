@@ -6,6 +6,6 @@ define(['./hashToPath', './hash'], function(hashToPath, hash) {
      * @return {Array}
      */
     return function pathFromKey(key) {
-        return hashToPath(hash(String(key)).toString(2));
+        return hashToPath(hash(String(key)));
     };
 });
