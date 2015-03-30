@@ -4,7 +4,7 @@ define([
     './trie/setIn',
     './trie/deleteIn',
     './utils/pathFromKey',
-    '../functional/isTraversable',
+    '../functional/isObject',
     '../functional/tail',
     '../functional/head',
     '../functional/reduce',
@@ -17,7 +17,7 @@ define([
     setIn,
     deleteIn,
     pathFromKey,
-    isTraversable,
+    isObject,
     tail,
     head,
     reduce,
@@ -147,7 +147,7 @@ define([
             return setIn(
                 pathFromKey(key),
                 trie,
-                deep && isTraversable(value) && !(value instanceof Map)
+                deep && isObject(value) && !(value instanceof Map)
                     ? fromObject(value, deep)
                     : value
             );
