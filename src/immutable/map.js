@@ -2,6 +2,7 @@ define([
     './trie/getIn',
     './trie/hasIn',
     './trie/setIn',
+    './trie/deleteIn',
     './utils/pathFromKey',
     '../functional/isTraversable',
     '../functional/tail',
@@ -14,6 +15,7 @@ define([
     getIn,
     hasIn,
     setIn,
+    deleteIn,
     pathFromKey,
     isTraversable,
     tail,
@@ -34,14 +36,21 @@ define([
      * @constructor
      */
     function Map(trie, keys) {
-        this.get = function get(key) {
+        this.has = function has_(key) {
+            return hasIn(
+                pathFromKey(key),
+                trie
+            );
+        };
+
+        this.get = function get_(key) {
             return getIn(
                 pathFromKey(key),
                 trie
             );
         };
 
-        this.set = function set(key, value) {
+        this.set = function set_(key, value) {
             return new Map(
                 setIn(
                     pathFromKey(key),
@@ -51,7 +60,16 @@ define([
             );
         };
 
-        this.keys = function() {
+        this.delete = function delete_(key) {
+            return new Map(
+                deleteIn(
+                    pathFromKey(key),
+                    trie
+                )
+            );
+        };
+
+        this.keys = function keys_() {
             return keys;
         };
     }

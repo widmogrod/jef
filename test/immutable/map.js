@@ -42,6 +42,27 @@ describe('Immutable#Map', function() {
         l2.get(4).should.be.exactly(l1.get(4));
     });
 
+    it('should create copy of a Map when deleting key', function() {
+        var l2 = l1.delete(0);
+        l2.should.be.an.instanceOf(Map);
+        l2.should.not.be.exactly(l1);
+    });
+    it('should not have deleted value', function() {
+        var l2 = l1.delete(0);
+
+        l1.has(0).should.be.true;
+        l2.has(0).should.be.false;
+        l1.get(0).should.be.exactly(a);
+    });
+    it('should have exactly the same values as in original except deleted one', function() {
+        var l2 = l1.delete(0);
+
+        l2.get(1).should.be.exactly(l1.get(1));
+        l2.get(2).should.be.exactly(l1.get(2));
+        l2.get(3).should.be.exactly(l1.get(3));
+        l2.get(4).should.be.exactly(l1.get(4));
+    });
+
     it('should set changes Map -> Map', function() {
         var l1 = Map.fromObject({
             a: Map.fromObject({
