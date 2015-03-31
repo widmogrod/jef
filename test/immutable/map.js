@@ -179,4 +179,26 @@ describe('Immutable#Map', function() {
             values.should.be.eql([a, a, a, a, a])
         });
     });
+
+    describe('.keys', function() {
+        it('should return array', function() {
+            l1.keys().should.be.array;
+            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
+        });
+        it('should update keys when update value', function() {
+            var l2 = l1.set(0, f);
+            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
+            l2.keys().should.be.eql([0, 4, 1, 2, 3]);
+        });
+        it('should update keys when set new value', function() {
+            var l2 = l1.set('f', f);
+            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
+            l2.keys().should.be.eql([0, 4, 1, 2, 'f', 3]);
+        });
+        it('should update keys when delete value', function() {
+            var l2 = l1.delete(0);
+            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
+            l2.keys().should.be.eql([4, 1, 2, 3]);
+        });
+    });
 });

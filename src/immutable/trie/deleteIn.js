@@ -8,6 +8,7 @@ define([
         return updateIn(path, inTrie, function(node, options) {
             if (options.isLast) {
                 node.v = undefined;
+                node.k = undefined;
             } else if (options.hasNode) {
                 node = copyNodes(options.original, node);
             }

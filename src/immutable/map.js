@@ -4,26 +4,26 @@ define([
     './trie/setIn',
     './trie/deleteIn',
     './utils/pathFromKey',
+    './utils/keys',
     '../functional/isObject',
     '../functional/tail',
     '../functional/head',
     '../functional/reduce',
     '../functional/slice',
-    '../functional/each',
-    '../functional/keys'
+    '../functional/each'
 ], function(
     getIn,
     hasIn,
     setIn,
     deleteIn,
     pathFromKey,
+    keys,
     isObject,
     tail,
     head,
     reduce,
     slice,
-    each,
-    keys
+    each
 ) {
     'use strict';
 
@@ -31,11 +31,10 @@ define([
      * Ensure everything on start.
      *
      * @param {Array} [trie]    Trie data structure
-     * @param {Array} [keys]    Keys stored in the trie
      * @returns {Map}
      * @constructor
      */
-    function Map(trie, keys) {
+    function Map(trie) {
         this.has = function has_(key) {
             return hasIn(
                 pathFromKey(key),
@@ -55,6 +54,7 @@ define([
                 setIn(
                     pathFromKey(key),
                     trie,
+                    key,
                     value
                 )
             );
@@ -70,7 +70,7 @@ define([
         };
 
         this.keys = function keys_() {
-            return keys;
+            return keys(trie);
         };
     }
 
@@ -147,11 +147,12 @@ define([
             return setIn(
                 pathFromKey(key),
                 trie,
+                key,
                 deep && isObject(value) && !(value instanceof Map)
                     ? fromObject(value, deep)
                     : value
             );
-        }, []), keys(data));
+        }, []));
     };
 
     return Map;
