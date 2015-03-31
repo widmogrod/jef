@@ -1,7 +1,7 @@
 define([
     './updateIn',
-    './copyNodes'
-], function(updateIn, copyNodes, undefined) {
+    './copyArray'
+], function(updateIn, copyArray, undefined) {
     'use strict';
 
     return function deleteIn(path, inTrie) {
@@ -10,7 +10,7 @@ define([
                 node.v = undefined;
                 node.k = undefined;
             } else if (options.hasNode) {
-                node = copyNodes(options.original, node);
+                node.nodes = copyArray(options.original.nodes, node.nodes);
             }
 
             return node;
