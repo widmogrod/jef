@@ -10,6 +10,7 @@ describe('Immutable#hashToPath', function() {
         hashToPath(parseInt('01', 2)).should.be.eql([1]);
         hashToPath(parseInt('10', 2)).should.be.eql([2]);
         hashToPath(parseInt('11', 2)).should.be.eql([3]);
-        hashToPath(parseInt('1011', 2)).should.be.eql([3, 2]);
+        hashToPath(parseInt('1011', 2)).should.be.eql([11]);
+        hashToPath(parseInt('11' + '11011' + '11011', 2)).should.be.eql([27, 27, 3]);
     });
 });
