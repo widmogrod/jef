@@ -13,7 +13,7 @@ describe('Immutable#Map', function() {
         e = {e: 'e'};
         f = {f: 'f'};
 
-        l1 = Map.of(a, b, c, d, e);
+        l1 = Map.fromNative([a, b, c, d, e]);
     });
 
     it('should retrieve values by its key', function() {
@@ -64,9 +64,9 @@ describe('Immutable#Map', function() {
     });
 
     it('should set changes Map -> Map', function() {
-        var l1 = Map.fromObject({
-            a: Map.fromObject({
-                b: Map.fromObject({
+        var l1 = Map.fromNative({
+            a: Map.fromNative({
+                b: Map.fromNative({
                     c: c,
                     d: d
                 })
@@ -89,7 +89,7 @@ describe('Immutable#Map', function() {
 
     });
     it('should set deep changes Map -> Map', function() {
-        var l1 = Map.fromObject({
+        var l1 = Map.fromNative({
             a: {
                 b: {
                     c: 1,
@@ -115,7 +115,7 @@ describe('Immutable#Map', function() {
         );
     });
     it('should work with bigger keys', function() {
-        var l1 = Map.fromObject({
+        var l1 = Map.fromNative({
             abdef: a
         });
 
@@ -183,22 +183,22 @@ describe('Immutable#Map', function() {
     describe('.keys', function() {
         it('should return array', function() {
             l1.keys().should.be.array;
-            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
+            l1.keys().should.be.eql([0, 1, 2, 3, 4]);
         });
         it('should update keys when update value', function() {
             var l2 = l1.set(0, f);
-            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
-            l2.keys().should.be.eql([0, 4, 1, 2, 3]);
+            l1.keys().should.be.eql([0, 1, 2, 3, 4]);
+            l2.keys().should.be.eql([0, 1, 2, 3, 4]);
         });
         it('should update keys when set new value', function() {
             var l2 = l1.set('f', f);
-            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
-            l2.keys().should.be.eql([0, 4, 1, 2, 'f', 3]);
+            l1.keys().should.be.eql([0, 1, 2, 3, 4]);
+            l2.keys().should.be.eql(['f', 0, 1, 2, 3, 4]);
         });
         it('should update keys when delete value', function() {
             var l2 = l1.delete(0);
-            l1.keys().should.be.eql([0, 4, 1, 2, 3]);
-            l2.keys().should.be.eql([4, 1, 2, 3]);
+            l1.keys().should.be.eql([0, 1, 2, 3, 4]);
+            l2.keys().should.be.eql([1, 2, 3, 4]);
         });
     });
 });

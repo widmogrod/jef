@@ -2,6 +2,6 @@ define(function() {
     'use strict';
 
     return function createTrieNodes() {
-        return new Array(4);
+        return new Array(31);
     };
 });

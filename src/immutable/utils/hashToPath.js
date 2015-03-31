@@ -14,15 +14,15 @@ define(function() {
             return [0];
         }
 
-        for (var result = [], shifted = hash; shifted; shifted >>>= 2) {
+        for (var result = [], shifted = hash; shifted; shifted >>>= 5) {
             // Isolate first two bits
-            // Isolated value will be between 0 and 3
+            // Isolated value will be between 0 and 31
             // which is what we want
-            //   11110
-            // & 00011      // 3
-            //   -----
-            //   00010
-            result.push(shifted & 3);
+            //   0101 1011 1110
+            // & 0000 0001 1111      // 31
+            //   --------------
+            //   0000 0001 1110
+            result.push(shifted & 31);
         }
 
         return result;

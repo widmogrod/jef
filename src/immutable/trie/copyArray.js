@@ -9,7 +9,7 @@ define(['../../functional/isDefined'], function(isDefined) {
      * @returns {Array}
      */
     return function copyArray(from, to) {
-        for (var i = 0; i < 4; i++) {
+        for (var i = 0, len = from.length; i < len; i++) {
             // isDefines allows to keep sparse arrays sparse
             if (isDefined(from[i]) ) {
                 to[i] = from[i];
