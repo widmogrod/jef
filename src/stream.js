@@ -12,6 +12,7 @@ define([
     './stream/distinct',
     './stream/debounce',
     './stream/when',
+    './stream/zip',
     './stream/until',
     './stream/noop',
     './stream/log',
@@ -28,7 +29,7 @@ define([
     './stream/push-stream',
     './stream/push-consume',
     './stream/dom/toElementProp',
-    './stream/domdiff/domDiffWith',
+    './stream/domdiff/domDiffWith'
 ], function(
     Stream,
     map,
@@ -43,6 +44,7 @@ define([
     distinct,
     debounce,
     when,
+    zip,
     until,
     noop,
     log,
@@ -150,6 +152,7 @@ define([
     Stream.fromValue = fromValue;
     Stream.both = both;
     Stream.when = when;
+    Stream.zip = zip;
     Stream.noop = noop;
     Stream.merge = merge;
     Stream.timeout = timeout;

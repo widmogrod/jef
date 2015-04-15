@@ -1,20 +1,12 @@
-define(['./map'], function (map) {
+define(['./map', '../functional/pluck'], function (map, fpluck) {
     'use strict';
 
     /**
      * @param {Stream} stream
+     * @param {String} pattern
      * @return {Stream}
      */
     return function pluck(stream, pattern) {
-        var path = pattern.split('.'), undefined;
-        return map(stream, function(value) {
-            return path.reduce(function(base, key) {
-                return undefined === base
-                    ? base
-                    : (base.hasOwnProperty(key)
-                        ? base[key]
-                        : undefined);
-            }, value);
-        });
+        return map(stream, fpluck(pattern))
     };
 });
