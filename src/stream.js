@@ -1,4 +1,6 @@
 define([
+    './functional/isArray',
+    './functional/slice',
     './stream/stream',
     './stream/map',
     './stream/filter',
@@ -31,6 +33,10 @@ define([
     './stream/dom/toElementProp',
     './stream/domdiff/domDiffWith'
 ], function(
+    // functional
+    isArray,
+    slice,
+    // streams
     Stream,
     map,
     filter,
@@ -151,8 +157,18 @@ define([
     Stream.fromElement = fromElement;
     Stream.fromValue = fromValue;
     Stream.both = both;
-    Stream.when = when;
-    Stream.zip = zip;
+    Stream.when = function(streams) {
+        return when(isArray(streams)
+            ? streams
+            : slice(arguments)
+        );
+    };
+    Stream.zip = function(streams) {
+        return zip(isArray(streams)
+                ? streams
+                : slice(arguments)
+        );
+    };
     Stream.noop = noop;
     Stream.merge = merge;
     Stream.timeout = timeout;
