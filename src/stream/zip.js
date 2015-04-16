@@ -11,8 +11,9 @@ define([
      */
     return function zip(streams) {
         var len = streams.length,
-            buffer =  new Array(len),
-            completed = false;
+            buffer = [],
+            maxLevel = null,
+            completed = new Array(len);
 
         return new Stream(function(sinkValue, sinkError, sinkComplete) {
             each(streams, function(stream, index) {
@@ -20,22 +21,25 @@ define([
                 stream.on(function(value) {
                     var current = next++;
 
-                    if (false !== completed) {
-                        return sinkComplete();
+                    if (null !== maxLevel && current > maxLevel) {
+                        return Stream.stop;
                     }
 
-                    buffer[index] = buffer[index] || new Array(len);
-                    buffer[index][current] = value;
+                    buffer[current] = buffer[current] || new Array(len);
+                    buffer[current][index] = value;
 
-                    if (!contains(buffer[index][current], undefined)) {
-                        current = buffer[index];
-                        delete buffer[index];
-                        sinkValue(current);
+                    if (!contains(buffer[current], undefined)) {
+                        sinkValue(buffer[current]);
+                        delete buffer[current];
                     }
                 }, sinkError, function() {
-                    sinkComplete();
-                    // clear reference
-                    completed = buffer = streams = next = null;
+                    completed[index] = next;
+                    maxLevel = Math.min.apply(null, completed);
+                    if (!contains(completed, undefined)) {
+                        sinkComplete();
+                        // clear reference
+                        completed = buffer = streams = next = len = maxLevel = null;
+                    }
                 });
             });
         });
