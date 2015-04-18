@@ -129,7 +129,6 @@ define([
         }
     }
 
-    Stream.constructor = Stream;
     Stream.prototype.constructor = Stream;
 
     /**

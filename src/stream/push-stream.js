@@ -35,8 +35,8 @@ define([
         };
     }
 
-    PushStream.constructor = PushStream;
     PushStream.prototype = Object.create(Stream.prototype);
+    PushStream.prototype.constructor = PushStream;
 
     return PushStream;
 });
