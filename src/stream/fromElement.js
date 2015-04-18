@@ -1,4 +1,4 @@
-define(['../stream'], function (Stream) {
+define(['./stream'], function (Stream) {
     'use strict';
 
     /**
