@@ -39,11 +39,7 @@ define([
             }
 
             if (isDefined(lastValue) && isFunction(onValue)) {
-                //try {
-                    return onValue(lastValue);
-                //} catch (e) {
-                //    return onError(e, lastNext);
-                //}
+                return onValue(lastValue);
             }
         });
     };
