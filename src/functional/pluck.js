@@ -1,4 +1,4 @@
-define(['./curryN'], function(curryN) {
+define(['./curryN', './isDefined'], function(curryN, isDefined) {
     'use strict';
 
     return curryN(2, function pluck(pattern, data, defaults) {
@@ -6,7 +6,7 @@ define(['./curryN'], function(curryN) {
         return path.reduce(function(base, key) {
             return base === defaults
                 ? base
-                : (base.hasOwnProperty(key) ? base[key] : defaults);
+                : (base && isDefined(base[key]) ? base[key] : defaults);
         }, data);
     });
 });

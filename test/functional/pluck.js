@@ -18,4 +18,7 @@ describe('Functional#pluck', function() {
     it('should return default value is cant be found', function() {
         pluck('99999', ['a', ['b', ['c']]], 'fallback').should.be.eql('fallback');
     });
+    it('should return inherited properties', function() {
+        pluck('toString', {}).should.be.type('function');
+    });
 });
