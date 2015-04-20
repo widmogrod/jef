@@ -4,10 +4,10 @@ define([
     '../../functional/isArray',
     '../../domdiff/diff',
     '../../domdiff/applyDiff'
-], function (
+], function(
     el,
     selector,
-    isArray ,
+    isArray,
     domDiff,
     applyDiff
 ) {
@@ -21,29 +21,35 @@ define([
      */
     return function domDiffWith(stream, elementSelector) {
         return stream.on(function(value) {
-            var found = selector(elementSelector);
+            var element, clone, candidate, i,
+                found = selector(elementSelector);
+
             if (!found.length) {
                 throw new Error(
-                    'domDiffWith: Can\'t match any element ' +
-                    'for given selector: "'+ elementSelector +'"'
+                    'stream/domDiffWith: Can\'t match any element ' +
+                    'for given selector: "' + elementSelector + '"'
                 );
             }
 
-            var element = found.get(0);
-            var clone = element.cloneNode(false);
-            var candidate = el(
-                clone,
-                isArray(value) ? value : [value]
-            );
+            for (i = 0; i < found.length; i++) {
+                element = found.get(i);
+                clone = element.cloneNode(false);
+                candidate = el(
+                    clone,
+                    isArray(value) ? value : [value]
+                );
 
-            applyDiff(
-                element,
-                candidate,
-                domDiff(
+                applyDiff(
                     element,
-                    candidate
-                )
-            );
+                    found.length === 1
+                        ? candidate
+                        : candidate.cloneNode(true),
+                    domDiff(
+                        element,
+                        candidate
+                    )
+                );
+            }
 
             clone = null;
             found = null;
