@@ -10,7 +10,7 @@ define([
      */
     return function toElementProp(stream, elementSelector, prop) {
         return stream.on(function (value) {
-            var found = selector(elementSelector);
+            var i, found = selector(elementSelector);
 
             if (!found.length) {
                 throw new Error(
@@ -19,7 +19,10 @@ define([
                 );
             }
 
-            found.get(0)[prop] = value;
+            for (i = 0; i < found.length; i++) {
+                found.get(i)[prop] = value;
+            }
+
             found = null;
         });
     };
